@@ -7,6 +7,7 @@ on:
       - main
       - phase-0-1-foundation
       - phase-3-auth
+      - phase-4-onboarding
 
 jobs:
   web:
