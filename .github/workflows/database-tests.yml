@@ -7,6 +7,7 @@ on:
     branches:
       - main
       - phase-0-1-foundation
+      - phase-3-auth
 
 jobs:
   database:
@@ -23,11 +24,30 @@ jobs:
         with:
           version: 2.117.0
 
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Show Supabase CLI version
         run: supabase --version
 
       - name: Start local Supabase stack
         run: supabase start
+
+      - name: Export local Supabase environment
+        shell: bash
+        run: |
+          supabase status -o env > supabase.env
+          source supabase.env
+          echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$ANON_KEY" >> "$GITHUB_ENV"
+          echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY" >> "$GITHUB_ENV"
+          echo "APP_BASE_URL=http://127.0.0.1:3000" >> "$GITHUB_ENV"
 
       - name: Recreate database from migrations and seed
         run: supabase db reset
@@ -37,3 +57,22 @@ jobs:
 
       - name: Run Supabase database advisors
         run: supabase db advisors --local --type all --level warn --fail-on error
+
+      - name: Build app for auth integration
+        run: npm run build
+
+      - name: Run auth integration tests
+        shell: bash
+        run: |
+          npm run start -- -p 3000 > next-auth.log 2>&1 &
+          NEXT_PID=$!
+          trap 'kill "$NEXT_PID"' EXIT
+          for attempt in {1..60}; do
+            if curl -sf http://127.0.0.1:3000/login > /dev/null; then
+              npm run test:auth:integration
+              exit 0
+            fi
+            sleep 1
+          done
+          cat next-auth.log
+          exit 1
