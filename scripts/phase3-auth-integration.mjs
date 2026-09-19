@@ -243,6 +243,41 @@ async function run() {
   });
   assert.ok(malformedSignup.error, "malformed email rejects signup");
 
+  const confirmationLink = await expectNoSupabaseError(
+    await service.auth.admin.generateLink({
+      type: "signup",
+      email: `confirm-${suffix}@${allowedDomain}`,
+      password,
+      options: {
+        redirectTo: appUrl("/auth/confirm"),
+      },
+    }),
+    "generate signup confirmation link",
+  );
+  assert.ok(
+    confirmationLink.properties?.hashed_token,
+    "signup confirmation link includes a token hash",
+  );
+  assert.ok(confirmationLink.user?.id, "signup confirmation user exists");
+  usersToDelete.push(confirmationLink.user.id);
+
+  const confirmationCookies = new Map();
+  assertRedirect(
+    await getPath(
+      `/auth/confirm?token_hash=${encodeURIComponent(
+        confirmationLink.properties.hashed_token,
+      )}&type=signup`,
+      confirmationCookies,
+    ),
+    "/account/setup",
+    "email confirmation route",
+  );
+  assert.equal(
+    (await getPath("/account/setup", confirmationCookies)).status,
+    200,
+    "confirmed user can access onboarding setup placeholder",
+  );
+
   assertRedirect(await getPath("/app"), "/login", "anonymous protected app");
   assertRedirect(
     await getPath("/account/setup"),
