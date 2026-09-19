@@ -13,6 +13,7 @@ const serviceRoleKey =
   process.env.SERVICE_ROLE_KEY ??
   "";
 const appBaseUrl = process.env.APP_BASE_URL ?? "http://127.0.0.1:3000";
+const mailpitUrl = process.env.MAILPIT_URL ?? "http://127.0.0.1:54324";
 
 assert.ok(supabaseUrl, "NEXT_PUBLIC_SUPABASE_URL or API_URL is required");
 assert.ok(
@@ -60,6 +61,147 @@ async function cleanup() {
 
 function appUrl(pathname) {
   return new URL(pathname, appBaseUrl).toString();
+}
+
+function mailpitApi(pathname) {
+  return new URL(pathname, mailpitUrl).toString();
+}
+
+async function readJson(response, label) {
+  if (!response.ok) {
+    throw new Error(`${label}: expected 2xx, got ${response.status}`);
+  }
+
+  return response.json();
+}
+
+async function clearMailpitMessages() {
+  const response = await fetch(mailpitApi("/api/v1/messages"), {
+    method: "DELETE",
+  });
+
+  if (!response.ok && response.status !== 404) {
+    throw new Error(
+      `clear Mailpit messages: expected 2xx/404, got ${response.status}`,
+    );
+  }
+}
+
+function collectMailAddresses(value) {
+  if (!value) {
+    return [];
+  }
+
+  if (typeof value === "string") {
+    return [value];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap(collectMailAddresses);
+  }
+
+  if (typeof value === "object") {
+    const mailbox = value.Mailbox ?? value.mailbox;
+    const domain = value.Domain ?? value.domain;
+
+    return [
+      value.Address,
+      value.address,
+      value.Email,
+      value.email,
+      mailbox && domain ? `${mailbox}@${domain}` : null,
+    ].filter(Boolean);
+  }
+
+  return [];
+}
+
+function mailpitRecipients(message) {
+  return [
+    ...collectMailAddresses(message.To),
+    ...collectMailAddresses(message.to),
+    ...collectMailAddresses(message.Recipients),
+    ...collectMailAddresses(message.recipients),
+  ].map((email) => email.toLowerCase());
+}
+
+function mailpitMessageId(message) {
+  return message.ID ?? message.Id ?? message.id;
+}
+
+async function loadMailpitMessage(messageId) {
+  const response = await fetch(
+    mailpitApi(`/api/v1/message/${encodeURIComponent(messageId)}`),
+  );
+
+  return readJson(response, `load Mailpit message ${messageId}`);
+}
+
+async function waitForConfirmationEmail(email) {
+  const expectedEmail = email.toLowerCase();
+  const deadline = Date.now() + 30_000;
+  let lastError = null;
+
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(mailpitApi("/api/v1/messages?limit=50"));
+      const mailbox = await readJson(response, "list Mailpit messages");
+      const messages = mailbox.messages ?? mailbox.Messages ?? [];
+      const summary = messages.find((message) =>
+        mailpitRecipients(message).includes(expectedEmail),
+      );
+      const messageId = summary ? mailpitMessageId(summary) : null;
+
+      if (messageId) {
+        return loadMailpitMessage(messageId);
+      }
+    } catch (error) {
+      lastError = error;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+
+  throw new Error(
+    `timed out waiting for Mailpit confirmation email for ${email}${
+      lastError ? `: ${lastError.message}` : ""
+    }`,
+  );
+}
+
+function extractConfirmationUrl(message) {
+  const body = [
+    message.HTML,
+    message.Html,
+    message.html,
+    message.Text,
+    message.text,
+    message.Body,
+    message.body,
+  ]
+    .filter((part) => typeof part === "string")
+    .join("\n")
+    .replaceAll("&amp;", "&");
+  const urls = body.match(/https?:\/\/[^"'\s<>]+/g) ?? [];
+  const confirmationUrl = urls.find((url) => {
+    try {
+      const parsedUrl = new URL(url);
+      return (
+        parsedUrl.pathname === "/auth/confirm" &&
+        parsedUrl.searchParams.has("token_hash") &&
+        parsedUrl.searchParams.get("type") === "email"
+      );
+    } catch {
+      return false;
+    }
+  });
+
+  assert.ok(
+    confirmationUrl,
+    "Mailpit signup confirmation email includes SSR token_hash link",
+  );
+
+  return confirmationUrl;
 }
 
 function getSetCookieHeaders(response) {
@@ -204,14 +346,33 @@ async function run() {
     "insert allowed signup domain",
   );
 
+  await clearMailpitMessages();
+  const realEmailSignupAddress = `allowed-${suffix}@${allowedDomain}`;
   const allowedSignup = await anon.auth.signUp({
-    email: `allowed-${suffix}@${allowedDomain}`,
+    email: realEmailSignupAddress,
     password,
     options: { emailRedirectTo: appUrl("/auth/confirm") },
   });
   assert.equal(allowedSignup.error, null, "allowed domain accepts signup");
   assert.ok(allowedSignup.data.user?.id, "allowed signup creates a user");
   usersToDelete.push(allowedSignup.data.user.id);
+
+  const realConfirmationMessage =
+    await waitForConfirmationEmail(realEmailSignupAddress);
+  const realConfirmationCookies = new Map();
+  assertRedirect(
+    await getPath(
+      extractConfirmationUrl(realConfirmationMessage),
+      realConfirmationCookies,
+    ),
+    "/account/setup",
+    "real signup email confirmation route",
+  );
+  assert.equal(
+    (await getPath("/account/setup", realConfirmationCookies)).status,
+    200,
+    "real signup email confirmation establishes a browser session",
+  );
 
   const caseInsensitiveSignup = await anon.auth.signUp({
     email: `case-${suffix}@Phase3-Auth.Test`,
