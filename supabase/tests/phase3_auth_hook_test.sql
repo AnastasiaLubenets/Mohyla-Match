@@ -30,10 +30,10 @@ select isnt(
 
 reset role;
 
-insert into public.signup_email_domains (domain, description, is_active)
+insert into public.signup_email_domains (domain, is_active)
 values
-  ('allowed.test', 'Phase 3 allowed test domain', true),
-  ('inactive.test', 'Phase 3 inactive test domain', false);
+  ('allowed.test', true),
+  ('inactive.test', false);
 
 select is(
   public.hook_before_user_created(
@@ -127,8 +127,8 @@ select is_empty(
 );
 
 select throws_ok(
-  $$ insert into public.signup_email_domains (domain, description)
-     values ('normal-user-write.test', 'should fail') $$,
+  $$ insert into public.signup_email_domains (domain)
+     values ('normal-user-write.test') $$,
   '42501',
   null,
   'normal authenticated users cannot insert signup email domains'
@@ -136,7 +136,7 @@ select throws_ok(
 
 select is_empty(
   $$ update public.signup_email_domains
-     set description = 'edited by normal user'
+     set is_active = false
      where domain = 'allowed.test'
      returning domain $$,
   'normal authenticated users cannot update signup email domains'

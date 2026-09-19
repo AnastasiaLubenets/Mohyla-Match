@@ -199,7 +199,6 @@ async function run() {
   await expectNoSupabaseError(
     await service.from("signup_email_domains").insert({
       domain: allowedDomain,
-      description: "Phase 3 auth integration domain",
       is_active: true,
     }),
     "insert allowed signup domain",
