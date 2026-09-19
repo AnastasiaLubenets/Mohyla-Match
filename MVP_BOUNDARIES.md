@@ -31,7 +31,7 @@ This file prevents scope drift.
 - account deletion;
 - basic admin;
 - basic product metrics;
-- avatars only if straightforward;
+- generated/system avatars based on faculty/program;
 - staging deployment;
 - seed/test users;
 - security/RLS tests.
@@ -67,6 +67,7 @@ Do not implement unless a new decision explicitly changes scope:
 - other universities;
 - native Android;
 - native iOS;
+- user-uploaded profile photos;
 - microservices;
 - paid infrastructure without demonstrated need.
 

@@ -13,6 +13,7 @@ Mohyla Match is a closed web platform for NaUKMA students to discover other stud
 - Web/PWA first; native mobile later.
 - No internal chat.
 - No AI matching in V1.
+- No user-uploaded profile photos in V1.
 - Corporate email is private until mutual match.
 - Supabase is the backend platform.
 - Security rules are enforced server/database-side, not only in the UI.
@@ -24,6 +25,7 @@ Foundation documents are maintained in the repository:
 
 - `PRODUCT_SPEC.md`
 - `ARCHITECTURE.md`
+- `DATA_MODEL.md`
 - `DATABASE_SCHEMA.md`
 - `SECURITY_MODEL.md`
 - `MVP_BOUNDARIES.md`
@@ -108,7 +110,7 @@ Phase 0 foundation:
 
 Phase 1:
 - product specification complete;
-- screens, entities, permissions, match rules, security model, and MVP boundaries documented;
+- screens, entities, permissions, match rules, avatar policy, security model, and MVP boundaries documented;
 - canonical scope reviewed for contradictions.
 
 Current working branch:
@@ -117,5 +119,5 @@ Current working branch:
 
 Next implementation step:
 
-1. Initialize Supabase local/project structure when the CLI is available.
-2. Begin Phase 2 migrations, grants, RLS, seed data, and security tests.
+1. Review Phase 1 documents.
+2. Begin Phase 2 migrations, grants, RLS, seed data, and security tests after approval.

@@ -29,6 +29,7 @@ Deliverables:
 
 - [x] `PRODUCT_SPEC.md`
 - [x] `ARCHITECTURE.md`
+- [x] `DATA_MODEL.md`
 - [x] `DATABASE_SCHEMA.md`
 - [x] `SECURITY_MODEL.md`
 - [x] `MVP_BOUNDARIES.md`
@@ -37,6 +38,8 @@ Deliverables:
 - [x] entities documented
 - [x] permissions documented
 - [x] matching rules documented
+- [x] avatar policy documented
+- [x] corporate email storage/reveal decision documented
 - [x] contradictions reviewed
 
 Exit criteria:
@@ -105,7 +108,7 @@ Deliverables:
 - My Profile;
 - Edit Profile;
 - Full Profile;
-- avatar optional;
+- generated/system avatar;
 - skills/interests/goals/availability;
 - safe public profile projection.
 

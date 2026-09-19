@@ -1,360 +1,451 @@
 # Mohyla Match — Architecture
 
-Status: Canonical architecture for Web/PWA MVP
+Status: Canonical Phase 1 architecture
+Scope: Responsive Web/PWA MVP with reusable Supabase backend
 
-## 1. Goals
+## 1. Architecture Goals
 
-The architecture must be:
+The MVP architecture must be:
 
-- production-oriented;
-- maintainable by a small team;
-- low-cost for a ~4,000-student target;
 - secure by default;
+- maintainable by a small team;
+- low-cost for an approximately 4,000-student pilot;
+- simple enough to ship without unnecessary infrastructure;
 - compatible with a future native mobile client;
-- simple enough for a pilot;
-- free of infrastructure that is not needed for the MVP.
+- explicit about privacy boundaries;
+- free of internal chat/messaging architecture.
 
-## 2. High-level architecture
+## 2. High-Level System
 
 ```text
 Browser / installed PWA
         |
         v
-React / Next.js web application
+Next.js App Router web application
         |
-        +---- Supabase Auth
-        |
-        +---- Supabase Data API / RPC
-        |
-        +---- Server-only application routes for privileged operations
+        +-- Supabase Auth
+        +-- Supabase Data API / RPC
+        +-- Server-only route handlers / server actions when needed
         |
         v
 Supabase PostgreSQL
-  - relational data
-  - RLS
-  - constraints
-  - DB functions/triggers where appropriate
-  - optional Storage for avatars only
+  - relational product data
+  - explicit grants
+  - Row Level Security
+  - constraints and indexes
+  - database functions/triggers for invariants where appropriate
 ```
 
-No internal realtime messaging layer is part of the MVP.
+Supabase Storage is not required for V1 profile photos because user-uploaded profile photos are out of scope. Storage may be used later for approved design assets or future avatar work only after a separate decision.
 
-## 3. Frontend
+No internal chat, realtime messaging, typing indicators, online presence, or message storage exists in the architecture.
 
-Use a current stable Next.js App Router release with:
+## 3. Frontend Architecture
 
+Frontend stack:
+
+- Next.js App Router;
 - React;
-- TypeScript in strict mode;
-- responsive/mobile-first UI;
-- server/client component boundaries chosen deliberately;
-- accessible semantic HTML;
-- CSS design tokens;
-- Tailwind CSS may be used for implementation speed, but product styling must be owned by Mohyla Match rather than default library appearance.
+- TypeScript strict mode;
+- Tailwind CSS for implementation speed;
+- mobile-first responsive UI;
+- route groups as needed for public/authenticated/admin sections.
 
-Package versions must be pinned in the lockfile.
+The frontend owns:
 
-### Recommended source layout
+- rendering screens;
+- form UX and client-side validation feedback;
+- calling safe Supabase clients, RPCs, and server routes;
+- navigation between Discover, Saved, Matches, and Profile;
+- opening `mailto:` links after authorized contact reveal.
 
-```text
-src/
-  app/
-    (public)/
-    (auth)/
-    (app)/
-    admin/
-    api/
-  components/
-    ui/
-    layout/
-  features/
-    auth/
-    onboarding/
-    profiles/
-    discover/
-    interactions/
-    matches/
-    safety/
-    admin/
-  lib/
-    supabase/
-    auth/
-    validation/
-    config/
-  types/
-  styles/
-```
+The frontend must not own:
 
-Keep domain logic in feature/lib modules rather than in page components.
+- authorization decisions;
+- corporate email reveal logic;
+- match creation invariants;
+- admin authorization;
+- signup-domain enforcement;
+- trust in client-provided user IDs.
 
-## 4. PWA
+Domain logic should live in feature/lib modules or backend/database contracts, not directly inside page components.
 
-PWA is desirable when it does not delay the core pilot.
+## 4. Next.js App Router Boundaries
 
-Minimum later requirements:
+Use Server Components by default for static or server-rendered UI.
 
-- web app manifest;
-- installable metadata/icons;
-- safe caching strategy;
-- no caching of sensitive authenticated API responses.
+Use Client Components only for:
 
-Offline-first behavior is not an MVP requirement.
+- interactive form state;
+- local UI transitions;
+- client-side Supabase operations that are fully protected by RLS;
+- browser-only actions such as `mailto:`.
 
-## 5. Backend
+Use server-only route handlers or server actions for:
+
+- privileged administrative operations;
+- account deletion orchestration;
+- contact reveal when the implementation needs a server-side boundary;
+- operations requiring secret keys;
+- operations where client-supplied IDs must be re-derived from verified identity.
+
+Default runtime:
+
+- Node.js runtime unless a specific Edge requirement is proven.
+
+## 5. Supabase Backend Responsibilities
 
 Supabase provides:
 
 - PostgreSQL;
 - Supabase Auth;
 - Data API;
+- RPC functions where needed;
 - Row Level Security;
-- Storage only for avatars if avatars are enabled.
+- explicit grants;
+- local development configuration.
 
-No additional backend service is introduced unless a concrete requirement cannot be implemented safely with this stack.
+Supabase Auth is responsible for:
 
-## 6. Authentication architecture
+- verified email identity;
+- session issuance;
+- email confirmation;
+- rejecting unconfirmed or disallowed signup paths when Phase 2 Auth hooks/config are implemented.
 
-Production Auth:
+PostgreSQL is responsible for:
 
-- email-based authentication;
-- email confirmation enabled;
-- anonymous sign-in disabled;
-- allowed corporate domain stored in the protected Auth/database allowlist;
-- exact NaUKMA domain remains unset until confirmed.
+- relational state;
+- constraints;
+- unique directed interaction rows;
+- canonical unordered match pairs;
+- block precedence checks;
+- RLS enforcement;
+- admin role storage;
+- audit log storage;
+- deterministic matching inputs and configuration.
 
-The allowed-domain rule must be enforced before account creation using an Auth-side/server-side rule (preferred: Supabase Before User Created hook backed by an allowlist/config value), not only by frontend validation.
+## 6. Browser Supabase Client
 
-Frontend validation exists only for fast feedback.
+The browser client:
 
-## 7. Supabase client strategy
+- uses only `NEXT_PUBLIC_SUPABASE_URL`;
+- uses only `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`;
+- never receives a secret/service-role key;
+- can call exposed tables/RPCs only when explicit grants and RLS make the operation safe;
+- may read safe profile projections;
+- may manage the current user's own profile and own interaction state through RLS-protected paths.
 
-Use separate browser and server Supabase client factories.
+The browser client must not:
+
+- read `auth.users`;
+- read another user's corporate email;
+- decide admin status;
+- supply trusted `source_user_id` values;
+- bypass server/database validation.
+
+## 7. Server Supabase Client
+
+The server client:
+
+- uses cookie-based SSR/session handling;
+- validates user identity server-side for protected routes;
+- may use a server-only privileged key only when the operation cannot be expressed safely with user JWT + RLS;
+- keeps privileged keys outside browser bundles;
+- derives caller identity from verified session, not request payload.
+
+Server-only code is required for:
+
+- account deletion/cleanup;
+- admin mutations;
+- contact reveal if implemented outside a narrowly scoped database RPC;
+- any operation that touches protected Auth/admin/contact data.
+
+## 8. Authorization Boundaries
+
+Authorization must be enforced in database/server rules.
+
+Frontend hiding is not a security boundary.
+
+Required enforcement layers:
+
+- explicit database grants;
+- RLS on all exposed tables;
+- constraints for invariants;
+- transaction-safe match creation;
+- protected admin role storage;
+- server-only privileged code where unavoidable;
+- negative security tests.
+
+Use direct Data API access only when table grants plus RLS fully express the rule.
+
+Use RPC/server routes for:
+
+- match creation side effects;
+- contact reveal;
+- admin actions;
+- account deletion;
+- any sensitive projection that must not expose whole rows.
+
+## 9. Data API Exposure
+
+New user-facing tables must not rely on automatic exposure.
+
+Phase 2 should:
+
+- grant schema/table access intentionally;
+- enable RLS before granting client roles access;
+- prefer narrow projections/RPCs for sensitive flows;
+- never grant broad `ALL` access for convenience;
+- never expose private contact, report, or admin tables to normal users.
+
+## 10. Corporate Email Architecture
+
+Corporate email is sensitive contact data.
+
+Canonical source:
+
+- verified Supabase Auth identity.
+
+Discoverable profile data:
+
+- never contains corporate email.
+
+Reveal path:
+
+- accepts authenticated caller and target user;
+- verifies active mutual match;
+- verifies no block in either direction;
+- verifies both accounts are active/onboarded;
+- returns only the target corporate email;
+- never returns arbitrary Auth/private rows.
+
+If Phase 2 introduces a private derived contact table for implementation convenience, it must be system-populated from verified Auth state, inaccessible to normal list/read queries, and treated as sensitive contact data.
+
+## 11. Matching Architecture
+
+Matching V1 is deterministic and centralized.
+
+Inputs:
+
+- profile skills with direction `offer`;
+- profile skills with direction `looking_for`;
+- interests;
+- collaboration goals;
+- availability;
+- profile eligibility state;
+- blocks and suspensions.
+
+Weights:
+
+- 35% my looking-for <-> their offer;
+- 25% their looking-for <-> my offer;
+- 15% common interests;
+- 15% collaboration-goal compatibility;
+- 10% availability/additional compatibility.
 
 Rules:
 
-- browser receives only the publishable key;
-- secret/service-role keys never enter browser bundles;
-- server requests validate the authenticated user rather than trusting client-supplied user IDs;
-- authorization never relies on editable `user_metadata`.
+- no AI;
+- no embeddings;
+- no vector search;
+- weights are stored in configuration/data;
+- score output includes component scores and explanation items;
+- matching code must be reusable by future mobile clients;
+- at MVP scale, compute-on-read with indexes is preferred over a separate recommendation service.
 
-If SSR auth helpers are used, follow current Supabase guidance and pin versions because SSR helper APIs may change.
+## 12. Interaction Architecture
 
-## 8. Data-access strategy
+Interactions represent current directed state:
 
-Prefer direct Supabase Data API access from authenticated clients only for operations whose table grants + RLS fully express the authorization rule.
+`source_user_id -> target_user_id`
 
-Use server-only routes or narrowly scoped RPC functions for privileged/sensitive operations.
+Allowed actions:
 
-Every exposed table gets:
+- `save`;
+- `skip`;
+- `connect`.
 
-1. explicit least-privilege `GRANT`;
-2. RLS enabled;
-3. explicit policies;
-4. tests.
+Persistence rule:
 
-Do not assume newly created tables are automatically exposed to the Data API.
+- one row per directed pair;
+- unique `(source_user_id, target_user_id)`;
+- action changes update the row;
+- analytics use separate append-only events.
 
-## 9. Corporate-email isolation
+The database/server must derive or verify `source_user_id` from authenticated identity.
 
-Product rule: another user's corporate email is unavailable until mutual match.
+## 13. Match Architecture
 
-Logical profile data includes the corporate email, but the physical schema isolates contact data from discoverable profile data.
+Matches represent unordered pairs.
 
-Recommended physical split:
+Canonical representation:
 
-- `profiles`: discoverable profile attributes;
-- `profile_contacts`: corporate email, one row per user, private.
+- `user_low` stores the lower UUID;
+- `user_high` stores the higher UUID;
+- check `user_low < user_high`;
+- unique `(user_low, user_high)`;
+- no self-match.
 
-Why:
+Creation:
 
-- RLS is row-level, not field-level;
-- keeping sensitive contact data outside the normally discoverable row removes accidental `select *` exposure;
-- the reveal operation becomes explicit and testable.
+- only after reciprocal current `connect`;
+- transaction-safe;
+- idempotent for concurrent requests;
+- enforced in database/server logic, not only in UI.
 
-Only an explicitly authorized contact-reveal path may return the other user's email, and only when an active mutual match exists.
+## 14. Blocking Architecture
 
-This is an implementation/security normalization, not a product-flow change.
+Block row:
 
-## 10. Matching architecture
+- directional storage: blocker -> blocked.
 
-Matching V1 is deterministic and centralized so web and future mobile clients use the same rules.
+Access effect:
 
-Recommended implementation:
+- bilateral visibility exclusion;
+- blocks Discover in both directions;
+- blocks full profile access in both directions;
+- blocks contact reveal in both directions;
+- blocks new interactions in both directions.
 
-- normalized relational input tables;
-- one database RPC/query layer that computes candidate compatibility;
-- configurable weights stored in a settings table or a single versioned DB configuration;
-- result returns:
-  - candidate user ID;
-  - score;
-  - component scores;
-  - explanation keys/data.
+Block precedence is higher than match/contact state.
 
-Do not persist every calculated score unless measurement proves it necessary.
+## 15. Account States
 
-At ~4,000 users, compute-on-read with proper indexes is preferable to premature infrastructure.
+Profile/account states:
 
-## 11. Interaction model
+- active;
+- suspended;
+- deleted.
 
-One current interaction state per directed user pair:
+Suspended accounts:
 
-`(source_user_id, target_user_id) -> skip | save | connect`
+- retained for admin review;
+- excluded from Discover and contact reveal;
+- blocked from normal product mutations.
 
-A unique constraint prevents duplicate current-state rows.
+Deleted accounts:
 
-Changing an action updates the current state.
+- removed from product experience;
+- profile fields minimized/anonymized;
+- contact data no longer revealable;
+- relationships cleaned or made inaccessible;
+- retained moderation/audit data minimized according to policy.
 
-If event-level metrics are required, append an immutable product event separately instead of allowing contradictory interaction rows.
+## 16. Admin Architecture
 
-## 12. Match creation
+Admin role storage:
 
-A match is created only after reciprocal `connect`.
+- protected database table such as `user_roles`;
+- not editable by users;
+- not inferred from `user_metadata`;
+- not trusted from client-supplied data.
 
-Database guarantees:
+Admin operations:
 
-- canonical pair ordering;
-- `user_a != user_b`;
-- unique pair;
-- transaction-safe creation;
-- idempotent `ON CONFLICT DO NOTHING` behavior or equivalent.
+- performed through server/database-protected paths;
+- revalidate admin role server-side;
+- write append-only `admin_actions`;
+- avoid broad privileged endpoints.
 
-This rule is enforced in database logic, not only in frontend code.
+## 17. Avatar Architecture
 
-## 13. Blocking
+V1 has no user-uploaded profile photos.
 
-A block row is directional:
+Generated/system avatars:
 
-- blocker;
-- blocked.
+- derived from faculty and academic program data;
+- use deterministic visual variants;
+- use data-backed faculty/program taxonomy;
+- can be rendered by the frontend without storing uploaded files.
 
-Visibility/effect is bilateral:
+Future design assets:
 
-- exclude candidates where either direction contains a block;
-- block access to relevant user-to-user surfaces;
-- do not expose matched contact data after a block if product policy marks the match inaccessible.
+- can be static app assets or controlled storage assets;
+- do not require changing the core user/profile/contact schema.
 
-## 14. Admin
+## 18. Configuration And Environment Strategy
 
-Admin privileges are not inferred from a client-controlled profile field.
-
-Use a protected role/authorization source and server-side checks.
-
-Admin actions write to an append-only audit log.
-
-## 15. Storage
-
-Storage is used only if avatars are enabled.
-
-Rules:
-
-- user can upload/update only own avatar object;
-- validate type and size;
-- randomized/canonical path owned by user ID;
-- no executable content assumptions;
-- public vs signed URL decision must match profile privacy.
-
-For MVP, public avatars are acceptable only if product accepts the avatar itself as non-sensitive. Otherwise use signed access.
-
-## 16. Environment strategy
-
-Never commit secrets.
-
-Expected local variables:
+Local/browser-safe variables:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+```
+
+Optional server-only variable:
+
+```env
 SUPABASE_SECRET_KEY=
 ```
 
-Notes:
+Rules:
 
-- The allowed corporate domain is not duplicated in app environment variables; the protected Auth/database allowlist is authoritative.
-- `SUPABASE_SECRET_KEY` is server-only and may not be necessary for most app paths.
-- Do not use a secret/service-role key for operations that can be expressed with the user's JWT + RLS.
-- Production/staging values are stored in hosting/Supabase environment settings, not Git.
+- do not commit secrets;
+- do not expose privileged keys in browser bundles;
+- do not duplicate the corporate domain in client env and database/Auth config;
+- allowed signup domains are protected configuration/data;
+- staging and production values live in hosting/Supabase configuration.
 
-## 17. Environments
+## 19. Deployment Boundaries
 
-Minimum environments:
+Frontend:
+
+- Vercel or equivalent Next.js hosting;
+- no always-on custom server unless a concrete need appears.
+
+Backend:
+
+- Supabase project per environment;
+- migrations in Git once Phase 2 begins;
+- RLS/grants/security tests required before pilot.
+
+Environments:
 
 - local development;
 - staging/pilot;
 - production.
 
-Before public launch, staging and production must not share real user data.
+Staging and production must not share real user data before public launch.
 
-Schema changes are migration-driven and reproducible.
+## 20. Observability
 
-## 18. Git strategy
+MVP observability:
 
-Primary branch: `main`.
-
-Working changes:
-
-- short-lived feature/foundation branches;
-- pull request into `main`;
-- CI required before merge once code exists.
-
-Initial foundation branch:
-
-`phase-0-1-foundation`
-
-## 19. CI quality gates
-
-Once the app is scaffolded, GitHub Actions should run:
-
-- install from lockfile;
-- lint;
-- TypeScript typecheck;
-- unit tests;
-- build;
-- database/security tests when practical.
-
-Do not call work complete when the build/tests have not been run.
-
-## 20. Hosting
-
-Preferred MVP approach:
-
-- frontend: Vercel free/low-cost tier or an equivalent Next.js-capable host;
-- backend: Supabase;
-- no always-on custom server.
-
-Deployment choice remains replaceable because business rules and permissions live in reusable backend/database layers.
-
-## 21. Observability
-
-MVP:
-
-- hosting deployment logs;
+- hosting build/runtime logs;
 - Supabase logs/advisors;
-- structured app errors where useful.
+- lightweight product events;
+- basic admin metrics.
 
-Do not introduce paid observability until the pilot creates a demonstrated need.
+Do not introduce paid observability infrastructure until pilot usage proves a need.
 
-## 22. Future mobile compatibility
+## 21. Future Mobile Reuse
 
-Future iOS/Android clients must be able to reuse:
+Future native clients must reuse:
 
 - Supabase Auth;
-- relational schema;
-- RLS;
-- matching RPC/query contract;
+- canonical relational schema;
+- RLS policies;
+- matching query/RPC contract;
 - interaction rules;
-- match rules;
-- contact-reveal authorization.
+- match creation rules;
+- block/report/delete rules;
+- contact reveal authorization.
 
-Do not place canonical matching/security logic exclusively in React UI code.
+Do not place canonical product/security logic exclusively in React components.
 
-## 23. Architecture decisions frozen for MVP
+## 22. Explicit Non-Architecture
 
-- Web/PWA first.
-- Next.js + TypeScript frontend.
-- Supabase backend.
-- No internal chat.
-- No AI matching.
-- No separate microservice.
-- No realtime presence/messaging.
-- Matching logic centralized outside presentation components.
-- Corporate contact information isolated from discoverable profiles.
-- Explicit grants + RLS on exposed database objects.
+The MVP architecture does not include:
+
+- internal chat service;
+- messages/conversations tables;
+- realtime messaging;
+- presence;
+- push notifications for chat;
+- AI recommendation service;
+- vector database/search for matching;
+- microservices;
+- native mobile code;
+- user-uploaded profile photo pipeline.
+
+These require separate product and architecture decisions.

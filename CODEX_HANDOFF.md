@@ -1,194 +1,63 @@
 # Mohyla Match — Codex Handoff
 
-## Current state
+## Current State
 
 Repository: `Nitomi777/Mohyla-Match`  
 Working branch: `phase-0-1-foundation`
 
-Phase 1 specification is complete.
+Phase 0 foundation commit:
 
-Read before changing code:
+`a519e20 feat: scaffold Mohyla Match web foundation`
+
+Phase 1 canonical product/specification documents are now the source of truth:
 
 1. `PRODUCT_SPEC.md`
 2. `ARCHITECTURE.md`
-3. `DATABASE_SCHEMA.md`
-4. `SECURITY_MODEL.md`
+3. `SECURITY_MODEL.md`
+4. `DATA_MODEL.md`
 5. `MVP_BOUNDARIES.md`
-6. `ROADMAP.md`
+6. `DATABASE_SCHEMA.md`
+7. `ROADMAP.md`
 
-Do not reinterpret the product.
+Do not reinterpret the product before Phase 2.
 
 Canonical flow:
 
-`Corporate email → Verification → Profile → Discover → Connect → Mutual Match → Corporate email contact`
+`Corporate email -> Verification -> Profile -> Discover -> Connect -> Mutual Match -> Corporate email contact`
 
-## Immediate task
+## Frozen MVP Decisions
 
-Finish Phase 0 development setup and create the first implementation foundation.
+- Web/PWA first.
+- Next.js App Router frontend.
+- Supabase PostgreSQL/Auth backend.
+- No internal chat or messaging tables.
+- No AI, embeddings, or vector matching in MVP.
+- No user-uploaded profile photos in V1.
+- Default avatar identity is generated/system avatar based on faculty/program.
+- Faculty/program taxonomy is stored as data.
+- Corporate email is not in discoverable `profiles`.
+- Corporate email is derived securely from verified Auth identity or a private system-derived contact projection.
+- Corporate email reveal is allowed only after active mutual match and no block.
+- Contact uses `mailto:`.
+- Interactions are unique directed current state rows.
+- Matches use canonical unordered pair representation with `user_low` and `user_high`.
+- Blocks are stored directionally but enforced bilaterally.
+- Admin role storage is protected data, not editable metadata.
 
-### 1. Preserve existing files
+## Next Phase
 
-Do not overwrite/remove the existing documentation.
+Do not start Phase 2 until the Phase 1 documents are accepted.
 
-### 2. Scaffold the web app in repository root
+Phase 2 should implement:
 
-Use the current stable Next.js App Router release and current supported tooling.
+- Supabase migrations;
+- constraints;
+- indexes;
+- explicit grants;
+- Row Level Security;
+- seed data;
+- matching configuration;
+- contact reveal authorization;
+- security tests.
 
-Requirements:
-
-- React;
-- TypeScript strict mode;
-- App Router;
-- `src/` directory;
-- ESLint;
-- Tailwind CSS;
-- import alias `@/*`;
-- npm + committed lockfile;
-- mobile-first baseline;
-- no component library unless genuinely needed.
-
-If create-next-app refuses to scaffold into a non-empty repository, scaffold into a temporary directory and move only the generated application/config files into the repo while preserving all existing docs and Git history.
-
-### 3. Establish source structure
-
-Create the architecture skeleton documented in `ARCHITECTURE.md`:
-
-```text
-src/
-  app/
-  components/
-    ui/
-    layout/
-  features/
-    auth/
-    onboarding/
-    profiles/
-    discover/
-    interactions/
-    matches/
-    safety/
-    admin/
-  lib/
-    supabase/
-    auth/
-    validation/
-    config/
-  types/
-  styles/
-```
-
-Do not implement feature scope beyond the foundation yet.
-
-### 4. Supabase client foundation
-
-Use current official Supabase guidance.
-
-Before coding:
-
-- inspect the current Supabase changelog for relevant breaking changes;
-- inspect current official Auth/SSR guidance;
-- do not use deprecated auth helper packages;
-- pin package versions via lockfile.
-
-Create browser/server client factories with no secrets in browser code.
-
-Do not create a guessed NaUKMA domain.
-
-The authoritative domain allowlist will live in the protected Auth/database configuration during Phase 2.
-
-### 5. Environment
-
-Keep `.env.example` safe.
-
-Expected browser values:
-
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-
-Optional server-only privileged key:
-
-- `SUPABASE_SECRET_KEY`
-
-Never expose the privileged key to browser bundles.
-
-### 6. Initial pages
-
-Create only minimal route placeholders needed to prove routing/build structure:
-
-- landing `/`;
-- login;
-- signup.
-
-Do not spend time on final design yet.
-
-Do not create:
-
-- chat;
-- AI matching;
-- feed;
-- native mobile code;
-- payments;
-- realtime messaging.
-
-### 7. Quality gates
-
-Add scripts for:
-
-- lint;
-- typecheck;
-- build;
-- test (a minimal useful test setup if justified).
-
-Add GitHub Actions CI that installs from lockfile and runs at least:
-
-- lint;
-- typecheck;
-- build.
-
-### 8. Supabase project structure
-
-Initialize local Supabase project structure if the current CLI supports it.
-
-Discover CLI commands with `supabase --help`; do not guess flags.
-
-Do not create Phase 2 migrations yet unless needed for a minimal reproducible setup.
-
-Do not link to or modify an unrelated Supabase project.
-
-### 9. Verification
-
-Actually run:
-
-- dependency install;
-- lint;
-- typecheck;
-- build.
-
-Fix failures before reporting success.
-
-### 10. Commit discipline
-
-Remain on `phase-0-1-foundation`.
-
-Commit the verified foundation changes.
-
-Do not merge to `main` until the foundation build/quality checks pass.
-
-## Required report
-
-Return:
-
-**Completed**
-- exact files/structure created.
-
-**Tests**
-- exact commands run and results.
-
-**Current state**
-- what actually runs now.
-
-**Risks / decisions**
-- only material issues.
-
-**Next step**
-- Phase 2 database schema + grants + RLS + seed + security tests.
+Phase 2 must preserve every privacy/security invariant in `SECURITY_MODEL.md` and every entity decision in `DATA_MODEL.md`.
