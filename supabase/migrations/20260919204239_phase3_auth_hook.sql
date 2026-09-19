@@ -67,6 +67,12 @@ $$;
 grant usage on schema public to supabase_auth_admin;
 grant select on public.signup_email_domains to supabase_auth_admin;
 
+grant usage on schema public to service_role;
+grant select on public.faculties, public.academic_programs to service_role;
+grant insert on public.profiles to service_role;
+grant select, insert, update, delete on public.signup_email_domains to service_role;
+grant usage, select on sequence public.signup_email_domains_id_seq to service_role;
+
 revoke execute on function public.hook_before_user_created(jsonb) from public, anon, authenticated;
 grant execute on function public.hook_before_user_created(jsonb) to supabase_auth_admin;
 

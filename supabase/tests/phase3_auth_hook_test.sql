@@ -1,6 +1,6 @@
 begin;
 
-select plan(13);
+select plan(17);
 
 delete from public.signup_email_domains;
 
@@ -83,6 +83,34 @@ select ok(
     'select'
   ),
   'supabase_auth_admin can read signup email domains'
+);
+
+select ok(
+  has_table_privilege(
+    'service_role',
+    'public.signup_email_domains',
+    'insert'
+  ),
+  'service_role can insert signup email domains for trusted server operations'
+);
+
+select ok(
+  has_table_privilege(
+    'service_role',
+    'public.signup_email_domains',
+    'delete'
+  ),
+  'service_role can delete signup email domains for trusted server operations'
+);
+
+select ok(
+  has_table_privilege('service_role', 'public.faculties', 'select'),
+  'service_role can read faculty taxonomy for trusted server tests'
+);
+
+select ok(
+  has_table_privilege('service_role', 'public.profiles', 'insert'),
+  'service_role can insert profiles for trusted server operations'
 );
 
 reset role;
