@@ -2,7 +2,7 @@
 
 ## Current State
 
-Repository: `Nitomi777/Mohyla-Match`  
+Repository: `AnastasiaLubenets/Mohyla-Match`  
 Working branch: `phase-0-1-foundation`
 
 Phase 0 foundation commit:
