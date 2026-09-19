@@ -23,6 +23,10 @@ export function destinationForAccountState(
   requestedPath = defaultAuthenticatedPath,
 ): string {
   if (state === "active") {
+    if (requestedPath === onboardingPath) {
+      return defaultAuthenticatedPath;
+    }
+
     return sanitizeNextPath(requestedPath);
   }
 

@@ -23,6 +23,10 @@ test("active users can continue to a safe requested route", () => {
   assert.equal(destinationForAccountState("active", "/app"), "/app");
 });
 
+test("active users opening setup are sent to the app", () => {
+  assert.equal(destinationForAccountState("active", "/account/setup"), "/app");
+});
+
 test("unsafe next paths are not accepted", () => {
   assert.equal(sanitizeNextPath("https://example.test/app"), "/app");
   assert.equal(sanitizeNextPath("//example.test/app"), "/app");
