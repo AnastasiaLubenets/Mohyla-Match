@@ -118,7 +118,7 @@ Production Auth:
 - email-based authentication;
 - email confirmation enabled;
 - anonymous sign-in disabled;
-- allowed corporate domain stored as configuration/data;
+- allowed corporate domain stored in the protected Auth/database allowlist;
 - exact NaUKMA domain remains unset until confirmed.
 
 The allowed-domain rule must be enforced before account creation using an Auth-side/server-side rule (preferred: Supabase Before User Created hook backed by an allowlist/config value), not only by frontend validation.
@@ -263,12 +263,12 @@ Expected local variables:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
-ALLOWED_EMAIL_DOMAIN=
 SUPABASE_SECRET_KEY=
 ```
 
 Notes:
 
+- The allowed corporate domain is not duplicated in app environment variables; the protected Auth/database allowlist is authoritative.
 - `SUPABASE_SECRET_KEY` is server-only and may not be necessary for most app paths.
 - Do not use a secret/service-role key for operations that can be expressed with the user's JWT + RLS.
 - Production/staging values are stored in hosting/Supabase environment settings, not Git.
