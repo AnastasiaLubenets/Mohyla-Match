@@ -223,6 +223,7 @@ set local role anon;
 select throws_ok(
   $$ select count(*) from public.profiles $$,
   '42501',
+  null,
   'anonymous cannot read private profile data'
 );
 
@@ -231,6 +232,7 @@ set local role anon;
 select throws_ok(
   $$ select * from public.get_matched_contact_email('00000000-0000-4000-8000-000000000002') $$,
   '42501',
+  null,
   'anonymous cannot call contact projection'
 );
 
@@ -250,6 +252,7 @@ select throws_ok(
   $$ insert into public.user_roles (user_id, role)
      values ('00000000-0000-4000-8000-000000000001', 'admin') $$,
   '42501',
+  null,
   'authenticated users cannot self-assign admin role'
 );
 
@@ -275,6 +278,7 @@ select is(
 select throws_ok(
   $$ select count(*) from public.user_roles $$,
   '42501',
+  null,
   'normal users cannot read protected role storage'
 );
 
@@ -282,6 +286,7 @@ select throws_ok(
   $$ insert into public.product_events (user_id, event_name)
      values ('00000000-0000-4000-8000-000000000001', 'email_verified') $$,
   '42501',
+  null,
   'normal users cannot forge trusted product events'
 );
 
@@ -380,6 +385,7 @@ select throws_ok(
        'save'
      ) $$,
   '23505',
+  null,
   'duplicate directed interaction rows are impossible'
 );
 
@@ -398,6 +404,7 @@ select throws_ok(
   $$ insert into public.matches (user_low, user_high)
      values ('00000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-000000000002') $$,
   '23505',
+  null,
   'duplicate canonical match is impossible'
 );
 
@@ -405,6 +412,7 @@ select throws_ok(
   $$ insert into public.matches (user_low, user_high)
      values ('00000000-0000-4000-8000-000000000002', '00000000-0000-4000-8000-000000000001') $$,
   '23514',
+  null,
   'reversed match pair is rejected'
 );
 
@@ -412,6 +420,7 @@ select throws_ok(
   $$ insert into public.matches (user_low, user_high)
      values ('00000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-000000000001') $$,
   '23514',
+  null,
   'self-match is impossible'
 );
 
@@ -433,6 +442,7 @@ select throws_ok(
        'looking_for'
      ) $$,
   '42501',
+  null,
   'profile relation ownership is enforced'
 );
 
@@ -444,6 +454,7 @@ select throws_ok(
        'offer'
      ) $$,
   '23505',
+  null,
   'duplicate skill and direction assignment is impossible'
 );
 
@@ -455,6 +466,7 @@ select throws_ok(
        'mentor'
      ) $$,
   '22P02',
+  null,
   'invalid skill direction is impossible'
 );
 
@@ -466,6 +478,7 @@ select throws_ok(
        'save'
      ) $$,
   '42501',
+  null,
   'users cannot create interactions for another source user'
 );
 
@@ -556,6 +569,7 @@ select throws_ok(
   $$ insert into public.admin_actions (admin_user_id, action_type)
      values ('00000000-0000-4000-8000-000000000001', 'suspend-user') $$,
   '42501',
+  null,
   'non-admin users cannot write admin actions'
 );
 
@@ -575,6 +589,7 @@ select throws_ok(
        'save'
      ) $$,
   '42501',
+  null,
   'suspended users cannot create normal interactions'
 );
 
