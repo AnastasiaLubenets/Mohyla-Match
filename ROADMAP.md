@@ -48,7 +48,7 @@ Exit criteria:
 
 ## Phase 2 — Database
 
-Status: implementation complete; local runtime verification blocked until Docker Desktop or Podman is available; GitHub Actions database verification added and pending result.
+Status: Phase 2 runtime verification PASS in GitHub Actions; local runtime remains unavailable until Docker Desktop or Podman is available.
 
 Deliverables:
 
@@ -65,8 +65,8 @@ Deliverables:
 - [x] seed taxonomy/config;
 - [x] database tests authored;
 - [x] database CI workflow authored;
-- [ ] database reset/test execution;
-- [ ] advisors clean or findings documented.
+- [x] database reset/test execution;
+- [x] advisors clean or findings documented.
 
 Exit criteria:
 
@@ -76,9 +76,9 @@ Exit criteria:
 
 Current validation note:
 
-- `supabase db reset` and `supabase test db` have not executed successfully locally because no supported container runtime is available in the current environment.
-- `.github/workflows/database-tests.yml` verifies a clean database in GitHub Actions with `supabase start`, `supabase db reset`, and `supabase test db`.
-- Phase 2 must not be marked PASS until migrations, seed, and pgTAP tests execute successfully against a clean database in CI or another independent runtime environment.
+- `supabase db reset`, `supabase test db`, and `supabase db advisors --local --type all --level warn --fail-on error` have not executed successfully locally because no supported container runtime is available in the current environment.
+- `.github/workflows/database-tests.yml` verifies a clean database in GitHub Actions with `supabase start`, `supabase db reset`, `supabase test db`, and `supabase db advisors --local --type all --level warn --fail-on error`.
+- GitHub Actions `Database Tests` passed for `927fe3c57f773f43f70ed6dd5306facfa1e50d27`, including migrations, seed, all 40 pgTAP assertions, and the advisor step with no error-level findings.
 
 ## Phase 3 — Authentication
 
