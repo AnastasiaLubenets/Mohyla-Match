@@ -13,8 +13,9 @@ Deliverables:
 - [x] environment strategy documented
 - [x] Git strategy documented
 - [x] README initialized
-- [ ] application scaffold created
-- [ ] CI pipeline active
+- [x] application scaffold created
+- [x] CI pipeline active
+- [x] lint/typecheck/build verified
 
 Exit criteria:
 

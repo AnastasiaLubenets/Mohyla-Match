@@ -29,12 +29,82 @@ Foundation documents are maintained in the repository:
 - `MVP_BOUNDARIES.md`
 - `ROADMAP.md`
 
+## Local setup
+
+Requirements:
+
+- Node.js 24+
+- npm
+- Supabase CLI for local backend work in later phases
+
+Install dependencies:
+
+```bash
+npm ci
+```
+
+Create local environment values when needed:
+
+```bash
+cp .env.example .env.local
+```
+
+Do not commit `.env.local` or secrets.
+
+## Development
+
+```bash
+npm run dev
+```
+
+The initial web routes are:
+
+- `/`
+- `/login`
+- `/signup`
+
+## Quality commands
+
+```bash
+npm run lint
+npm run typecheck
+npm run build
+```
+
+## Repository structure
+
+```text
+src/
+  app/
+  components/
+    ui/
+    layout/
+  features/
+    auth/
+    onboarding/
+    profiles/
+    discover/
+    interactions/
+    matches/
+    safety/
+    admin/
+  lib/
+    supabase/
+    auth/
+    validation/
+    config/
+  styles/
+  types/
+```
+
 ## Current status
 
 Phase 0 foundation:
 - repository initialized;
 - architecture/env/Git strategy documented;
-- application scaffold and CI are the next implementation step.
+- Next.js web application scaffolded;
+- Supabase client factories added;
+- CI quality gates added.
 
 Phase 1:
 - product specification complete;
@@ -47,7 +117,5 @@ Current working branch:
 
 Next implementation step:
 
-1. Scaffold the Next.js + TypeScript application.
-2. Add CI quality gates.
-3. Initialize Supabase local/project structure.
-4. Begin Phase 2 migrations, grants, RLS, seed data, and security tests.
+1. Initialize Supabase local/project structure when the CLI is available.
+2. Begin Phase 2 migrations, grants, RLS, seed data, and security tests.
