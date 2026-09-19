@@ -181,6 +181,9 @@ grant execute on function public.complete_onboarding() to authenticated;
 grant select on public.skills, public.interests, public.collaboration_goals
   to service_role;
 
+grant select on public.profiles
+  to service_role;
+
 comment on function public.complete_onboarding() is
   'Database-enforced onboarding completion gate. Checks the current authenticated user has all required Phase 4 data before setting onboarding_completed_at idempotently.';
 
