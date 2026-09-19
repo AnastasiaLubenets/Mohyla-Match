@@ -82,12 +82,18 @@ The Phase 2 pgTAP test covers:
 - anonymous denial for profile/contact access;
 - no editing another profile;
 - no self-admin;
+- no direct read access to protected role storage;
 - onboarding relation rows can be created before onboarding completion;
 - incoming directed Connect rows are not readable by the target user;
+- `select *` profile reads do not expose corporate email;
+- one-way Connect does not reveal corporate email;
 - email denied before match and allowed after match;
+- unrelated users cannot use another pair's match to reveal email;
 - reciprocal connect creates exactly one match;
+- duplicate directed interactions are rejected;
 - duplicate, reversed, and self matches are rejected;
 - duplicate/invalid profile skills are rejected;
+- profile relation ownership is enforced;
 - interaction source spoofing is rejected;
 - block disables contact/profile visibility, hides incoming block rows from the blocked user, and closes active match;
 - report moderation fields are protected;

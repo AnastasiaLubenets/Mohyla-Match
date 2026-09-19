@@ -1,6 +1,6 @@
 begin;
 
-select plan(30);
+select plan(36);
 
 insert into public.faculties (slug, display_name, avatar_theme_key, sort_order)
 values ('phase2-test-faculty', 'Phase 2 Test Faculty', 'faculty-test', 900)
@@ -187,6 +187,25 @@ select is_empty(
   'corporate email is denied before mutual match'
 );
 
+select is(
+  (
+    select coalesce(bool_or(row_to_json(profile_row)::text like '%@example.test%'), false)
+    from (
+      select *
+      from public.profiles
+      where user_id = '00000000-0000-4000-8000-000000000002'
+    ) profile_row
+  ),
+  false,
+  'select * from profiles does not leak corporate email'
+);
+
+select throws_ok(
+  $$ select count(*) from public.user_roles $$,
+  '42501',
+  'normal users cannot read protected role storage'
+);
+
 reset role;
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000004', true);
@@ -210,6 +229,12 @@ values (
   '00000000-0000-4000-8000-000000000001',
   '00000000-0000-4000-8000-000000000002',
   'connect'
+);
+
+select is_empty(
+  $$ select corporate_email
+     from public.get_matched_contact_email('00000000-0000-4000-8000-000000000002') $$,
+  'one-way Connect does not reveal corporate email'
 );
 
 reset role;
@@ -268,6 +293,27 @@ select results_eq(
   'corporate email is available after mutual match'
 );
 
+select throws_ok(
+  $$ insert into public.interactions (source_user_id, target_user_id, action)
+     values (
+       '00000000-0000-4000-8000-000000000001',
+       '00000000-0000-4000-8000-000000000002',
+       'save'
+     ) $$,
+  '23505',
+  'duplicate directed interaction rows are impossible'
+);
+
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000003', true);
+
+select is_empty(
+  $$ select corporate_email
+     from public.get_matched_contact_email('00000000-0000-4000-8000-000000000002') $$,
+  'unrelated user cannot use another pair match to reveal email'
+);
+
 reset role;
 select throws_ok(
   $$ insert into public.matches (user_low, user_high)
@@ -298,6 +344,17 @@ values (
   '00000000-0000-4000-8000-000000000001',
   (select id from public.skills where slug = 'phase2-test-skill'),
   'offer'
+);
+
+select throws_ok(
+  $$ insert into public.profile_skills (user_id, skill_id, direction)
+     values (
+       '00000000-0000-4000-8000-000000000002',
+       (select id from public.skills where slug = 'phase2-test-skill'),
+       'looking_for'
+     ) $$,
+  '42501',
+  'profile relation ownership is enforced'
 );
 
 select throws_ok(

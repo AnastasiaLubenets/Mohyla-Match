@@ -48,27 +48,35 @@ Exit criteria:
 
 ## Phase 2 — Database
 
+Status: implementation complete; local runtime verification blocked until Docker Desktop or Podman is available.
+
 Deliverables:
 
-- Supabase local/project setup;
-- migrations;
-- enums/check constraints;
-- tables;
-- indexes;
-- explicit grants;
-- RLS;
-- Auth signup-domain hook/config;
-- deterministic match-query foundation;
-- reciprocal-match creation rule;
-- seed taxonomy/config;
-- database tests;
-- advisors clean or findings documented.
+- [x] Supabase local project files;
+- [x] migrations;
+- [x] enums/check constraints;
+- [x] tables;
+- [x] indexes;
+- [x] explicit grants;
+- [x] RLS;
+- [ ] Auth signup-domain hook/config;
+- [x] deterministic matching configuration foundation;
+- [x] reciprocal-match creation rule;
+- [x] seed taxonomy/config;
+- [x] database tests authored;
+- [ ] database reset/test execution;
+- [ ] advisors clean or findings documented.
 
 Exit criteria:
 
 - migrations reproduce schema;
 - negative security tests pass;
 - email cannot be leaked pre-match.
+
+Current validation note:
+
+- `supabase db reset` and `supabase test db` have not executed successfully locally because no supported container runtime is available in the current environment.
+- Phase 2 must not be marked PASS until migrations, seed, and pgTAP tests execute successfully against a clean local database.
 
 ## Phase 3 — Authentication
 
