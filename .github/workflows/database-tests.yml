@@ -10,7 +10,7 @@ on:
 
 jobs:
   database:
-    name: Supabase migrations, seed, and pgTAP
+    name: Supabase migrations, seed, pgTAP, and advisors
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -34,3 +34,6 @@ jobs:
 
       - name: Run pgTAP database tests
         run: supabase test db
+
+      - name: Run Supabase database advisors
+        run: supabase db advisors --local --type all --level warn --fail-on error
