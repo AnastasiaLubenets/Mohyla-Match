@@ -29,7 +29,25 @@ Foundation documents are maintained in the repository:
 - `MVP_BOUNDARIES.md`
 - `ROADMAP.md`
 
-## Status
+## Current status
 
-Phase 0 — Repository & Architecture: in progress  
-Phase 1 — Product specification: in progress
+Phase 0 foundation:
+- repository initialized;
+- architecture/env/Git strategy documented;
+- application scaffold and CI are the next implementation step.
+
+Phase 1:
+- product specification complete;
+- screens, entities, permissions, match rules, security model, and MVP boundaries documented;
+- canonical scope reviewed for contradictions.
+
+Current working branch:
+
+`phase-0-1-foundation`
+
+Next implementation step:
+
+1. Scaffold the Next.js + TypeScript application.
+2. Add CI quality gates.
+3. Initialize Supabase local/project structure.
+4. Begin Phase 2 migrations, grants, RLS, seed data, and security tests.
