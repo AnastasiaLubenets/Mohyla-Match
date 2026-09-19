@@ -2,7 +2,7 @@
 
 The roadmap follows the canonical phase order. Do not skip ahead because a later feature is visually attractive.
 
-Current working branch: `phase-3-auth`.
+Current working branch: `phase-4-onboarding`.
 
 ## Phase 0 — Repository & Architecture
 
@@ -123,18 +123,31 @@ Validation:
 
 ## Phase 4 — Onboarding
 
+Status: Phase 4 Onboarding implemented on `phase-4-onboarding`.
+
 Deliverables:
 
-- 4-step flow;
-- progress;
-- required validation;
-- taxonomy selection;
-- completion state;
-- responsive UX.
+- [x] 4-step flow;
+- [x] progress;
+- [x] required validation;
+- [x] taxonomy selection;
+- [x] completion state;
+- [x] responsive UX;
+- [x] resume from first incomplete step;
+- [x] server/database-derived system avatar key;
+- [x] database-enforced completion RPC;
+- [x] pgTAP and real local Supabase integration coverage.
 
 Exit criteria:
 
 - verified user can become Discover-eligible.
+
+Validation:
+
+- `public.complete_onboarding()` checks the authenticated user's own active profile, valid active faculty/program/year, at least one offered skill, at least one looking-for skill, at least one interest, and at least one collaboration goal before setting `onboarding_completed_at`.
+- Direct client writes to `system_avatar_key` and `onboarding_completed_at` are revoked for authenticated users.
+- The integration flow signs up through Auth, follows the real Mailpit confirmation link, completes all four onboarding steps through HTTP form posts, and verifies access to `/app`.
+- Phase 5 Profiles has not started.
 
 ## Phase 5 — Profiles
 

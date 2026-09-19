@@ -10,6 +10,19 @@ type AuthStateResult = {
 };
 
 type SupabaseServerClient = SupabaseClient<Database>;
+const routableAccountStates: readonly AccountState[] = [
+  "onboarding_incomplete",
+  "active",
+  "suspended",
+  "deleted",
+];
+
+function isRoutableAccountState(value: unknown): value is AccountState {
+  return (
+    typeof value === "string" &&
+    routableAccountStates.includes(value as AccountState)
+  );
+}
 
 export async function getCurrentAccountState(
   supabaseClient?: SupabaseServerClient,
@@ -23,9 +36,16 @@ export async function getCurrentAccountState(
     return { state: "anonymous", userId: null };
   }
 
+  const { data: dbAccountState, error: dbAccountStateError } =
+    await supabase.rpc("get_current_account_state");
+
+  if (!dbAccountStateError && isRoutableAccountState(dbAccountState)) {
+    return { state: dbAccountState, userId };
+  }
+
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("profile_status,onboarding_completed_at,deleted_at")
+    .select("profile_status,deleted_at")
     .eq("user_id", userId)
     .maybeSingle();
 
@@ -41,9 +61,5 @@ export async function getCurrentAccountState(
     return { state: "deleted", userId };
   }
 
-  if (!profile.onboarding_completed_at) {
-    return { state: "onboarding_incomplete", userId };
-  }
-
-  return { state: "active", userId };
+  return { state: "onboarding_incomplete", userId };
 }

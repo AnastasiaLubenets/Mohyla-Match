@@ -68,12 +68,15 @@ The initial web routes are:
 - `/auth/confirm`
 - `/account/setup`
 - `/account/suspended`
+- `/app`
 
 Current development branch:
 
-`phase-3-auth`
+`phase-4-onboarding`
 
 Phase 3 Auth is implemented and verified on this branch. It includes signup, login, logout, SSR email confirmation, authenticated route protection, onboarding-incomplete redirects, suspended-account redirects, and corporate-domain enforcement through the database-backed allowlist.
+
+Phase 4 Onboarding is implemented on this branch. It includes the canonical 4-step onboarding flow, taxonomy-driven selections from Supabase, resume-from-first-incomplete-step behavior, server-side system avatar derivation, and a database-enforced completion RPC.
 
 Allowed signup domains are stored in `public.signup_email_domains`. Do not hardcode a NaUKMA email domain in the app, configuration, or tests; add allowed corporate domains as data.
 
@@ -113,8 +116,10 @@ npx supabase db advisors --local --type all --level warn --fail-on error
 The database foundation lives in:
 
 - `supabase/migrations/20260919120909_database_foundation.sql`
+- `supabase/migrations/20260919215757_phase4_onboarding_completion.sql`
 - `supabase/seed.sql`
 - `supabase/tests/phase2_security_test.sql`
+- `supabase/tests/phase4_onboarding_test.sql`
 
 ## Repository structure
 
@@ -167,11 +172,18 @@ Phase 3:
 - local Confirm signup email template is configured with the token-hash SSR callback URL;
 - auth unit tests and GitHub Actions integration coverage verify allowed/disallowed/empty/case-insensitive/malformed domain behavior, normal-user restrictions, protected routes, logout, suspended users, onboarding-incomplete redirects, and the real Mailpit signup email confirmation path.
 
+Phase 4:
+- canonical 4-step onboarding is implemented at `/account/setup`;
+- faculties, programs, skills, interests, and collaboration goals load from active Supabase taxonomy rows;
+- `system_avatar_key` is derived server/database-side from faculty/program taxonomy fields;
+- `onboarding_completed_at` is set only by the database-controlled `public.complete_onboarding()` RPC after all required profile, skill, interest, and goal data exists;
+- completed active users can access `/app`; incomplete users resume onboarding.
+
 Current working branch:
 
-`phase-3-auth`
+`phase-4-onboarding`
 
 Next implementation step:
 
-1. Wait for Phase 3 acceptance.
-2. Begin Phase 4 onboarding only after Phase 3 is accepted.
+1. Wait for Phase 4 acceptance.
+2. Begin Phase 5 Profiles only after Phase 4 is accepted.

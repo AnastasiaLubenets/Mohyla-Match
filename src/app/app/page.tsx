@@ -28,13 +28,13 @@ export default async function AppPage() {
 
         <div className="max-w-3xl">
           <p className="mb-5 inline-flex rounded-full border border-border bg-surface px-3 py-1 text-sm font-medium text-muted">
-            Phase 3 auth shell
+            Onboarding complete
           </p>
           <h1 className="text-5xl font-semibold leading-[1.05] sm:text-6xl">
-            You are signed in.
+            You are ready for Mohyla Match.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-            Discover, onboarding and profile editing begin in later phases.
+            Discover and profile editing begin in later phases.
           </p>
         </div>
       </section>

@@ -216,6 +216,72 @@ set full_name = excluded.full_name,
     deleted_at = null,
     updated_at = now();
 
+insert into public.profile_skills (user_id, skill_id, direction)
+values
+  (
+    '00000000-0000-4000-8000-000000000001',
+    (select id from public.skills where slug = 'react'),
+    'offer'
+  ),
+  (
+    '00000000-0000-4000-8000-000000000001',
+    (select id from public.skills where slug = 'figma'),
+    'looking_for'
+  ),
+  (
+    '00000000-0000-4000-8000-000000000002',
+    (select id from public.skills where slug = 'react'),
+    'offer'
+  ),
+  (
+    '00000000-0000-4000-8000-000000000002',
+    (select id from public.skills where slug = 'figma'),
+    'looking_for'
+  ),
+  (
+    '00000000-0000-4000-8000-000000000003',
+    (select id from public.skills where slug = 'react'),
+    'offer'
+  ),
+  (
+    '00000000-0000-4000-8000-000000000003',
+    (select id from public.skills where slug = 'figma'),
+    'looking_for'
+  )
+on conflict do nothing;
+
+insert into public.profile_interests (user_id, interest_id)
+values
+  (
+    '00000000-0000-4000-8000-000000000001',
+    (select id from public.interests where slug = 'phase2-test-interest')
+  ),
+  (
+    '00000000-0000-4000-8000-000000000002',
+    (select id from public.interests where slug = 'phase2-test-interest')
+  ),
+  (
+    '00000000-0000-4000-8000-000000000003',
+    (select id from public.interests where slug = 'phase2-test-interest')
+  )
+on conflict do nothing;
+
+insert into public.profile_collaboration_goals (user_id, collaboration_goal_id)
+values
+  (
+    '00000000-0000-4000-8000-000000000001',
+    (select id from public.collaboration_goals where slug = 'phase2-test-goal')
+  ),
+  (
+    '00000000-0000-4000-8000-000000000002',
+    (select id from public.collaboration_goals where slug = 'phase2-test-goal')
+  ),
+  (
+    '00000000-0000-4000-8000-000000000003',
+    (select id from public.collaboration_goals where slug = 'phase2-test-goal')
+  )
+on conflict do nothing;
+
 select hasnt_column('public', 'profiles', 'corporate_email', 'profiles do not duplicate corporate email');
 
 reset role;
