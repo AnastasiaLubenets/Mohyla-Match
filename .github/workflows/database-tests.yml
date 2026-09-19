@@ -1,0 +1,36 @@
+name: Database Tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+      - phase-0-1-foundation
+
+jobs:
+  database:
+    name: Supabase migrations, seed, and pgTAP
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.117.0
+
+      - name: Show Supabase CLI version
+        run: supabase --version
+
+      - name: Start local Supabase stack
+        run: supabase start
+
+      - name: Recreate database from migrations and seed
+        run: supabase db reset
+
+      - name: Run pgTAP database tests
+        run: supabase test db

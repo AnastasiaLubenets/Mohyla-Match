@@ -715,7 +715,6 @@ grant select, insert, delete on public.blocks to authenticated;
 grant select, insert on public.reports to authenticated;
 grant update (status, resolved_at, updated_at) on public.reports to authenticated;
 grant select, insert on public.admin_actions to authenticated;
-grant insert on public.product_events to authenticated;
 
 grant usage, select on sequence public.faculties_id_seq to authenticated;
 grant usage, select on sequence public.academic_programs_id_seq to authenticated;
@@ -723,7 +722,6 @@ grant usage, select on sequence public.skills_id_seq to authenticated;
 grant usage, select on sequence public.interests_id_seq to authenticated;
 grant usage, select on sequence public.collaboration_goals_id_seq to authenticated;
 grant usage, select on sequence public.signup_email_domains_id_seq to authenticated;
-grant usage on sequence public.product_events_id_seq to authenticated;
 
 grant execute on function private.is_admin(uuid) to authenticated;
 grant execute on function private.is_active_onboarded(uuid) to authenticated;
@@ -1023,14 +1021,6 @@ create policy matching_config_update_admin
   for update to authenticated
   using (private.is_admin(auth.uid()))
   with check (private.is_admin(auth.uid()));
-
-create policy product_events_insert_own_minimal
-  on public.product_events
-  for insert to authenticated
-  with check (
-    user_id = auth.uid()
-    and event_name <> 'mutual_match_created'
-  );
 
 create policy signup_email_domains_select_admin
   on public.signup_email_domains

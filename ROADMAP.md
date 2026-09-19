@@ -48,7 +48,7 @@ Exit criteria:
 
 ## Phase 2 — Database
 
-Status: implementation complete; local runtime verification blocked until Docker Desktop or Podman is available.
+Status: implementation complete; local runtime verification blocked until Docker Desktop or Podman is available; GitHub Actions database verification added and pending result.
 
 Deliverables:
 
@@ -64,6 +64,7 @@ Deliverables:
 - [x] reciprocal-match creation rule;
 - [x] seed taxonomy/config;
 - [x] database tests authored;
+- [x] database CI workflow authored;
 - [ ] database reset/test execution;
 - [ ] advisors clean or findings documented.
 
@@ -76,7 +77,8 @@ Exit criteria:
 Current validation note:
 
 - `supabase db reset` and `supabase test db` have not executed successfully locally because no supported container runtime is available in the current environment.
-- Phase 2 must not be marked PASS until migrations, seed, and pgTAP tests execute successfully against a clean local database.
+- `.github/workflows/database-tests.yml` verifies a clean database in GitHub Actions with `supabase start`, `supabase db reset`, and `supabase test db`.
+- Phase 2 must not be marked PASS until migrations, seed, and pgTAP tests execute successfully against a clean database in CI or another independent runtime environment.
 
 ## Phase 3 — Authentication
 

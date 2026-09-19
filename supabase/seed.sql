@@ -43,20 +43,30 @@ set faculty_id = excluded.faculty_id,
 
 insert into public.skills (category, slug, name, sort_order)
 values
-  ('technical', 'frontend-development', 'Frontend development', 10),
-  ('technical', 'backend-development', 'Backend development', 20),
-  ('technical', 'data-analysis', 'Data analysis', 30),
-  ('technical', 'product-design', 'Product design', 40),
-  ('technical', 'research-methods', 'Research methods', 50),
-  ('creative', 'copywriting', 'Copywriting', 10),
-  ('creative', 'visual-design', 'Visual design', 20),
-  ('creative', 'presentation-design', 'Presentation design', 30),
-  ('business', 'market-research', 'Market research', 10),
-  ('business', 'financial-modeling', 'Financial modeling', 20),
-  ('business', 'project-management', 'Project management', 30),
-  ('communication', 'public-speaking', 'Public speaking', 10),
-  ('communication', 'community-building', 'Community building', 20),
-  ('communication', 'event-organization', 'Event organization', 30)
+  ('Development', 'react', 'React', 10),
+  ('Development', 'python', 'Python', 20),
+  ('Development', 'java', 'Java', 30),
+  ('Development', 'sql', 'SQL', 40),
+  ('Development', 'ai-data', 'AI/Data', 50),
+  ('Design', 'figma', 'Figma', 10),
+  ('Design', 'ui-ux', 'UI/UX', 20),
+  ('Design', 'graphic-design', 'Graphic Design', 30),
+  ('Finance', 'excel', 'Excel', 10),
+  ('Finance', 'financial-analysis', 'Financial Analysis', 20),
+  ('Finance', 'accounting', 'Accounting', 30),
+  ('Finance', 'investments', 'Investments', 40),
+  ('Marketing', 'smm', 'SMM', 10),
+  ('Marketing', 'branding', 'Branding', 20),
+  ('Marketing', 'advertising', 'Advertising', 30),
+  ('Marketing', 'copywriting', 'Copywriting', 40),
+  ('Research', 'statistics', 'Statistics', 10),
+  ('Research', 'data-analysis', 'Data Analysis', 20),
+  ('Research', 'academic-research', 'Academic Research', 30),
+  ('Media', 'photography', 'Photography', 10),
+  ('Media', 'video', 'Video', 20),
+  ('Media', 'editing', 'Editing', 30),
+  ('Management', 'project-management', 'Project Management', 10),
+  ('Management', 'event-management', 'Event Management', 20)
 on conflict (slug) do update
 set category = excluded.category,
     name = excluded.name,
@@ -64,39 +74,99 @@ set category = excluded.category,
     is_active = true,
     updated_at = now();
 
+update public.skills
+set is_active = false,
+    updated_at = now()
+where slug not in (
+  'react',
+  'python',
+  'java',
+  'sql',
+  'ai-data',
+  'figma',
+  'ui-ux',
+  'graphic-design',
+  'excel',
+  'financial-analysis',
+  'accounting',
+  'investments',
+  'smm',
+  'branding',
+  'advertising',
+  'copywriting',
+  'statistics',
+  'data-analysis',
+  'academic-research',
+  'photography',
+  'video',
+  'editing',
+  'project-management',
+  'event-management'
+);
+
 insert into public.interests (slug, name, sort_order)
 values
   ('startups', 'Startups', 10),
   ('education', 'Education', 20),
-  ('civic-tech', 'Civic tech', 30),
-  ('culture', 'Culture', 40),
-  ('media', 'Media', 50),
-  ('science', 'Science', 60),
-  ('sustainability', 'Sustainability', 70),
-  ('career-growth', 'Career growth', 80),
-  ('student-initiatives', 'Student initiatives', 90),
-  ('volunteering', 'Volunteering', 100)
+  ('technology', 'Technology', 30),
+  ('finance', 'Finance', 40),
+  ('culture', 'Culture', 50),
+  ('volunteering', 'Volunteering', 60),
+  ('research', 'Research', 70),
+  ('social-impact', 'Social Impact', 80),
+  ('media', 'Media', 90),
+  ('entrepreneurship', 'Entrepreneurship', 100)
 on conflict (slug) do update
 set name = excluded.name,
     sort_order = excluded.sort_order,
     is_active = true,
     updated_at = now();
 
+update public.interests
+set is_active = false,
+    updated_at = now()
+where slug not in (
+  'startups',
+  'education',
+  'technology',
+  'finance',
+  'culture',
+  'volunteering',
+  'research',
+  'social-impact',
+  'media',
+  'entrepreneurship'
+);
+
 insert into public.collaboration_goals (slug, name, sort_order)
 values
-  ('build-project', 'Build a project', 10),
-  ('join-team', 'Join a team', 20),
-  ('find-cofounder', 'Find a cofounder', 30),
-  ('study-together', 'Study together', 40),
-  ('prepare-event', 'Prepare an event', 50),
-  ('research-collaboration', 'Research collaboration', 60),
-  ('portfolio-piece', 'Create a portfolio piece', 70),
-  ('practice-skills', 'Practice skills', 80)
+  ('project-teammate', 'Project teammate', 10),
+  ('startup-cofounder', 'Startup / Co-founder', 20),
+  ('study-partner', 'Study partner', 30),
+  ('research', 'Research', 40),
+  ('volunteering', 'Volunteering', 50),
+  ('event', 'Event', 60),
+  ('creative-project', 'Creative project', 70),
+  ('mentor-mentee', 'Mentor / Mentee', 80)
 on conflict (slug) do update
 set name = excluded.name,
     sort_order = excluded.sort_order,
     is_active = true,
     updated_at = now();
+
+update public.collaboration_goals
+set is_active = false,
+    updated_at = now()
+where slug not in (
+  'project-teammate',
+  'startup-cofounder',
+  'study-partner',
+  'research',
+  'volunteering',
+  'event',
+  'creative-project',
+  'mentor-mentee'
+);
 
 insert into public.matching_config (
   version,
