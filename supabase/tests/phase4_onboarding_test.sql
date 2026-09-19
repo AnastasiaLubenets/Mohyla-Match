@@ -1,6 +1,6 @@
 begin;
 
-select plan(17);
+select plan(29);
 
 insert into public.faculties (slug, display_name, avatar_theme_key, sort_order)
 values
@@ -293,6 +293,19 @@ select isnt(
   'profile stores the database-controlled completion timestamp'
 );
 
+do $$
+begin
+  perform set_config(
+    'phase4.completed_at',
+    (
+      select onboarding_completed_at::text
+      from public.profiles
+      where user_id = '00000000-0000-4000-8000-000000000401'
+    ),
+    true
+  );
+end $$;
+
 select is(
   (select public.complete_onboarding()),
   (
@@ -301,6 +314,113 @@ select is(
     where user_id = '00000000-0000-4000-8000-000000000401'
   ),
   'completion is idempotent'
+);
+
+select ok(
+  private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
+  'effective onboarded eligibility is active after full completion'
+);
+
+select is(
+  public.get_current_account_state(),
+  'active',
+  'account state is active after full completion'
+);
+
+delete from public.profile_skills
+where user_id = '00000000-0000-4000-8000-000000000401'
+  and skill_id = (select id from public.skills where slug = 'phase4-offer-skill')
+  and direction = 'offer';
+
+select ok(
+  not private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
+  'deleting the last offer skill removes effective onboarded eligibility'
+);
+
+select is(
+  public.get_current_account_state(),
+  'onboarding_incomplete',
+  'account state returns incomplete after deleting the last offer skill'
+);
+
+insert into public.profile_skills (user_id, skill_id, direction)
+values (
+  '00000000-0000-4000-8000-000000000401',
+  (select id from public.skills where slug = 'phase4-offer-skill'),
+  'offer'
+);
+
+select ok(
+  private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
+  'restoring an offer skill restores effective onboarded eligibility'
+);
+
+delete from public.profile_skills
+where user_id = '00000000-0000-4000-8000-000000000401'
+  and skill_id = (select id from public.skills where slug = 'phase4-looking-skill')
+  and direction = 'looking_for';
+
+select ok(
+  not private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
+  'deleting the last looking-for skill removes effective onboarded eligibility'
+);
+
+insert into public.profile_skills (user_id, skill_id, direction)
+values (
+  '00000000-0000-4000-8000-000000000401',
+  (select id from public.skills where slug = 'phase4-looking-skill'),
+  'looking_for'
+);
+
+select ok(
+  private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
+  'restoring a looking-for skill restores effective onboarded eligibility'
+);
+
+delete from public.profile_interests
+where user_id = '00000000-0000-4000-8000-000000000401'
+  and interest_id = (select id from public.interests where slug = 'phase4-interest');
+
+select ok(
+  not private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
+  'deleting the last interest removes effective onboarded eligibility'
+);
+
+insert into public.profile_interests (user_id, interest_id)
+values (
+  '00000000-0000-4000-8000-000000000401',
+  (select id from public.interests where slug = 'phase4-interest')
+);
+
+select ok(
+  private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
+  'restoring an interest restores effective onboarded eligibility'
+);
+
+delete from public.profile_collaboration_goals
+where user_id = '00000000-0000-4000-8000-000000000401'
+  and collaboration_goal_id = (select id from public.collaboration_goals where slug = 'phase4-goal');
+
+select ok(
+  not private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
+  'deleting the last collaboration goal removes effective onboarded eligibility'
+);
+
+insert into public.profile_collaboration_goals (user_id, collaboration_goal_id)
+values (
+  '00000000-0000-4000-8000-000000000401',
+  (select id from public.collaboration_goals where slug = 'phase4-goal')
+);
+
+select ok(
+  private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
+  'restoring a collaboration goal restores effective onboarded eligibility'
+);
+
+select is(
+  (select public.complete_onboarding()::text),
+  current_setting('phase4.completed_at'),
+  'completion after restored valid data keeps the original timestamp'
 );
 
 reset role;

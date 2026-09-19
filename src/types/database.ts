@@ -337,6 +337,10 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: string;
       };
+      get_current_account_state: {
+        Args: Record<PropertyKey, never>;
+        Returns: "onboarding_incomplete" | "active" | "suspended" | "deleted";
+      };
       get_matched_contact_email: {
         Args: {
           target_user_id: string;

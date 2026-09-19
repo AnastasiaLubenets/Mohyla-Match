@@ -395,6 +395,162 @@ async function loadOnboardingTaxonomy() {
   };
 }
 
+function applyFilters(query, filters) {
+  return filters.reduce(
+    (filteredQuery, [column, value]) => filteredQuery.eq(column, value),
+    query,
+  );
+}
+
+async function deleteOnboardingRows(table, filters, label) {
+  await expectNoSupabaseError(
+    await applyFilters(service.from(table).delete(), filters),
+    label,
+  );
+}
+
+async function insertOnboardingRow(table, row, label) {
+  await expectNoSupabaseError(await service.from(table).insert(row), label);
+}
+
+async function countOnboardingCompletedEvents(userId) {
+  const result = await service
+    .from("product_events")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("event_name", "onboarding_completed");
+
+  if (result.error) {
+    throw new Error(
+      `count onboarding_completed events: ${result.error.message}`,
+    );
+  }
+
+  return result.count ?? 0;
+}
+
+async function assertAppAccessible(cookieJar, label) {
+  assert.equal((await getPath("/app", cookieJar)).status, 200, label);
+}
+
+async function assertAppReturnsToOnboarding(cookieJar, label) {
+  assertRedirect(await getPath("/app", cookieJar), "/account/setup", label);
+}
+
+async function verifyOnboardingEligibilityToggle({
+  cookieJar,
+  deleteTable,
+  deleteFilters,
+  restoreTable,
+  restoreRow,
+  missingLabel,
+  restoredLabel,
+}) {
+  await deleteOnboardingRows(deleteTable, deleteFilters, missingLabel);
+  await assertAppReturnsToOnboarding(cookieJar, missingLabel);
+  await insertOnboardingRow(restoreTable, restoreRow, restoredLabel);
+  await assertAppAccessible(cookieJar, restoredLabel);
+}
+
+async function runOnboardingEligibilityRegression(
+  cookieJar,
+  userId,
+  taxonomy,
+  completedAt,
+) {
+  await verifyOnboardingEligibilityToggle({
+    cookieJar,
+    deleteTable: "profile_skills",
+    deleteFilters: [
+      ["user_id", userId],
+      ["skill_id", taxonomy.offerSkill.id],
+      ["direction", "offer"],
+    ],
+    restoreTable: "profile_skills",
+    restoreRow: {
+      user_id: userId,
+      skill_id: taxonomy.offerSkill.id,
+      direction: "offer",
+    },
+    missingLabel:
+      "deleting the last offer skill removes /app eligibility",
+    restoredLabel: "restoring an offer skill restores /app eligibility",
+  });
+
+  await verifyOnboardingEligibilityToggle({
+    cookieJar,
+    deleteTable: "profile_skills",
+    deleteFilters: [
+      ["user_id", userId],
+      ["skill_id", taxonomy.lookingForSkill.id],
+      ["direction", "looking_for"],
+    ],
+    restoreTable: "profile_skills",
+    restoreRow: {
+      user_id: userId,
+      skill_id: taxonomy.lookingForSkill.id,
+      direction: "looking_for",
+    },
+    missingLabel:
+      "deleting the last looking-for skill removes /app eligibility",
+    restoredLabel:
+      "restoring a looking-for skill restores /app eligibility",
+  });
+
+  await verifyOnboardingEligibilityToggle({
+    cookieJar,
+    deleteTable: "profile_interests",
+    deleteFilters: [
+      ["user_id", userId],
+      ["interest_id", taxonomy.interest.id],
+    ],
+    restoreTable: "profile_interests",
+    restoreRow: {
+      user_id: userId,
+      interest_id: taxonomy.interest.id,
+    },
+    missingLabel: "deleting the last interest removes /app eligibility",
+    restoredLabel: "restoring an interest restores /app eligibility",
+  });
+
+  await verifyOnboardingEligibilityToggle({
+    cookieJar,
+    deleteTable: "profile_collaboration_goals",
+    deleteFilters: [
+      ["user_id", userId],
+      ["collaboration_goal_id", taxonomy.goal.id],
+    ],
+    restoreTable: "profile_collaboration_goals",
+    restoreRow: {
+      user_id: userId,
+      collaboration_goal_id: taxonomy.goal.id,
+    },
+    missingLabel:
+      "deleting the last collaboration goal removes /app eligibility",
+    restoredLabel:
+      "restoring a collaboration goal restores /app eligibility",
+  });
+
+  const restoredProfile = await expectNoSupabaseError(
+    await service
+      .from("profiles")
+      .select("onboarding_completed_at")
+      .eq("user_id", userId)
+      .single(),
+    "load restored onboarding profile",
+  );
+  assert.equal(
+    restoredProfile.onboarding_completed_at,
+    completedAt,
+    "transient onboarding incompleteness preserves original completion timestamp",
+  );
+  assert.equal(
+    await countOnboardingCompletedEvents(userId),
+    1,
+    "onboarding_completed product event remains exactly once",
+  );
+}
+
 async function runOnboardingFlow(cookieJar, userId) {
   const taxonomy = await loadOnboardingTaxonomy();
 
@@ -542,11 +698,7 @@ async function runOnboardingFlow(cookieJar, userId) {
     "successful 4-step flow reaches app",
   );
 
-  assert.equal(
-    (await getPath("/app", cookieJar)).status,
-    200,
-    "completed active user can access app",
-  );
+  await assertAppAccessible(cookieJar, "completed active user can access app");
   assertRedirect(
     await getPath("/account/setup", cookieJar),
     "/app",
@@ -569,6 +721,12 @@ async function runOnboardingFlow(cookieJar, userId) {
     Object.hasOwn(completedProfile, "corporate_email"),
     false,
     "corporate email never enters profiles",
+  );
+  await runOnboardingEligibilityRegression(
+    cookieJar,
+    userId,
+    taxonomy,
+    completedProfile.onboarding_completed_at,
   );
 }
 
