@@ -181,7 +181,7 @@ select throws_ok(
        (select id from public.academic_programs where slug = 'phase4-program-b'),
        2
      ) $$,
-  '42501',
+  '23514',
   null,
   'program from another faculty is rejected'
 );
@@ -302,6 +302,8 @@ select is(
   ),
   'completion is idempotent'
 );
+
+reset role;
 
 select is(
   (
