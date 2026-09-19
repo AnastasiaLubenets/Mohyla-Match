@@ -455,7 +455,8 @@ Rules:
 - no client-only enforcement;
 - protected allowlist/configuration;
 - no normal user write access to domain configuration;
-- Auth hook or equivalent server-side mechanism in Phase 2.
+- Phase 2 database foundation stores the protected allowlist table;
+- Auth hook or equivalent server-side enforcement is wired in the auth integration phase.
 
 ## 19. Data Validation
 

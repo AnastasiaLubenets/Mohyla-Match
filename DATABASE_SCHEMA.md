@@ -1,29 +1,103 @@
 # Mohyla Match — Database Schema
 
-Status: Deferred until Phase 2 migrations
+Status: Phase 2 database foundation implemented
+Migration: `supabase/migrations/20260919120909_database_foundation.sql`
+Seed: `supabase/seed.sql`
+Security tests: `supabase/tests/phase2_security_test.sql`
 
-The canonical Phase 1 data model is maintained in `DATA_MODEL.md`.
+This file summarizes the implemented database contract. The canonical SQL remains the migration.
 
-Do not treat this file as an implemented SQL schema. Final database schema work begins in Phase 2 after the product, architecture, security model, and data model are reviewed for contradictions.
+## Implemented Tables
 
-Phase 2 will convert the reviewed model into:
+- `profiles`
+- `faculties`
+- `academic_programs`
+- `skills`
+- `profile_skills`
+- `interests`
+- `profile_interests`
+- `collaboration_goals`
+- `profile_collaboration_goals`
+- `interactions`
+- `matches`
+- `blocks`
+- `reports`
+- `admin_actions`
+- `user_roles`
+- `matching_config`
+- `product_events`
+- `signup_email_domains`
 
-- SQL migrations;
-- constraints;
-- indexes;
-- explicit grants;
-- Row Level Security policies;
-- seed data;
-- database/security tests.
+No internal messaging/chat tables, embeddings/vector tables, or user photo upload tables were created.
 
-Key Phase 1 decisions that Phase 2 must preserve:
+## Key Decisions
 
-- `corporate_email` is not stored in discoverable `profiles`;
-- corporate email is derived from verified Auth identity or a private system-derived contact projection;
-- no user-uploaded profile photos in V1;
-- faculties and academic programs are normalized data;
-- matches use canonical unordered pairs;
-- interactions use one current directed row per pair;
-- blocks have bilateral access effect;
-- admin roles are protected data, not editable metadata;
-- no internal messaging tables.
+- `profiles` uses `user_id` as the primary key and does not store `corporate_email`.
+- Corporate email is derived from `auth.users.email` only through `public.get_matched_contact_email(target_user_id)`.
+- Contact reveal requires an active mutual match, both profiles active/onboarded, confirmed target email, and no block in either direction.
+- Matches use canonical unordered pairs: `user_low < user_high` with unique `(user_low, user_high)`.
+- Directed interactions use one current row per `(source_user_id, target_user_id)` and support `connect`, `save`, and `skip`.
+- Directed interactions are readable by the source user only, so incoming Connect does not leak before mutual match.
+- Reciprocal current `connect` rows create a match through a database trigger; clients do not insert matches directly.
+- Blocks are stored directionally but readable by the blocker only; they close an active match and are enforced bilaterally for visibility, interaction, and contact reveal.
+- `user_roles` is protected role storage; normal users cannot self-admin.
+- `matching_config` stores integer percentage weights summing to 100. V1 seed is `35 / 25 / 15 / 15 / 10`.
+- `signup_email_domains` exists for configurable allowed domains, but no guessed production domain is seeded.
+
+## RLS And Grants
+
+All product tables have Row Level Security enabled and explicit grants.
+
+Anonymous users receive no product-table grants.
+
+Authenticated users can:
+
+- read active taxonomy data;
+- create/update their own profile fields;
+- manage their own profile skill/interest/goal rows;
+- manage their own outgoing interactions and blocks;
+- create reports;
+- insert minimal product events;
+- read only profiles, relations, matches, and reports allowed by ownership, active/onboarded state, match state, and block rules.
+
+Admin access is expressed through protected `user_roles` checks. Admin-client management is intentionally narrow and still subject to RLS; server-only admin flows can be added in Phase 3 without changing the schema shape.
+
+## Seed Data
+
+Seed data includes:
+
+- development/reference faculty and academic-program taxonomy;
+- controlled skills;
+- controlled interests;
+- controlled collaboration goals;
+- active Matching V1 configuration.
+
+The faculty/program taxonomy is explicitly development reference data, not verified production-canonical NaUKMA data.
+
+## Tests
+
+The Phase 2 pgTAP test covers:
+
+- no `corporate_email` column in `profiles`;
+- anonymous denial for profile/contact access;
+- no editing another profile;
+- no self-admin;
+- onboarding relation rows can be created before onboarding completion;
+- incoming directed Connect rows are not readable by the target user;
+- email denied before match and allowed after match;
+- reciprocal connect creates exactly one match;
+- duplicate, reversed, and self matches are rejected;
+- duplicate/invalid profile skills are rejected;
+- interaction source spoofing is rejected;
+- block disables contact/profile visibility, hides incoming block rows from the blocked user, and closes active match;
+- report moderation fields are protected;
+- admin actions are protected from normal users;
+- suspended users cannot act or be discovered;
+- seed weights and empty signup domain allowlist.
+
+## Known Phase 3 Integration Work
+
+- Wire signup-domain enforcement into Auth hook/server signup flow.
+- Build onboarding/profile/discover screens against these RLS contracts.
+- Add server/admin flows for suspension, account deletion/anonymisation, taxonomy management, and report triage.
+- Generate typed database bindings after a local Supabase stack is available.

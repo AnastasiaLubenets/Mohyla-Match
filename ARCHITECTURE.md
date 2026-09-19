@@ -110,7 +110,7 @@ Supabase Auth is responsible for:
 - verified email identity;
 - session issuance;
 - email confirmation;
-- rejecting unconfirmed or disallowed signup paths when Phase 2 Auth hooks/config are implemented.
+- rejecting unconfirmed or disallowed signup paths when the Auth hook/server signup integration is implemented.
 
 PostgreSQL is responsible for:
 

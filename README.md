@@ -37,7 +37,8 @@ Requirements:
 
 - Node.js 24+
 - npm
-- Supabase CLI for local backend work in later phases
+- Supabase CLI
+- Docker Desktop or Podman for the local Supabase database stack
 
 Install dependencies:
 
@@ -72,6 +73,19 @@ npm run lint
 npm run typecheck
 npm run build
 ```
+
+## Database commands
+
+```bash
+npx supabase db reset
+npx supabase test db
+```
+
+The database foundation lives in:
+
+- `supabase/migrations/20260919120909_database_foundation.sql`
+- `supabase/seed.sql`
+- `supabase/tests/phase2_security_test.sql`
 
 ## Repository structure
 
@@ -113,11 +127,17 @@ Phase 1:
 - screens, entities, permissions, match rules, avatar policy, security model, and MVP boundaries documented;
 - canonical scope reviewed for contradictions.
 
+Phase 2:
+- PostgreSQL schema, constraints, indexes, grants, RLS, seed data, and database security tests added;
+- `profiles` deliberately excludes `corporate_email`;
+- mutual matches are database-created from reciprocal Connect interactions;
+- internal chat, AI/vector tables, and user-uploaded profile photo storage remain out of scope.
+
 Current working branch:
 
 `phase-0-1-foundation`
 
 Next implementation step:
 
-1. Review Phase 1 documents.
-2. Begin Phase 2 migrations, grants, RLS, seed data, and security tests after approval.
+1. Run the Phase 2 database reset/tests in a local Supabase stack.
+2. Begin Phase 3 UI/auth/onboarding integration after Phase 2 acceptance.

@@ -1,8 +1,8 @@
 # Mohyla Match — Data Model
 
-Status: Canonical Phase 1 data model
+Status: Canonical Phase 1 data model, implemented by Phase 2 database foundation
 Purpose: Define entities and relationships before Phase 2 SQL migrations
-Important: This is not a migration file.
+Important: This is not a migration file. The implemented SQL source of truth is `supabase/migrations/20260919120909_database_foundation.sql`.
 
 ## 1. Modeling Principles
 
@@ -518,19 +518,20 @@ Candidate fields:
 - `collaboration_goals_weight`
 - `availability_weight`
 - `created_at`
+- `updated_at`
 
 Canonical V1 values:
 
-- 0.35
-- 0.25
-- 0.15
-- 0.15
-- 0.10
+- 35
+- 25
+- 15
+- 15
+- 10
 
 Rules:
 
 - exactly one active config version;
-- weights sum to 1.0;
+- weights sum to 100;
 - matching uses active config, not frontend constants.
 
 ## 20. Supporting `product_events`
@@ -648,4 +649,4 @@ Phase 2 migrations should include:
 - RLS enabled on exposed tables before grants;
 - explicit least-privilege grants.
 
-Do not write final SQL migrations until this model is reviewed for contradictions.
+Phase 2 implementation preserves these constraints through the database migration, seed data, explicit grants, RLS policies, and pgTAP tests.
