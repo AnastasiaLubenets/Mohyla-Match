@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - phase-0-1-foundation
+      - phase-3-auth
 
 jobs:
   web:
@@ -30,6 +31,9 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
+
+      - name: Auth route tests
+        run: npm run test:auth
 
       - name: Build
         run: npm run build

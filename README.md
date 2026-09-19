@@ -65,12 +65,40 @@ The initial web routes are:
 - `/`
 - `/login`
 - `/signup`
+- `/auth/confirm`
+- `/account/setup`
+- `/account/suspended`
+
+Current development branch:
+
+`phase-3-auth`
+
+Phase 3 Auth is implemented and verified on this branch. It includes signup, login, logout, SSR email confirmation, authenticated route protection, onboarding-incomplete redirects, suspended-account redirects, and corporate-domain enforcement through the database-backed allowlist.
+
+Allowed signup domains are stored in `public.signup_email_domains`. Do not hardcode a NaUKMA email domain in the app, configuration, or tests; add allowed corporate domains as data.
+
+## Supabase Auth email configuration
+
+Local Supabase uses a committed Confirm signup email template:
+
+- `supabase/templates/confirm_signup.html`
+
+The confirmation link must keep the Supabase SSR token-hash pattern:
+
+```text
+{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email
+```
+
+Hosted Supabase projects must configure the same Confirm signup template in the Auth email template settings. Production Site URL and redirect URLs must also include the deployed application origin and its Auth callback route before real users sign up.
+
+A new Free Supabase project using default SMTP may not permit customized Auth email templates. Production may require custom SMTP or an appropriate paid Supabase plan.
 
 ## Quality commands
 
 ```bash
 npm run lint
 npm run typecheck
+npm run test:auth
 npm run build
 ```
 
@@ -79,6 +107,7 @@ npm run build
 ```bash
 npx supabase db reset
 npx supabase test db
+npx supabase db advisors --local --type all --level warn --fail-on error
 ```
 
 The database foundation lives in:
@@ -133,11 +162,16 @@ Phase 2:
 - mutual matches are database-created from reciprocal Connect interactions;
 - internal chat, AI/vector tables, and user-uploaded profile photo storage remain out of scope.
 
+Phase 3:
+- Supabase SSR Auth client/server wiring, email confirmation, login/logout, protected-route state handling, and Before User Created corporate-domain enforcement are implemented;
+- local Confirm signup email template is configured with the token-hash SSR callback URL;
+- auth unit tests and GitHub Actions integration coverage verify allowed/disallowed/empty/case-insensitive/malformed domain behavior, normal-user restrictions, protected routes, logout, suspended users, onboarding-incomplete redirects, and the real Mailpit signup email confirmation path.
+
 Current working branch:
 
-`phase-0-1-foundation`
+`phase-3-auth`
 
 Next implementation step:
 
-1. Run the Phase 2 database reset/tests in a local Supabase stack.
-2. Begin Phase 3 UI/auth/onboarding integration after Phase 2 acceptance.
+1. Wait for Phase 3 acceptance.
+2. Begin Phase 4 onboarding only after Phase 3 is accepted.

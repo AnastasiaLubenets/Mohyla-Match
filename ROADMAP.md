@@ -2,6 +2,8 @@
 
 The roadmap follows the canonical phase order. Do not skip ahead because a later feature is visually attractive.
 
+Current working branch: `phase-3-auth`.
+
 ## Phase 0 — Repository & Architecture
 
 Deliverables:
@@ -59,7 +61,7 @@ Deliverables:
 - [x] indexes;
 - [x] explicit grants;
 - [x] RLS;
-- [ ] Auth signup-domain hook/config;
+- [x] Auth signup-domain hook/config;
 - [x] deterministic matching configuration foundation;
 - [x] reciprocal-match creation rule;
 - [x] seed taxonomy/config;
@@ -82,19 +84,42 @@ Current validation note:
 
 ## Phase 3 — Authentication
 
+Status: Phase 3 Auth implemented and verified on `phase-3-auth`.
+
 Deliverables:
 
-- sign up;
-- login;
-- email verification;
-- logout;
-- session handling;
-- allowed-domain enforcement;
-- unauthorized/suspended handling.
+- [x] sign up;
+- [x] login;
+- [x] email verification;
+- [x] logout;
+- [x] session handling;
+- [x] allowed-domain enforcement;
+- [x] unauthorized/suspended handling;
+- [x] SSR confirmation callback using `token_hash`;
+- [x] local Supabase Confirm signup template;
+- [x] real Mailpit signup email integration test.
 
 Exit criteria:
 
 - production-style Auth flow works end-to-end.
+
+Hosted Supabase requirements:
+
+- Configure the Confirm signup email template with:
+
+```text
+{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email
+```
+
+- Configure production Site URL and redirect URLs for the deployed app before signup is opened to real users.
+- Keep allowed corporate email domains in `public.signup_email_domains`; do not hardcode a NaUKMA email domain.
+- A new Free Supabase project using default SMTP may not permit customized Auth email templates, so production may require custom SMTP or an appropriate paid plan.
+
+Validation:
+
+- Auth unit coverage checks allowed domain, disallowed domain, empty allowlist fail-closed behavior, case-insensitive domain matching, malformed email rejection, normal-user restrictions, protected routes, logout, suspended users, and onboarding-incomplete redirects.
+- Auth integration coverage checks the real signup email path by creating a normal signup, reading the confirmation email from local Mailpit, following the email link, asserting SSR cookies are established, and confirming `/account/setup` returns 200.
+- Database CI keeps pgTAP and advisor checks green alongside Phase 3.
 
 ## Phase 4 — Onboarding
 
