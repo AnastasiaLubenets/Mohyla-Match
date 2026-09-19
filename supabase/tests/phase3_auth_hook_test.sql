@@ -1,11 +1,10 @@
 begin;
 
-select plan(11);
+select plan(13);
 
 delete from public.signup_email_domains;
 
 reset role;
-set local role supabase_auth_admin;
 
 select isnt(
   public.hook_before_user_created(
@@ -35,8 +34,6 @@ insert into public.signup_email_domains (domain, description, is_active)
 values
   ('allowed.test', 'Phase 3 allowed test domain', true),
   ('inactive.test', 'Phase 3 inactive test domain', false);
-
-set local role supabase_auth_admin;
 
 select is(
   public.hook_before_user_created(
@@ -68,6 +65,24 @@ select isnt(
   ) -> 'error',
   null,
   'inactive configured domain is rejected'
+);
+
+select ok(
+  has_function_privilege(
+    'supabase_auth_admin',
+    'public.hook_before_user_created(jsonb)',
+    'execute'
+  ),
+  'supabase_auth_admin can execute the auth hook'
+);
+
+select ok(
+  has_table_privilege(
+    'supabase_auth_admin',
+    'public.signup_email_domains',
+    'select'
+  ),
+  'supabase_auth_admin can read signup email domains'
 );
 
 reset role;
