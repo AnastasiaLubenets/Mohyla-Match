@@ -27,6 +27,13 @@ function loginMessage(error: string | null, status: string | null) {
     };
   }
 
+  if (status === "already-registered") {
+    return {
+      tone: "success",
+      text: "This account already exists. Log in to continue.",
+    };
+  }
+
   if (error === "missing") {
     return {
       tone: "error",
