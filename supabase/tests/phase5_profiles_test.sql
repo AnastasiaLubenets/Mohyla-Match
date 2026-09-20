@@ -531,7 +531,12 @@ select results_eq(
      from public.profile_skills ps
      join public.skills s on s.id = ps.skill_id
      where ps.user_id = '00000000-0000-4000-8000-000000000501'
-     order by ps.direction::text, s.slug $$,
+     order by
+       case
+         when ps.direction = 'offer'::public.skill_direction then 1
+         else 2
+       end,
+       s.slug $$,
   $$ values
        ('phase5-alt-skill'::text, 'offer'::text),
        ('phase5-looking-skill'::text, 'looking_for'::text) $$,
