@@ -684,10 +684,12 @@ select results_eq(
   'matching V1 weights are seeded exactly'
 );
 
-select is(
-  (select count(*)::integer from public.signup_email_domains),
-  0,
-  'no unconfirmed production signup email domains are seeded'
+select results_eq(
+  $$ select domain, is_active
+     from public.signup_email_domains
+     order by domain $$,
+  $$ values ('ukma.edu.ua'::text, true) $$,
+  'confirmed production signup email domain is seeded active'
 );
 
 select is(

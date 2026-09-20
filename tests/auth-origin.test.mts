@@ -88,6 +88,25 @@ test("forwarded production origin is used ahead of an internal localhost URL", (
   });
 });
 
+test("current production origin is used ahead of a Vercel deployment URL", () => {
+  withEnv({ VERCEL_URL: "mohyla-match-preview.vercel.app" }, () => {
+    const request = makeRequest("https://mohyla-match.vercel.app/auth/signup");
+
+    assert.equal(getAppOrigin(request), "https://mohyla-match.vercel.app");
+  });
+});
+
+test("forwarded production origin is used ahead of a Vercel deployment URL", () => {
+  withEnv({ VERCEL_URL: "mohyla-match-preview.vercel.app" }, () => {
+    const request = makeRequest("http://localhost:3000/auth/signup", {
+      "x-forwarded-host": "mohyla-match.vercel.app",
+      "x-forwarded-proto": "https",
+    });
+
+    assert.equal(getAppOrigin(request), "https://mohyla-match.vercel.app");
+  });
+});
+
 test("forwarded production origin is used ahead of a localhost site URL", () => {
   withEnv({ NEXT_PUBLIC_SITE_URL: "http://localhost:3000" }, () => {
     const request = makeRequest("http://localhost:3000/auth/signup", {
