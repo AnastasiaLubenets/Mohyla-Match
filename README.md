@@ -94,10 +94,12 @@ Local Supabase uses a committed Confirm signup email template:
 The confirmation link must keep the Supabase SSR token-hash pattern:
 
 ```text
-{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email
+{{ if .RedirectTo }}{{ .RedirectTo }}{{ else }}{{ .SiteURL }}/auth/confirm{{ end }}?token_hash={{ .TokenHash }}&type=email
 ```
 
-Hosted Supabase projects must configure the same Confirm signup template in the Auth email template settings. Production Site URL and redirect URLs must also include the deployed application origin and its Auth callback route before real users sign up.
+Hosted Supabase projects must configure the same Confirm signup template in the Auth email template settings. The app passes the full `/auth/confirm` callback through `emailRedirectTo`, so hosted templates should use `{{ .RedirectTo }}` for confirmation links instead of hardcoding localhost or relying only on `{{ .SiteURL }}`.
+
+Production must set `NEXT_PUBLIC_SITE_URL` to the deployed application origin. Supabase Auth Site URL must also be the deployed origin, and Redirect URLs must include the deployed `/auth/confirm` callback route before real users sign up. Local development can omit `NEXT_PUBLIC_SITE_URL` and continue using the current localhost origin.
 
 A new Free Supabase project using default SMTP may not permit customized Auth email templates. Production may require custom SMTP or an appropriate paid Supabase plan.
 

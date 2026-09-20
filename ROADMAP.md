@@ -108,10 +108,11 @@ Hosted Supabase requirements:
 - Configure the Confirm signup email template with:
 
 ```text
-{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email
+{{ if .RedirectTo }}{{ .RedirectTo }}{{ else }}{{ .SiteURL }}/auth/confirm{{ end }}?token_hash={{ .TokenHash }}&type=email
 ```
 
-- Configure production Site URL and redirect URLs for the deployed app before signup is opened to real users.
+- Set `NEXT_PUBLIC_SITE_URL` to the deployed application origin in production. Local development can omit it and use the current localhost origin.
+- Configure Supabase Auth Site URL to the deployed app origin and Redirect URLs to include the deployed `/auth/confirm` callback before signup is opened to real users.
 - Keep allowed corporate email domains in `public.signup_email_domains`; do not hardcode a NaUKMA email domain.
 - A new Free Supabase project using default SMTP may not permit customized Auth email templates, so production may require custom SMTP or an appropriate paid plan.
 

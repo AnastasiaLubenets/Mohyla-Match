@@ -5,6 +5,7 @@ import {
   readRequiredFormString,
   redirectTo,
 } from "@/lib/auth/http";
+import { getAppUrl } from "@/lib/auth/origin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function classifySignupError(message: string): string {
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = await createSupabaseServerClient();
-  const confirmUrl = new URL("/auth/confirm", request.url);
+  const confirmUrl = getAppUrl(request, "/auth/confirm");
   const { error } = await supabase.auth.signUp({
     email,
     password,
