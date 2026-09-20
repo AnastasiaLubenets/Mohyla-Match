@@ -69,14 +69,19 @@ The initial web routes are:
 - `/account/setup`
 - `/account/suspended`
 - `/app`
+- `/profile`
+- `/profile/edit`
+- `/profiles/[userId]`
 
 Current development branch:
 
-`phase-4-onboarding`
+`phase-5-profiles`
 
 Phase 3 Auth is implemented and verified on this branch. It includes signup, login, logout, SSR email confirmation, authenticated route protection, onboarding-incomplete redirects, suspended-account redirects, and corporate-domain enforcement through the database-backed allowlist.
 
-Phase 4 Onboarding is implemented on this branch. It includes the canonical 4-step onboarding flow, taxonomy-driven selections from Supabase, resume-from-first-incomplete-step behavior, server-side system avatar derivation, and a database-enforced completion RPC.
+Phase 4 Onboarding is implemented. It includes the canonical 4-step onboarding flow, taxonomy-driven selections from Supabase, resume-from-first-incomplete-step behavior, server-side system avatar derivation, and a database-enforced completion RPC.
+
+Phase 5 Profiles is implemented on this branch. It includes My Profile, Edit Profile, safe eligible-student Full Profile pages, reusable generated/system avatars, and an atomic database-controlled `public.update_my_profile(...)` RPC.
 
 Allowed signup domains are stored in `public.signup_email_domains`. Do not hardcode a NaUKMA email domain in the app, configuration, or tests; add allowed corporate domains as data.
 
@@ -117,9 +122,11 @@ The database foundation lives in:
 
 - `supabase/migrations/20260919120909_database_foundation.sql`
 - `supabase/migrations/20260919215757_phase4_onboarding_completion.sql`
+- `supabase/migrations/20260919230655_phase5_profiles.sql`
 - `supabase/seed.sql`
 - `supabase/tests/phase2_security_test.sql`
 - `supabase/tests/phase4_onboarding_test.sql`
+- `supabase/tests/phase5_profiles_test.sql`
 
 ## Repository structure
 
@@ -179,11 +186,19 @@ Phase 4:
 - `onboarding_completed_at` is set only by the database-controlled `public.complete_onboarding()` RPC after all required profile, skill, interest, and goal data exists;
 - completed active users can access `/app`; incomplete users resume onboarding.
 
+Phase 5:
+- My Profile, Edit Profile, and safe Full Profile views are implemented;
+- profile pages render system avatar, full name, faculty/program/year, bio, availability, offered skills, wanted skills, interests, and collaboration goals;
+- profile editing uses active Supabase taxonomy rows and saves through `public.update_my_profile(...)`;
+- the profile update RPC validates all required fields and relations before replacing data atomically;
+- corporate email remains outside `profiles` and is not rendered on profile pages;
+- Full Profile access depends on database/RLS eligibility: both users must be effectively active/onboarded and unblocked.
+
 Current working branch:
 
-`phase-4-onboarding`
+`phase-5-profiles`
 
 Next implementation step:
 
-1. Wait for Phase 4 acceptance.
-2. Begin Phase 5 Profiles only after Phase 4 is accepted.
+1. Wait for Phase 5 acceptance.
+2. Begin Phase 6 Matching Engine only after Phase 5 is accepted.

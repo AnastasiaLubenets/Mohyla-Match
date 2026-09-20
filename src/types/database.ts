@@ -351,6 +351,21 @@ export type Database = {
           user_id: string;
         }[];
       };
+      update_my_profile: {
+        Args: {
+          collaboration_goal_ids: number[];
+          interest_ids: number[];
+          looking_for_skill_ids: number[];
+          offer_skill_ids: number[];
+          profile_academic_program_id: number;
+          profile_availability: string | null;
+          profile_bio: string | null;
+          profile_faculty_id: number;
+          profile_full_name: string;
+          profile_year_of_study: number;
+        };
+        Returns: undefined;
+      };
     };
     Enums: {
       interaction_action: "connect" | "save" | "skip";

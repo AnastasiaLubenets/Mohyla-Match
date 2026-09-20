@@ -313,6 +313,25 @@ function assertRedirectWithParams(
   });
 }
 
+async function readPageText(response, label) {
+  assert.equal(response.status, 200, `${label}: expected 200`);
+  return response.text();
+}
+
+function assertTextContains(body, expectedText, label) {
+  assert.ok(
+    body.includes(expectedText),
+    `${label}: expected page to include "${expectedText}"`,
+  );
+}
+
+function assertTextExcludes(body, forbiddenText, label) {
+  assert.ok(
+    !body.includes(forbiddenText),
+    `${label}: expected page to omit "${forbiddenText}"`,
+  );
+}
+
 async function createConfirmedUser(email) {
   const { user } = await expectNoSupabaseError(
     await service.auth.admin.createUser({
@@ -338,10 +357,18 @@ async function loadOnboardingTaxonomy() {
       .single(),
     "load onboarding faculty",
   );
+  const otherFaculty = await expectNoSupabaseError(
+    await service
+      .from("faculties")
+      .select("id,avatar_theme_key")
+      .eq("slug", "development-humanities")
+      .single(),
+    "load second onboarding faculty",
+  );
   const program = await expectNoSupabaseError(
     await service
       .from("academic_programs")
-      .select("id,avatar_variant_key")
+      .select("id,faculty_id,avatar_variant_key")
       .eq("slug", "development-computer-science")
       .single(),
     "load onboarding program",
@@ -349,7 +376,7 @@ async function loadOnboardingTaxonomy() {
   const otherProgram = await expectNoSupabaseError(
     await service
       .from("academic_programs")
-      .select("id")
+      .select("id,faculty_id,avatar_variant_key")
       .eq("slug", "development-literature")
       .single(),
     "load other faculty program",
@@ -358,40 +385,73 @@ async function loadOnboardingTaxonomy() {
     await service
       .from("skills")
       .select("id,slug")
-      .in("slug", ["react", "figma"]),
+      .in("slug", ["react", "figma", "python", "ui-ux"]),
     "load onboarding skills",
   );
   const interests = await expectNoSupabaseError(
     await service
       .from("interests")
       .select("id,slug")
-      .eq("slug", "technology"),
-    "load onboarding interest",
+      .in("slug", ["technology", "education"]),
+    "load onboarding interests",
   );
   const goals = await expectNoSupabaseError(
     await service
       .from("collaboration_goals")
       .select("id,slug")
-      .eq("slug", "project-teammate"),
-    "load onboarding goal",
+      .in("slug", ["project-teammate", "study-partner"]),
+    "load onboarding goals",
   );
   const skillBySlug = new Map(skills.map((skill) => [skill.slug, skill]));
-  const interest = interests[0];
-  const goal = goals[0];
+  const interestBySlug = new Map(
+    interests.map((interest) => [interest.slug, interest]),
+  );
+  const goalBySlug = new Map(goals.map((goal) => [goal.slug, goal]));
 
   assert.ok(skillBySlug.get("react")?.id, "offer skill fixture exists");
   assert.ok(skillBySlug.get("figma")?.id, "looking-for skill fixture exists");
-  assert.ok(interest?.id, "interest fixture exists");
-  assert.ok(goal?.id, "collaboration goal fixture exists");
+  assert.ok(skillBySlug.get("python")?.id, "edit offer skill fixture exists");
+  assert.ok(
+    skillBySlug.get("ui-ux")?.id,
+    "edit looking-for skill fixture exists",
+  );
+  assert.ok(
+    interestBySlug.get("technology")?.id,
+    "interest fixture exists",
+  );
+  assert.ok(
+    interestBySlug.get("education")?.id,
+    "edit interest fixture exists",
+  );
+  assert.ok(
+    goalBySlug.get("project-teammate")?.id,
+    "collaboration goal fixture exists",
+  );
+  assert.ok(goalBySlug.get("study-partner")?.id, "edit goal fixture exists");
+  assert.notEqual(
+    faculty.id,
+    otherProgram.faculty_id,
+    "cross-faculty program fixture belongs to another faculty",
+  );
+  assert.equal(
+    otherFaculty.id,
+    otherProgram.faculty_id,
+    "second faculty owns the second program fixture",
+  );
 
   return {
+    editGoal: goalBySlug.get("study-partner"),
+    editInterest: interestBySlug.get("education"),
+    editLookingForSkill: skillBySlug.get("ui-ux"),
+    editOfferSkill: skillBySlug.get("python"),
     faculty,
-    program,
-    otherProgram,
+    goal: goalBySlug.get("project-teammate"),
+    interest: interestBySlug.get("technology"),
     offerSkill: skillBySlug.get("react"),
     lookingForSkill: skillBySlug.get("figma"),
-    interest,
-    goal,
+    otherFaculty,
+    otherProgram,
+    program,
   };
 }
 
@@ -427,6 +487,85 @@ async function countOnboardingCompletedEvents(userId) {
   }
 
   return result.count ?? 0;
+}
+
+function expectedAvatarKey(faculty, program) {
+  return `${faculty.avatar_theme_key}--${program.avatar_variant_key}`;
+}
+
+async function seedProfileRelations(userId, taxonomy) {
+  await expectNoSupabaseError(
+    await service.from("profile_skills").insert([
+      {
+        user_id: userId,
+        skill_id: taxonomy.offerSkill.id,
+        direction: "offer",
+      },
+      {
+        user_id: userId,
+        skill_id: taxonomy.lookingForSkill.id,
+        direction: "looking_for",
+      },
+    ]),
+    "seed profile skill relations",
+  );
+
+  await expectNoSupabaseError(
+    await service.from("profile_interests").insert({
+      user_id: userId,
+      interest_id: taxonomy.interest.id,
+    }),
+    "seed profile interest relation",
+  );
+
+  await expectNoSupabaseError(
+    await service.from("profile_collaboration_goals").insert({
+      user_id: userId,
+      collaboration_goal_id: taxonomy.goal.id,
+    }),
+    "seed profile collaboration goal relation",
+  );
+}
+
+async function seedCompletedProfile(
+  userId,
+  taxonomy,
+  {
+    deletedAt = null,
+    fullName = "Phase Five Target",
+    includeRequiredData = true,
+    profileStatus = "active",
+  } = {},
+) {
+  await expectNoSupabaseError(
+    await service.from("profiles").insert({
+      user_id: userId,
+      full_name: fullName,
+      faculty_id: taxonomy.faculty.id,
+      academic_program_id: taxonomy.program.id,
+      year_of_study: 2,
+      bio: `${fullName} bio`,
+      availability: "By arrangement",
+      profile_status: profileStatus,
+      onboarding_completed_at: includeRequiredData
+        ? new Date().toISOString()
+        : null,
+      deleted_at: deletedAt,
+    }),
+    `seed ${fullName} profile`,
+  );
+
+  if (includeRequiredData) {
+    await seedProfileRelations(userId, taxonomy);
+  }
+}
+
+async function assertProfileUnavailable(cookieJar, userId, label) {
+  assert.equal(
+    (await getPath(`/profiles/${userId}`, cookieJar)).status,
+    404,
+    label,
+  );
 }
 
 async function assertAppAccessible(cookieJar, label) {
@@ -608,7 +747,7 @@ async function runOnboardingFlow(cookieJar, userId) {
   assert.equal(savedProfile.full_name, "Phase Four Integration");
   assert.equal(
     savedProfile.system_avatar_key,
-    `${taxonomy.faculty.avatar_theme_key}--${taxonomy.program.avatar_variant_key}`,
+    expectedAvatarKey(taxonomy.faculty, taxonomy.program),
     "system avatar key is server-derived",
   );
   assert.equal(
@@ -728,6 +867,348 @@ async function runOnboardingFlow(cookieJar, userId) {
     taxonomy,
     completedProfile.onboarding_completed_at,
   );
+
+  return {
+    completedAt: completedProfile.onboarding_completed_at,
+    taxonomy,
+  };
+}
+
+async function runProfileFlow(
+  cookieJar,
+  userId,
+  userEmail,
+  taxonomy,
+  completedAt,
+) {
+  assertRedirect(await getPath("/profile"), "/login", "anonymous my profile");
+  assertRedirect(
+    await getPath("/profile/edit"),
+    "/login",
+    "anonymous edit profile",
+  );
+
+  const targetUser = await createConfirmedUser(
+    `profile-target-${suffix}@${allowedDomain}`,
+  );
+  await seedCompletedProfile(targetUser.id, taxonomy, {
+    fullName: "Phase Five Visible Target",
+  });
+
+  assertRedirect(
+    await getPath(`/profiles/${targetUser.id}`),
+    "/login",
+    "anonymous other profile",
+  );
+  assertRedirect(
+    await getPath(`/profiles/${userId}`, cookieJar),
+    "/profile",
+    "own full-profile route canonicalizes to my profile",
+  );
+
+  const ownProfileBody = await readPageText(
+    await getPath("/profile", cookieJar),
+    "own profile view",
+  );
+  assertTextContains(
+    ownProfileBody,
+    "Phase Four Integration",
+    "own profile shows saved onboarding name",
+  );
+  assertTextContains(
+    ownProfileBody,
+    "Edit profile",
+    "own profile includes edit action",
+  );
+  assertTextExcludes(
+    ownProfileBody,
+    userEmail,
+    "own profile never renders corporate email",
+  );
+
+  const editProfileBody = await readPageText(
+    await getPath("/profile/edit", cookieJar),
+    "edit profile view",
+  );
+  assertTextContains(
+    editProfileBody,
+    "Edit profile",
+    "edit profile page renders",
+  );
+  assertTextExcludes(
+    editProfileBody,
+    userEmail,
+    "edit profile never renders corporate email",
+  );
+
+  assertRedirect(
+    await postForm(
+      "/profile/update",
+      {
+        fullName: "Zero Offer Profile",
+        facultyId: taxonomy.faculty.id,
+        academicProgramId: taxonomy.program.id,
+        yearOfStudy: 2,
+        lookingForSkillId: taxonomy.lookingForSkill.id,
+        interestId: taxonomy.interest.id,
+        collaborationGoalId: taxonomy.goal.id,
+      },
+      cookieJar,
+    ),
+    "/profile/edit",
+    "profile edit requires at least one offered skill",
+  );
+
+  assertRedirect(
+    await postForm(
+      "/profile/update",
+      {
+        fullName: "Cross Faculty Profile",
+        facultyId: taxonomy.faculty.id,
+        academicProgramId: taxonomy.otherProgram.id,
+        yearOfStudy: 2,
+        offerSkillId: taxonomy.offerSkill.id,
+        lookingForSkillId: taxonomy.lookingForSkill.id,
+        interestId: taxonomy.interest.id,
+        collaborationGoalId: taxonomy.goal.id,
+      },
+      cookieJar,
+    ),
+    "/profile/edit",
+    "profile edit rejects cross-faculty program",
+  );
+
+  const beforeEditProfile = await expectNoSupabaseError(
+    await service
+      .from("profiles")
+      .select("system_avatar_key,onboarding_completed_at")
+      .eq("user_id", userId)
+      .single(),
+    "load profile before edit",
+  );
+  assert.equal(
+    beforeEditProfile.onboarding_completed_at,
+    completedAt,
+    "profile flow starts with the onboarding completion timestamp",
+  );
+
+  assertRedirect(
+    await postForm(
+      "/profile/update",
+      {
+        fullName: "Phase Five Integration Updated",
+        facultyId: taxonomy.otherFaculty.id,
+        academicProgramId: taxonomy.otherProgram.id,
+        yearOfStudy: 4,
+        bio: "Updated profile bio",
+        availability: "Evenings after classes",
+        offerSkillId: taxonomy.editOfferSkill.id,
+        lookingForSkillId: taxonomy.editLookingForSkill.id,
+        interestId: taxonomy.editInterest.id,
+        collaborationGoalId: taxonomy.editGoal.id,
+      },
+      cookieJar,
+    ),
+    "/profile",
+    "valid profile edit redirects to my profile",
+  );
+
+  const updatedProfileBody = await readPageText(
+    await getPath("/profile", cookieJar),
+    "updated own profile view",
+  );
+  assertTextContains(
+    updatedProfileBody,
+    "Phase Five Integration Updated",
+    "updated profile page shows changed name",
+  );
+  assertTextContains(
+    updatedProfileBody,
+    "Updated profile bio",
+    "updated profile page shows changed bio",
+  );
+  assertTextContains(
+    updatedProfileBody,
+    "Evenings after classes",
+    "updated profile page shows changed availability",
+  );
+  assertTextExcludes(
+    updatedProfileBody,
+    userEmail,
+    "updated profile still omits corporate email",
+  );
+
+  const updatedProfile = await expectNoSupabaseError(
+    await service
+      .from("profiles")
+      .select(
+        "full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key,onboarding_completed_at",
+      )
+      .eq("user_id", userId)
+      .single(),
+    "load profile after edit",
+  );
+  assert.equal(updatedProfile.full_name, "Phase Five Integration Updated");
+  assert.equal(updatedProfile.faculty_id, taxonomy.otherFaculty.id);
+  assert.equal(updatedProfile.academic_program_id, taxonomy.otherProgram.id);
+  assert.equal(updatedProfile.year_of_study, 4);
+  assert.equal(updatedProfile.bio, "Updated profile bio");
+  assert.equal(updatedProfile.availability, "Evenings after classes");
+  assert.equal(
+    updatedProfile.system_avatar_key,
+    expectedAvatarKey(taxonomy.otherFaculty, taxonomy.otherProgram),
+    "profile edit keeps avatar database-derived",
+  );
+  assert.notEqual(
+    updatedProfile.system_avatar_key,
+    beforeEditProfile.system_avatar_key,
+    "faculty/program edit changes the derived avatar key",
+  );
+  assert.equal(
+    updatedProfile.onboarding_completed_at,
+    completedAt,
+    "profile edit preserves onboarding completion timestamp",
+  );
+  assert.equal(
+    Object.hasOwn(updatedProfile, "corporate_email"),
+    false,
+    "profile storage returned to the app has no corporate_email field",
+  );
+  assert.equal(
+    await countOnboardingCompletedEvents(userId),
+    1,
+    "profile edit does not duplicate onboarding_completed event",
+  );
+
+  const updatedSkills = await expectNoSupabaseError(
+    await service
+      .from("profile_skills")
+      .select("skill_id,direction")
+      .eq("user_id", userId),
+    "load updated profile skills",
+  );
+  const skillByDirection = new Map(
+    updatedSkills.map((skill) => [skill.direction, skill.skill_id]),
+  );
+  assert.equal(skillByDirection.get("offer"), taxonomy.editOfferSkill.id);
+  assert.equal(
+    skillByDirection.get("looking_for"),
+    taxonomy.editLookingForSkill.id,
+  );
+
+  const updatedInterests = await expectNoSupabaseError(
+    await service
+      .from("profile_interests")
+      .select("interest_id")
+      .eq("user_id", userId),
+    "load updated profile interests",
+  );
+  assert.deepEqual(
+    updatedInterests.map((interest) => interest.interest_id),
+    [taxonomy.editInterest.id],
+  );
+
+  const updatedGoals = await expectNoSupabaseError(
+    await service
+      .from("profile_collaboration_goals")
+      .select("collaboration_goal_id")
+      .eq("user_id", userId),
+    "load updated profile goals",
+  );
+  assert.deepEqual(
+    updatedGoals.map((goal) => goal.collaboration_goal_id),
+    [taxonomy.editGoal.id],
+  );
+
+  await assertAppAccessible(
+    cookieJar,
+    "valid profile edit keeps active user eligible for /app",
+  );
+
+  const targetProfileBody = await readPageText(
+    await getPath(`/profiles/${targetUser.id}`, cookieJar),
+    "eligible other profile view",
+  );
+  assertTextContains(
+    targetProfileBody,
+    "Phase Five Visible Target",
+    "eligible other profile is visible",
+  );
+  assertTextExcludes(
+    targetProfileBody,
+    targetUser.email,
+    "other profile never renders corporate email",
+  );
+  assertTextExcludes(
+    targetProfileBody,
+    "Edit profile",
+    "other profile has no edit action",
+  );
+
+  const incompleteTarget = await createConfirmedUser(
+    `profile-incomplete-${suffix}@${allowedDomain}`,
+  );
+  await seedCompletedProfile(incompleteTarget.id, taxonomy, {
+    fullName: "Phase Five Incomplete Target",
+    includeRequiredData: false,
+  });
+  await assertProfileUnavailable(
+    cookieJar,
+    incompleteTarget.id,
+    "incomplete target profile is unavailable",
+  );
+
+  const suspendedTarget = await createConfirmedUser(
+    `profile-suspended-${suffix}@${allowedDomain}`,
+  );
+  await seedCompletedProfile(suspendedTarget.id, taxonomy, {
+    fullName: "Phase Five Suspended Target",
+    profileStatus: "suspended",
+  });
+  await assertProfileUnavailable(
+    cookieJar,
+    suspendedTarget.id,
+    "suspended target profile is unavailable",
+  );
+
+  const deletedTarget = await createConfirmedUser(
+    `profile-deleted-${suffix}@${allowedDomain}`,
+  );
+  await seedCompletedProfile(deletedTarget.id, taxonomy, {
+    deletedAt: new Date().toISOString(),
+    fullName: "Phase Five Deleted Target",
+    profileStatus: "deleted",
+  });
+  await assertProfileUnavailable(
+    cookieJar,
+    deletedTarget.id,
+    "deleted target profile is unavailable",
+  );
+
+  const blockedTarget = await createConfirmedUser(
+    `profile-blocked-${suffix}@${allowedDomain}`,
+  );
+  await seedCompletedProfile(blockedTarget.id, taxonomy, {
+    fullName: "Phase Five Blocked Target",
+  });
+  await expectNoSupabaseError(
+    await service.from("blocks").insert({
+      blocker_user_id: userId,
+      blocked_user_id: blockedTarget.id,
+    }),
+    "seed profile block",
+  );
+  await assertProfileUnavailable(
+    cookieJar,
+    blockedTarget.id,
+    "blocked target profile is unavailable",
+  );
+
+  await assertProfileUnavailable(
+    cookieJar,
+    "00000000-0000-4000-8000-000000009999",
+    "guessed profile UUID is unavailable",
+  );
 }
 
 async function seedSuspendedProfile(userId) {
@@ -802,9 +1283,16 @@ async function run() {
     "/account/setup",
     "real signup email confirmation route",
   );
-  await runOnboardingFlow(
+  const onboardingResult = await runOnboardingFlow(
     realConfirmationCookies,
     allowedSignup.data.user.id,
+  );
+  await runProfileFlow(
+    realConfirmationCookies,
+    allowedSignup.data.user.id,
+    realEmailSignupAddress,
+    onboardingResult.taxonomy,
+    onboardingResult.completedAt,
   );
 
   const caseInsensitiveSignup = await anon.auth.signUp({
@@ -911,6 +1399,16 @@ async function run() {
     200,
     "onboarding incomplete user can view setup placeholder",
   );
+  assertRedirect(
+    await getPath("/profile", onboardingCookies),
+    "/account/setup",
+    "onboarding incomplete user cannot view my profile",
+  );
+  assertRedirect(
+    await getPath("/profile/edit", onboardingCookies),
+    "/account/setup",
+    "onboarding incomplete user cannot edit profile",
+  );
 
   assertRedirect(
     await postForm("/auth/logout", {}, onboardingCookies),
@@ -950,6 +1448,16 @@ async function run() {
     await getPath("/account/setup", suspendedCookies),
     "/account/suspended",
     "suspended user cannot onboard",
+  );
+  assertRedirect(
+    await getPath("/profile", suspendedCookies),
+    "/account/suspended",
+    "suspended user cannot view my profile",
+  );
+  assertRedirect(
+    await getPath("/profile/edit", suspendedCookies),
+    "/account/suspended",
+    "suspended user cannot edit profile",
   );
 }
 

@@ -9,6 +9,7 @@ on:
       - phase-0-1-foundation
       - phase-3-auth
       - phase-4-onboarding
+      - phase-5-profiles
 
 jobs:
   database:
@@ -62,7 +63,7 @@ jobs:
       - name: Build app for auth integration
         run: npm run build
 
-      - name: Run auth integration tests
+      - name: Run auth and profile integration tests
         shell: bash
         run: |
           npm run start -- -p 3000 > next-auth.log 2>&1 &

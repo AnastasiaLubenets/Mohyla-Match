@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { requireAccountState } from "@/lib/auth/guards";
 
 export const dynamic = "force-dynamic";
@@ -34,8 +36,14 @@ export default async function AppPage() {
             You are ready for Mohyla Match.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-            Discover and profile editing begin in later phases.
+            Your profile is ready. Discover begins in a later phase.
           </p>
+          <Link
+            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-primary px-5 text-sm font-semibold text-white transition hover:bg-primary-strong"
+            href="/profile"
+          >
+            View my profile
+          </Link>
         </div>
       </section>
     </main>
