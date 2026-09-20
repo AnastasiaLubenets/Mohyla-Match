@@ -590,6 +590,8 @@ select is(
   'valid edit preserves original onboarding_completed_at'
 );
 
+reset role;
+
 select is(
   (
     select count(*)::integer
@@ -600,6 +602,9 @@ select is(
   1,
   'valid edit does not duplicate onboarding_completed event'
 );
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000501', true);
 
 select ok(
   private.is_active_onboarded('00000000-0000-4000-8000-000000000501'),
