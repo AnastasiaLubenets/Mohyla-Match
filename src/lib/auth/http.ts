@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { getAppUrl } from "@/lib/auth/origin";
+
 export function redirectTo(request: NextRequest, path: string): NextResponse {
-  return NextResponse.redirect(new URL(path, request.url), 303);
+  return NextResponse.redirect(getAppUrl(request, path), 303);
 }
 
 export function readRequiredFormString(
