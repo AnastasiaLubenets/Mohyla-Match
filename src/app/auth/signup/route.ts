@@ -6,22 +6,11 @@ import {
   redirectTo,
 } from "@/lib/auth/http";
 import { getAppUrl } from "@/lib/auth/origin";
-import { destinationForSignupResult } from "@/lib/auth/signup";
+import {
+  destinationForSignupError,
+  destinationForSignupResult,
+} from "@/lib/auth/signup";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-
-function classifySignupError(message: string): string {
-  const normalized = message.toLowerCase();
-
-  if (normalized.includes("corporate") || normalized.includes("domain")) {
-    return "domain";
-  }
-
-  if (normalized.includes("password")) {
-    return "password";
-  }
-
-  return "signup";
-}
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
@@ -52,10 +41,7 @@ export async function POST(request: NextRequest) {
   const { error } = signUpResult;
 
   if (error) {
-    return redirectTo(
-      request,
-      pathWithParams("/signup", { error: classifySignupError(error.message) }),
-    );
+    return redirectTo(request, destinationForSignupError(error.message));
   }
 
   return redirectTo(request, destinationForSignupResult(signUpResult));
