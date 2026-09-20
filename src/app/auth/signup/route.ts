@@ -6,6 +6,7 @@ import {
   redirectTo,
 } from "@/lib/auth/http";
 import { getAppUrl } from "@/lib/auth/origin";
+import { destinationForSignupResult } from "@/lib/auth/signup";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function classifySignupError(message: string): string {
@@ -41,13 +42,14 @@ export async function POST(request: NextRequest) {
 
   const supabase = await createSupabaseServerClient();
   const confirmUrl = getAppUrl(request, "/auth/confirm");
-  const { error } = await supabase.auth.signUp({
+  const signUpResult = await supabase.auth.signUp({
     email,
     password,
     options: {
       emailRedirectTo: confirmUrl.toString(),
     },
   });
+  const { error } = signUpResult;
 
   if (error) {
     return redirectTo(
@@ -56,5 +58,5 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  return redirectTo(request, pathWithParams("/signup", { status: "check-email" }));
+  return redirectTo(request, destinationForSignupResult(signUpResult));
 }
