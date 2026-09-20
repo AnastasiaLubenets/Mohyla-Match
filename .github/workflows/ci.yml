@@ -8,6 +8,7 @@ on:
       - phase-0-1-foundation
       - phase-3-auth
       - phase-4-onboarding
+      - phase-5-profiles
 
 jobs:
   web:

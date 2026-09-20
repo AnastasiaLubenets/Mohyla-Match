@@ -2,7 +2,7 @@
 
 The roadmap follows the canonical phase order. Do not skip ahead because a later feature is visually attractive.
 
-Current working branch: `phase-4-onboarding`.
+Current working branch: `phase-5-profiles`.
 
 ## Phase 0 — Repository & Architecture
 
@@ -147,22 +147,36 @@ Validation:
 - `public.complete_onboarding()` checks the authenticated user's own active profile, valid active faculty/program/year, at least one offered skill, at least one looking-for skill, at least one interest, and at least one collaboration goal before setting `onboarding_completed_at`.
 - Direct client writes to `system_avatar_key` and `onboarding_completed_at` are revoked for authenticated users.
 - The integration flow signs up through Auth, follows the real Mailpit confirmation link, completes all four onboarding steps through HTTP form posts, and verifies access to `/app`.
-- Phase 5 Profiles has not started.
+- Phase 5 profile routes reuse the same live-completeness boundary.
 
 ## Phase 5 — Profiles
 
+Status: Phase 5 Profiles implemented on `phase-5-profiles`.
+
 Deliverables:
 
-- My Profile;
-- Edit Profile;
-- Full Profile;
-- generated/system avatar;
-- skills/interests/goals/availability;
-- safe public profile projection.
+- [x] My Profile;
+- [x] Edit Profile;
+- [x] Full Profile;
+- [x] generated/system avatar;
+- [x] skills/interests/goals/availability;
+- [x] safe public profile projection;
+- [x] atomic database-controlled profile update path;
+- [x] RLS-backed hidden states for incomplete/suspended/deleted/blocked targets;
+- [x] pgTAP and real local Supabase integration coverage.
 
 Exit criteria:
 
 - own edit + eligible other-profile view work with RLS.
+
+Validation:
+
+- `/profile` and `/profile/edit` require an active effectively onboarded user.
+- `/profiles/[userId]` returns a safe unavailable page for incomplete, suspended, deleted, blocked, guessed, or otherwise inaccessible targets.
+- `public.update_my_profile(...)` uses `auth.uid()`, validates active taxonomy and all required profile sections, and replaces profile relations atomically.
+- `system_avatar_key` remains database-derived after faculty/program edits.
+- Corporate email remains outside `profiles` and is not rendered by profile pages.
+- Phase 6 Matching Engine has not started.
 
 ## Phase 6 — Matching Engine
 
