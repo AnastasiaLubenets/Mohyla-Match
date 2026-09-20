@@ -4,9 +4,8 @@ type OriginRequest = {
   url: string;
 };
 
-const configuredOriginEnvVars = [
-  "NEXT_PUBLIC_SITE_URL",
-  "SITE_URL",
+const canonicalOriginEnvVars = ["NEXT_PUBLIC_SITE_URL", "SITE_URL"] as const;
+const deploymentOriginEnvVars = [
   "NEXT_PUBLIC_VERCEL_URL",
   "VERCEL_URL",
 ] as const;
@@ -55,8 +54,8 @@ function isLocalOrigin(origin: string): boolean {
   }
 }
 
-function configuredOrigins(): string[] {
-  return configuredOriginEnvVars
+function originsFromEnv(envVars: readonly string[]): string[] {
+  return envVars
     .map((envVar) => normalizeOrigin(process.env[envVar]))
     .filter((origin): origin is string => Boolean(origin));
 }
@@ -87,19 +86,21 @@ function requestOrigin(request: OriginRequest): string | null {
 }
 
 export function getAppOrigin(request: OriginRequest): string {
-  const configured = configuredOrigins();
+  const canonical = originsFromEnv(canonicalOriginEnvVars);
   const current = [forwardedOrigin(request), requestOrigin(request)].filter(
     (origin): origin is string => Boolean(origin),
   );
-  const origins = [...configured, ...current];
+  const deployment = originsFromEnv(deploymentOriginEnvVars);
 
-  const nonLocalOrigin = origins.find((origin) => !isLocalOrigin(origin));
+  const nonLocalOrigin = [...canonical, ...current, ...deployment].find(
+    (origin) => !isLocalOrigin(origin),
+  );
 
   if (nonLocalOrigin) {
     return nonLocalOrigin;
   }
 
-  const localOrigin = origins.at(0);
+  const localOrigin = [...canonical, ...current, ...deployment].at(0);
 
   if (localOrigin && process.env.VERCEL_ENV !== "production") {
     return localOrigin;
