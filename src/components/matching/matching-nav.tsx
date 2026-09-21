@@ -15,6 +15,12 @@ export function MatchingNav() {
         </Link>
         <Link
           className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-foreground transition hover:border-primary"
+          href="/saved"
+        >
+          Saved
+        </Link>
+        <Link
+          className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-foreground transition hover:border-primary"
           href="/matches"
         >
           Matches
@@ -23,7 +29,7 @@ export function MatchingNav() {
           className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-foreground transition hover:border-primary"
           href="/profile"
         >
-          My profile
+          My Profile
         </Link>
         <form action="/auth/logout" method="post">
           <button

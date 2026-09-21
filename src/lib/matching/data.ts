@@ -42,6 +42,7 @@ export type MatchSummary = Readonly<{
   academicProgramName: string;
   availability: string | null;
   bio: string | null;
+  canDirectContact: boolean;
   collaborationGoals: MatchingItem[];
   facultyName: string;
   fullName: string;
@@ -55,8 +56,26 @@ export type MatchSummary = Readonly<{
   yearOfStudy: number;
 }>;
 
+export type SavedProfileSummary = Readonly<{
+  academicProgramName: string;
+  availability: string | null;
+  bio: string | null;
+  canDirectContact: boolean;
+  collaborationGoals: MatchingItem[];
+  facultyName: string;
+  fullName: string;
+  interests: MatchingItem[];
+  lookingForSkills: MatchingSkill[];
+  offeredSkills: MatchingSkill[];
+  savedAt: string;
+  systemAvatarKey: string;
+  userId: string;
+  yearOfStudy: number;
+}>;
+
 export type ProfileConnectionStatus = Readonly<{
   blockedByMe: boolean;
+  canDirectContact: boolean;
   isMatched: boolean;
   matchId: string | null;
   outgoingAction: "connect" | "save" | "skip" | null;
@@ -182,6 +201,7 @@ export async function loadMyMatches(
       academicProgramName: match.academic_program_name,
       availability: match.availability,
       bio: match.bio,
+      canDirectContact: match.can_direct_contact,
       collaborationGoals: parseNamedItems(match.collaboration_goals),
       facultyName: match.faculty_name,
       fullName: match.full_name,
@@ -193,6 +213,39 @@ export async function loadMyMatches(
       systemAvatarKey: match.system_avatar_key,
       userId: match.user_id,
       yearOfStudy: match.year_of_study,
+    })),
+    error: false,
+  };
+}
+
+export async function loadSavedProfiles(
+  supabase: SupabaseServerClient,
+  limit = 50,
+): Promise<LoadResult<SavedProfileSummary[]>> {
+  const result = await supabase.rpc("get_saved_profiles", {
+    saved_limit: limit,
+  });
+
+  if (result.error) {
+    return { data: null, error: true };
+  }
+
+  return {
+    data: (result.data ?? []).map((profile) => ({
+      academicProgramName: profile.academic_program_name,
+      availability: profile.availability,
+      bio: profile.bio,
+      canDirectContact: profile.can_direct_contact,
+      collaborationGoals: parseNamedItems(profile.collaboration_goals),
+      facultyName: profile.faculty_name,
+      fullName: profile.full_name,
+      interests: parseNamedItems(profile.interests),
+      lookingForSkills: parseSkillItems(profile.looking_for_skills),
+      offeredSkills: parseSkillItems(profile.offered_skills),
+      savedAt: profile.saved_at,
+      systemAvatarKey: profile.system_avatar_key,
+      userId: profile.user_id,
+      yearOfStudy: profile.year_of_study,
     })),
     error: false,
   };
@@ -216,6 +269,7 @@ export async function loadProfileConnectionStatus(
     data: status
       ? {
           blockedByMe: status.blocked_by_me,
+          canDirectContact: status.can_direct_contact,
           isMatched: status.is_matched,
           matchId: status.match_id,
           outgoingAction: status.outgoing_action,

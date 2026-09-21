@@ -101,6 +101,7 @@ export async function updateMyProfile(request: NextRequest) {
   const yearOfStudy = readRequiredInteger(formData, "yearOfStudy");
   const bio = readOptionalString(formData, "bio");
   const availability = readOptionalString(formData, "availability");
+  const allowDirectContact = formData.get("allowDirectContact") === "on";
   const offerSkillIds = readIdList(formData, "offerSkillId");
   const lookingForSkillIds = readIdList(formData, "lookingForSkillId");
   const interestIds = readIdList(formData, "interestId");
@@ -154,6 +155,7 @@ export async function updateMyProfile(request: NextRequest) {
     looking_for_skill_ids: lookingForSkillIds,
     offer_skill_ids: offerSkillIds,
     profile_academic_program_id: academicProgramId,
+    profile_allow_direct_contact: allowDirectContact,
     profile_availability: availability,
     profile_bio: bio,
     profile_faculty_id: facultyId,

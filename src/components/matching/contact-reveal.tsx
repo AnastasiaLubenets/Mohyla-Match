@@ -1,11 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 
 import {
   initialContactRevealState,
-  revealMatchedContact,
+  revealProfileContact,
 } from "@/lib/matching/server-actions";
 
 function RevealButton() {
@@ -17,7 +17,7 @@ function RevealButton() {
       disabled={pending}
       type="submit"
     >
-      {pending ? "Revealing..." : "Reveal student email"}
+      {pending ? "Preparing..." : "Write by email"}
     </button>
   );
 }
@@ -30,9 +30,15 @@ export function ContactReveal({
   targetUserId: string;
 }>) {
   const [state, formAction] = useActionState(
-    revealMatchedContact,
+    revealProfileContact,
     initialContactRevealState,
   );
+
+  useEffect(() => {
+    if (state.email) {
+      window.location.href = `mailto:${state.email}`;
+    }
+  }, [state.email]);
 
   return (
     <div className="space-y-3">

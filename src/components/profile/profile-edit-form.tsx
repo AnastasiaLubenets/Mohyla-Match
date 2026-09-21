@@ -253,6 +253,24 @@ export function ProfileEditForm({ data }: Readonly<{ data: EditProfileData }>) {
             type="text"
           />
         </label>
+
+        <label className="flex items-start gap-3 rounded-lg border border-border bg-surface px-4 py-4">
+          <input
+            className="mt-1 h-4 w-4 accent-primary"
+            defaultChecked={data.profile.allow_direct_contact}
+            name="allowDirectContact"
+            type="checkbox"
+          />
+          <span>
+            <span className="block text-sm font-semibold">
+              Allow direct email contact
+            </span>
+            <span className="mt-1 block text-sm leading-6 text-muted">
+              Other Mohyla Match students can use your student email to contact
+              you directly.
+            </span>
+          </span>
+        </label>
       </section>
 
       <SkillChoiceSection

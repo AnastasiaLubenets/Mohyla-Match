@@ -1,4 +1,4 @@
-export const discoveryActions = ["connect", "skip"] as const;
+export const discoveryActions = ["connect", "save", "skip"] as const;
 
 export type DiscoveryAction = (typeof discoveryActions)[number];
 

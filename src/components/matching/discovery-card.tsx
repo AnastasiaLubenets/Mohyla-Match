@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AuthSubmitButton } from "@/components/auth-submit-button";
+import { SaveProfileButton } from "@/components/matching/save-profile-button";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import { TaxonomyChipList } from "@/components/matching/taxonomy-chip-list";
 import type { DiscoveryCandidate } from "@/lib/matching/data";
@@ -19,11 +20,14 @@ function StatusMessage({
     matched: "It is a mutual match. You can reveal contact details in Matches.",
     passed: "Passed. Showing the next available profile.",
     reported: "Report submitted. Thank you for helping keep Mohyla Match safe.",
+    saved: "Saved for later. You can find this profile in Saved.",
+    unsaved: "Removed from Saved.",
   };
   const errorMessages: Record<string, string> = {
     "action-failed": "We could not save that discovery action. Try again.",
     "block-failed": "We could not block that profile. Try again.",
     "report-failed": "We could not submit that report. Try again.",
+    "save-failed": "We could not update Saved. Try again.",
   };
 
   if (error && errorMessages[error]) {
@@ -230,7 +234,12 @@ export function DiscoveryCard({
           >
             View profile
           </Link>
-          <div className="grid gap-3 sm:w-[25rem] sm:grid-cols-2">
+          <div className="grid gap-3 sm:w-[32rem] sm:grid-cols-3">
+            <SaveProfileButton
+              returnTo="/app"
+              saved={false}
+              targetUserId={candidate.userId}
+            />
             <DiscoveryActionForm
               action="skip"
               pendingLabel="Passing..."

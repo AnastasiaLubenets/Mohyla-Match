@@ -12,6 +12,7 @@ import {
 
 test("matching view model validates supported discovery actions", () => {
   assert.equal(isDiscoveryAction("connect"), true);
+  assert.equal(isDiscoveryAction("save"), true);
   assert.equal(isDiscoveryAction("skip"), true);
   assert.equal(isDiscoveryAction("delete"), false);
 });

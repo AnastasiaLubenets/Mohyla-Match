@@ -59,9 +59,11 @@ export function MatchCard({ match }: Readonly<{ match: MatchSummary }>) {
         </section>
       </div>
 
-      <div className="mt-6 border-t border-border pt-5">
-        <ContactReveal fullName={match.fullName} targetUserId={match.userId} />
-      </div>
+      {match.canDirectContact ? (
+        <div className="mt-6 border-t border-border pt-5">
+          <ContactReveal fullName={match.fullName} targetUserId={match.userId} />
+        </div>
+      ) : null}
     </article>
   );
 }

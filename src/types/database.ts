@@ -369,6 +369,7 @@ export type Database = {
       profiles: {
         Row: {
           academic_program_id: number;
+          allow_direct_contact: boolean;
           availability: string | null;
           bio: string | null;
           created_at: string;
@@ -384,6 +385,7 @@ export type Database = {
         };
         Insert: {
           academic_program_id: number;
+          allow_direct_contact?: boolean;
           availability?: string | null;
           bio?: string | null;
           created_at?: string;
@@ -399,6 +401,7 @@ export type Database = {
         };
         Update: {
           academic_program_id?: number;
+          allow_direct_contact?: boolean;
           availability?: string | null;
           bio?: string | null;
           created_at?: string;
@@ -533,6 +536,16 @@ export type Database = {
           user_id: string;
         }[];
       };
+      get_profile_contact_email: {
+        Args: {
+          target_user_id: string;
+        };
+        Returns: {
+          contact_email: string;
+          full_name: string;
+          user_id: string;
+        }[];
+      };
       get_my_matches: {
         Args: {
           match_limit?: number;
@@ -541,6 +554,7 @@ export type Database = {
           academic_program_name: string;
           availability: string | null;
           bio: string | null;
+          can_direct_contact: boolean;
           collaboration_goals: Json;
           faculty_name: string;
           full_name: string;
@@ -554,12 +568,34 @@ export type Database = {
           year_of_study: number;
         }[];
       };
+      get_saved_profiles: {
+        Args: {
+          saved_limit?: number;
+        };
+        Returns: {
+          academic_program_name: string;
+          availability: string | null;
+          bio: string | null;
+          can_direct_contact: boolean;
+          collaboration_goals: Json;
+          faculty_name: string;
+          full_name: string;
+          interests: Json;
+          looking_for_skills: Json;
+          offered_skills: Json;
+          saved_at: string;
+          system_avatar_key: string;
+          user_id: string;
+          year_of_study: number;
+        }[];
+      };
       get_profile_connection_status: {
         Args: {
           target_user_id: string;
         };
         Returns: {
           blocked_by_me: boolean;
+          can_direct_contact: boolean;
           is_matched: boolean;
           match_id: string | null;
           outgoing_action:
@@ -592,6 +628,18 @@ export type Database = {
           matched: boolean;
         }[];
       };
+      set_saved_profile: {
+        Args: {
+          should_save: boolean;
+          target_user_id: string;
+        };
+        Returns: {
+          action: Database["public"]["Enums"]["interaction_action"] | null;
+          match_id: string | null;
+          matched: boolean;
+          saved: boolean;
+        }[];
+      };
       update_my_profile: {
         Args: {
           collaboration_goal_ids: number[];
@@ -599,6 +647,7 @@ export type Database = {
           looking_for_skill_ids: number[];
           offer_skill_ids: number[];
           profile_academic_program_id: number;
+          profile_allow_direct_contact?: boolean;
           profile_availability: string | null;
           profile_bio: string | null;
           profile_faculty_id: number;
