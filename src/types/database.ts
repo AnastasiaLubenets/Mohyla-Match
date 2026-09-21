@@ -138,6 +138,111 @@ export type Database = {
         };
         Relationships: [];
       };
+      blocks: {
+        Row: {
+          blocked_user_id: string;
+          blocker_user_id: string;
+          created_at: string;
+        };
+        Insert: {
+          blocked_user_id: string;
+          blocker_user_id: string;
+          created_at?: string;
+        };
+        Update: {
+          blocked_user_id?: string;
+          blocker_user_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      interactions: {
+        Row: {
+          action: Database["public"]["Enums"]["interaction_action"];
+          created_at: string;
+          source_user_id: string;
+          target_user_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          action: Database["public"]["Enums"]["interaction_action"];
+          created_at?: string;
+          source_user_id: string;
+          target_user_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          action?: Database["public"]["Enums"]["interaction_action"];
+          created_at?: string;
+          source_user_id?: string;
+          target_user_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      matches: {
+        Row: {
+          closed_at: string | null;
+          created_at: string;
+          id: string;
+          status: Database["public"]["Enums"]["match_status"];
+          user_high: string;
+          user_low: string;
+        };
+        Insert: {
+          closed_at?: string | null;
+          created_at?: string;
+          id?: string;
+          status?: Database["public"]["Enums"]["match_status"];
+          user_high: string;
+          user_low: string;
+        };
+        Update: {
+          closed_at?: string | null;
+          created_at?: string;
+          id?: string;
+          status?: Database["public"]["Enums"]["match_status"];
+          user_high?: string;
+          user_low?: string;
+        };
+        Relationships: [];
+      };
+      matching_config: {
+        Row: {
+          availability_weight: number;
+          collaboration_goals_weight: number;
+          common_interests_weight: number;
+          created_at: string;
+          is_active: boolean;
+          my_looking_for_their_offer_weight: number;
+          their_looking_for_my_offer_weight: number;
+          updated_at: string;
+          version: number;
+        };
+        Insert: {
+          availability_weight: number;
+          collaboration_goals_weight: number;
+          common_interests_weight: number;
+          created_at?: string;
+          is_active?: boolean;
+          my_looking_for_their_offer_weight: number;
+          their_looking_for_my_offer_weight: number;
+          updated_at?: string;
+          version: number;
+        };
+        Update: {
+          availability_weight?: number;
+          collaboration_goals_weight?: number;
+          common_interests_weight?: number;
+          created_at?: string;
+          is_active?: boolean;
+          my_looking_for_their_offer_weight?: number;
+          their_looking_for_my_offer_weight?: number;
+          updated_at?: string;
+          version?: number;
+        };
+        Relationships: [];
+      };
       product_events: {
         Row: {
           created_at: string;
@@ -165,6 +270,42 @@ export type Database = {
           metadata?: Json;
           subject_user_id?: string | null;
           user_id?: string | null;
+        };
+        Relationships: [];
+      };
+      reports: {
+        Row: {
+          created_at: string;
+          details: string | null;
+          id: string;
+          reason_code: string;
+          reported_user_id: string;
+          reporter_user_id: string;
+          resolved_at: string | null;
+          status: Database["public"]["Enums"]["report_status"];
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          details?: string | null;
+          id?: string;
+          reason_code: string;
+          reported_user_id: string;
+          reporter_user_id: string;
+          resolved_at?: string | null;
+          status?: Database["public"]["Enums"]["report_status"];
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          details?: string | null;
+          id?: string;
+          reason_code?: string;
+          reported_user_id?: string;
+          reporter_user_id?: string;
+          resolved_at?: string | null;
+          status?: Database["public"]["Enums"]["report_status"];
+          updated_at?: string;
         };
         Relationships: [];
       };
@@ -347,6 +488,37 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: boolean;
       };
+      block_user: {
+        Args: {
+          target_user_id: string;
+        };
+        Returns: boolean;
+      };
+      get_discovery_candidates: {
+        Args: {
+          candidate_limit?: number;
+        };
+        Returns: {
+          academic_program_name: string;
+          availability: string | null;
+          bio: string | null;
+          collaboration_goals: Json;
+          compatibility_score: number;
+          faculty_name: string;
+          full_name: string;
+          interests: Json;
+          looking_for_skills: Json;
+          matched_i_offer: Json;
+          matched_they_offer: Json;
+          score_breakdown: Json;
+          shared_collaboration_goals: Json;
+          shared_interests: Json;
+          offered_skills: Json;
+          system_avatar_key: string;
+          user_id: string;
+          year_of_study: number;
+        }[];
+      };
       get_current_account_state: {
         Args: Record<PropertyKey, never>;
         Returns: "onboarding_incomplete" | "active" | "suspended" | "deleted";
@@ -359,6 +531,65 @@ export type Database = {
           corporate_email: string;
           full_name: string;
           user_id: string;
+        }[];
+      };
+      get_my_matches: {
+        Args: {
+          match_limit?: number;
+        };
+        Returns: {
+          academic_program_name: string;
+          availability: string | null;
+          bio: string | null;
+          collaboration_goals: Json;
+          faculty_name: string;
+          full_name: string;
+          interests: Json;
+          looking_for_skills: Json;
+          match_id: string;
+          matched_at: string;
+          offered_skills: Json;
+          system_avatar_key: string;
+          user_id: string;
+          year_of_study: number;
+        }[];
+      };
+      get_profile_connection_status: {
+        Args: {
+          target_user_id: string;
+        };
+        Returns: {
+          blocked_by_me: boolean;
+          is_matched: boolean;
+          match_id: string | null;
+          outgoing_action:
+            | Database["public"]["Enums"]["interaction_action"]
+            | null;
+        }[];
+      };
+      log_email_contact_clicked: {
+        Args: {
+          target_user_id: string;
+        };
+        Returns: boolean;
+      };
+      report_user: {
+        Args: {
+          details?: string | null;
+          reason_code: string;
+          target_user_id: string;
+        };
+        Returns: string;
+      };
+      set_discovery_action: {
+        Args: {
+          requested_action: Database["public"]["Enums"]["interaction_action"];
+          target_user_id: string;
+        };
+        Returns: {
+          action: Database["public"]["Enums"]["interaction_action"];
+          match_id: string | null;
+          matched: boolean;
         }[];
       };
       update_my_profile: {

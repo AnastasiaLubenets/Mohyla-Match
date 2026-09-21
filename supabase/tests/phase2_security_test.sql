@@ -638,7 +638,7 @@ select results_eq(
        availability_weight
      from public.matching_config
      where version = 1 and is_active $$,
-  $$ values (35::smallint, 25::smallint, 15::smallint, 15::smallint, 10::smallint) $$,
+  $$ values (40::smallint, 30::smallint, 15::smallint, 15::smallint, 0::smallint) $$,
   'matching V1 weights are seeded exactly'
 );
 
