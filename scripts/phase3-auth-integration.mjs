@@ -294,7 +294,12 @@ function assertRedirect(response, expectedPathname, label) {
 
   const location = response.headers.get("location");
   assert.ok(location, `${label}: redirect must include location`);
-  assert.equal(new URL(location, appBaseUrl).pathname, expectedPathname, label);
+  const actualUrl = new URL(location, appBaseUrl);
+  assert.equal(
+    actualUrl.pathname,
+    expectedPathname,
+    `${label}: redirected to ${actualUrl.pathname}${actualUrl.search}`,
+  );
 }
 
 function assertRedirectWithParams(
@@ -385,21 +390,24 @@ async function loadOnboardingTaxonomy() {
     await service
       .from("skills")
       .select("id,slug")
-      .in("slug", ["react", "figma", "python", "ui-ux"]),
+      .in("slug", ["react", "figma", "python", "ui-ux"])
+      .eq("is_active", true),
     "load onboarding skills",
   );
   const interests = await expectNoSupabaseError(
     await service
       .from("interests")
       .select("id,slug")
-      .in("slug", ["technology", "education"]),
+      .in("slug", ["startups", "education"])
+      .eq("is_active", true),
     "load onboarding interests",
   );
   const goals = await expectNoSupabaseError(
     await service
       .from("collaboration_goals")
       .select("id,slug")
-      .in("slug", ["project-teammate", "study-partner"]),
+      .in("slug", ["project-teammate", "study-partner"])
+      .eq("is_active", true),
     "load onboarding goals",
   );
   const skillBySlug = new Map(skills.map((skill) => [skill.slug, skill]));
@@ -416,7 +424,7 @@ async function loadOnboardingTaxonomy() {
     "edit looking-for skill fixture exists",
   );
   assert.ok(
-    interestBySlug.get("technology")?.id,
+    interestBySlug.get("startups")?.id,
     "interest fixture exists",
   );
   assert.ok(
@@ -446,7 +454,7 @@ async function loadOnboardingTaxonomy() {
     editOfferSkill: skillBySlug.get("python"),
     faculty,
     goal: goalBySlug.get("project-teammate"),
-    interest: interestBySlug.get("technology"),
+    interest: interestBySlug.get("startups"),
     offerSkill: skillBySlug.get("react"),
     lookingForSkill: skillBySlug.get("figma"),
     otherFaculty,
@@ -616,25 +624,32 @@ async function runOnboardingEligibilityRegression(
     restoredLabel: "restoring an offer skill restores /app eligibility",
   });
 
-  await verifyOnboardingEligibilityToggle({
-    cookieJar,
-    deleteTable: "profile_skills",
-    deleteFilters: [
-      ["user_id", userId],
-      ["skill_id", taxonomy.lookingForSkill.id],
-      ["direction", "looking_for"],
-    ],
-    restoreTable: "profile_skills",
-    restoreRow: {
+  await insertOnboardingRow(
+    "profile_skills",
+    {
       user_id: userId,
       skill_id: taxonomy.lookingForSkill.id,
       direction: "looking_for",
     },
-    missingLabel:
-      "deleting the last looking-for skill removes /app eligibility",
-    restoredLabel:
-      "restoring a looking-for skill restores /app eligibility",
-  });
+    "adding an optional looking-for skill succeeds",
+  );
+  await assertAppAccessible(
+    cookieJar,
+    "adding an optional looking-for skill keeps /app eligibility",
+  );
+  await deleteOnboardingRows(
+    "profile_skills",
+    [
+      ["user_id", userId],
+      ["skill_id", taxonomy.lookingForSkill.id],
+      ["direction", "looking_for"],
+    ],
+    "deleting an optional looking-for skill succeeds",
+  );
+  await assertAppAccessible(
+    cookieJar,
+    "deleting an optional looking-for skill keeps /app eligibility",
+  );
 
   await verifyOnboardingEligibilityToggle({
     cookieJar,
@@ -782,21 +797,24 @@ async function runOnboardingFlow(cookieJar, userId) {
   );
 
   assertRedirectWithParams(
-    await postForm("/account/setup/looking-for", {}, cookieJar),
-    "/account/setup",
-    { step: "3" },
-    "Step 3 cannot complete with zero looking-for skills",
-  );
-
-  assertRedirectWithParams(
-    await postForm(
-      "/account/setup/looking-for",
-      { skillId: taxonomy.lookingForSkill.id },
-      cookieJar,
-    ),
+    await postForm("/account/setup/looking-for", { skip: "true" }, cookieJar),
     "/account/setup",
     { step: "4" },
-    "Step 3 looking-for skill persists",
+    "Step 3 can be skipped with zero looking-for skills",
+  );
+
+  const skippedLookingForSkills = await expectNoSupabaseError(
+    await service
+      .from("profile_skills")
+      .select("skill_id")
+      .eq("user_id", userId)
+      .eq("direction", "looking_for"),
+    "load skipped looking-for skills",
+  );
+  assert.equal(
+    skippedLookingForSkills.length,
+    0,
+    "Step 3 skip stores zero looking-for skills",
   );
 
   assertRedirectWithParams(

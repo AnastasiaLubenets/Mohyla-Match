@@ -229,7 +229,7 @@ select throws_ok(
   $$ select public.complete_onboarding() $$,
   'P0001',
   null,
-  'Step 3 cannot complete with zero looking-for skills'
+  'Step 4 blocks completion after offer skills even with zero looking-for skills'
 );
 
 select throws_ok(
@@ -242,20 +242,6 @@ select throws_ok(
   '42501',
   null,
   'another user''s onboarding data cannot be changed'
-);
-
-insert into public.profile_skills (user_id, skill_id, direction)
-values (
-  '00000000-0000-4000-8000-000000000401',
-  (select id from public.skills where slug = 'phase4-looking-skill'),
-  'looking_for'
-);
-
-select throws_ok(
-  $$ select public.complete_onboarding() $$,
-  'P0001',
-  null,
-  'Step 4 requires at least one interest and one collaboration goal'
 );
 
 insert into public.profile_interests (user_id, interest_id)
@@ -355,14 +341,15 @@ select ok(
   'restoring an offer skill restores effective onboarded eligibility'
 );
 
-delete from public.profile_skills
-where user_id = '00000000-0000-4000-8000-000000000401'
-  and skill_id = (select id from public.skills where slug = 'phase4-looking-skill')
-  and direction = 'looking_for';
-
-select ok(
-  not private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
-  'deleting the last looking-for skill removes effective onboarded eligibility'
+select is(
+  (
+    select count(*)::integer
+    from public.profile_skills
+    where user_id = '00000000-0000-4000-8000-000000000401'
+      and direction = 'looking_for'
+  ),
+  0,
+  'successful onboarding can have zero looking-for skills'
 );
 
 insert into public.profile_skills (user_id, skill_id, direction)
@@ -374,7 +361,17 @@ values (
 
 select ok(
   private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
-  'restoring a looking-for skill restores effective onboarded eligibility'
+  'existing looking-for selections remain compatible'
+);
+
+delete from public.profile_skills
+where user_id = '00000000-0000-4000-8000-000000000401'
+  and skill_id = (select id from public.skills where slug = 'phase4-looking-skill')
+  and direction = 'looking_for';
+
+select ok(
+  private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
+  'removing optional looking-for skills keeps effective onboarded eligibility'
 );
 
 delete from public.profile_interests

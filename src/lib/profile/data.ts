@@ -116,7 +116,6 @@ async function loadSkillNamesById(
     .select("id,name")
     .in("id", ids)
     .eq("is_active", true)
-    .order("category", { ascending: true })
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
 
@@ -273,7 +272,6 @@ export async function loadProfileEditData(
       .from("skills")
       .select("id,category,name")
       .eq("is_active", true)
-      .order("category", { ascending: true })
       .order("sort_order", { ascending: true })
       .order("name", { ascending: true }),
     supabase

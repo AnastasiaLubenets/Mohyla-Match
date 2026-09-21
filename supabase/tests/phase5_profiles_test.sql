@@ -435,7 +435,7 @@ select throws_ok(
   'zero offer skills rejected'
 );
 
-select throws_ok(
+select lives_ok(
   $$ select public.update_my_profile(
        'Zero Looking',
        (select id from public.faculties where slug = 'phase5-faculty-a'),
@@ -448,9 +448,7 @@ select throws_ok(
        array[(select id from public.interests where slug = 'phase5-interest')],
        array[(select id from public.collaboration_goals where slug = 'phase5-goal')]
      ) $$,
-  'P0001',
-  null,
-  'zero looking-for skills rejected'
+  'zero looking-for skills accepted'
 );
 
 select throws_ok(

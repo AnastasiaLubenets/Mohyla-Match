@@ -215,6 +215,10 @@ export async function saveSkillStep(
   currentStep: number,
   nextStep: number,
   emptyMessage: string,
+  options: Readonly<{
+    allowEmpty?: boolean;
+    skipFieldName?: string;
+  }> = {},
 ) {
   const formData = await request.formData();
   const context = await requireOnboardingRequest(request);
@@ -223,9 +227,12 @@ export async function saveSkillStep(
     return context.response;
   }
 
-  const skillIds = readIdList(formData, "skillId");
+  const isSkipped =
+    options.skipFieldName &&
+    typeof formData.get(options.skipFieldName) === "string";
+  const skillIds = isSkipped ? [] : readIdList(formData, "skillId");
 
-  if (skillIds.length < 1) {
+  if (!options.allowEmpty && skillIds.length < 1) {
     return redirectTo(request, onboardingStepPath(currentStep, emptyMessage));
   }
 
@@ -243,11 +250,14 @@ export async function saveSkillStep(
     );
   }
 
-  const { data: activeSkills, error: skillsError } = await context.supabase
-    .from("skills")
-    .select("id")
-    .in("id", skillIds)
-    .eq("is_active", true);
+  const { data: activeSkills, error: skillsError } =
+    skillIds.length > 0
+      ? await context.supabase
+          .from("skills")
+          .select("id")
+          .in("id", skillIds)
+          .eq("is_active", true)
+      : { data: [], error: null };
 
   if (skillsError || (activeSkills ?? []).length !== skillIds.length) {
     return redirectTo(
@@ -269,19 +279,21 @@ export async function saveSkillStep(
     );
   }
 
-  const insertResult = await context.supabase.from("profile_skills").insert(
-    skillIds.map((skillId) => ({
-      user_id: context.userId,
-      skill_id: skillId,
-      direction,
-    })),
-  );
-
-  if (insertResult.error) {
-    return redirectTo(
-      request,
-      onboardingStepPath(currentStep, "We could not save your skills. Try again."),
+  if (skillIds.length > 0) {
+    const insertResult = await context.supabase.from("profile_skills").insert(
+      skillIds.map((skillId) => ({
+        user_id: context.userId,
+        skill_id: skillId,
+        direction,
+      })),
     );
+
+    if (insertResult.error) {
+      return redirectTo(
+        request,
+        onboardingStepPath(currentStep, "We could not save your skills. Try again."),
+      );
+    }
   }
 
   return redirectTo(request, onboardingStepPath(nextStep));

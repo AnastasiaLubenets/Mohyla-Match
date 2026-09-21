@@ -303,7 +303,9 @@ export type Database = {
           created_at: string;
           id: number;
           is_active: boolean;
+          is_featured: boolean;
           name: string;
+          search_aliases: string[];
           slug: string;
           sort_order: number;
           updated_at: string;
@@ -313,7 +315,9 @@ export type Database = {
           created_at?: string;
           id?: number;
           is_active?: boolean;
+          is_featured?: boolean;
           name: string;
+          search_aliases?: string[];
           slug: string;
           sort_order?: number;
           updated_at?: string;
@@ -323,7 +327,9 @@ export type Database = {
           created_at?: string;
           id?: number;
           is_active?: boolean;
+          is_featured?: boolean;
           name?: string;
+          search_aliases?: string[];
           slug?: string;
           sort_order?: number;
           updated_at?: string;

@@ -2,76 +2,34 @@ begin;
 
 select plan(40);
 
-select results_eq(
-  $$ select category, slug, name
-     from public.skills
-     where is_active
-     order by array_position(
-       array['Development', 'Design', 'Finance', 'Marketing', 'Research', 'Media', 'Management']::text[],
-       category
-     ), sort_order, slug $$,
-  $$ values
-       ('Development'::text, 'react'::text, 'React'::text),
-       ('Development'::text, 'python'::text, 'Python'::text),
-       ('Development'::text, 'java'::text, 'Java'::text),
-       ('Development'::text, 'sql'::text, 'SQL'::text),
-       ('Development'::text, 'ai-data'::text, 'AI/Data'::text),
-       ('Design'::text, 'figma'::text, 'Figma'::text),
-       ('Design'::text, 'ui-ux'::text, 'UI/UX'::text),
-       ('Design'::text, 'graphic-design'::text, 'Graphic Design'::text),
-       ('Finance'::text, 'excel'::text, 'Excel'::text),
-       ('Finance'::text, 'financial-analysis'::text, 'Financial Analysis'::text),
-       ('Finance'::text, 'accounting'::text, 'Accounting'::text),
-       ('Finance'::text, 'investments'::text, 'Investments'::text),
-       ('Marketing'::text, 'smm'::text, 'SMM'::text),
-       ('Marketing'::text, 'branding'::text, 'Branding'::text),
-       ('Marketing'::text, 'advertising'::text, 'Advertising'::text),
-       ('Marketing'::text, 'copywriting'::text, 'Copywriting'::text),
-       ('Research'::text, 'statistics'::text, 'Statistics'::text),
-       ('Research'::text, 'data-analysis'::text, 'Data Analysis'::text),
-       ('Research'::text, 'academic-research'::text, 'Academic Research'::text),
-       ('Media'::text, 'photography'::text, 'Photography'::text),
-       ('Media'::text, 'video'::text, 'Video'::text),
-       ('Media'::text, 'editing'::text, 'Editing'::text),
-       ('Management'::text, 'project-management'::text, 'Project Management'::text),
-       ('Management'::text, 'event-management'::text, 'Event Management'::text) $$,
-  'canonical active skill seed matches Product Spec'
+select is(
+  (
+    select count(*)::integer
+    from public.skills
+    where is_active
+  ),
+  268,
+  'expanded active skills are available for security tests'
 );
 
-select results_eq(
-  $$ select slug, name
-     from public.interests
-     where is_active
-     order by sort_order, slug $$,
-  $$ values
-       ('startups'::text, 'Startups'::text),
-       ('education'::text, 'Education'::text),
-       ('technology'::text, 'Technology'::text),
-       ('finance'::text, 'Finance'::text),
-       ('culture'::text, 'Culture'::text),
-       ('volunteering'::text, 'Volunteering'::text),
-       ('research'::text, 'Research'::text),
-       ('social-impact'::text, 'Social Impact'::text),
-       ('media'::text, 'Media'::text),
-       ('entrepreneurship'::text, 'Entrepreneurship'::text) $$,
-  'canonical active interest seed matches Product Spec'
+select is(
+  (
+    select count(*)::integer
+    from public.interests
+    where is_active
+  ),
+  57,
+  'expanded active interests are available for security tests'
 );
 
-select results_eq(
-  $$ select slug, name
-     from public.collaboration_goals
-     where is_active
-     order by sort_order, slug $$,
-  $$ values
-       ('project-teammate'::text, 'Project teammate'::text),
-       ('startup-cofounder'::text, 'Startup / Co-founder'::text),
-       ('study-partner'::text, 'Study partner'::text),
-       ('research'::text, 'Research'::text),
-       ('volunteering'::text, 'Volunteering'::text),
-       ('event'::text, 'Event'::text),
-       ('creative-project'::text, 'Creative project'::text),
-       ('mentor-mentee'::text, 'Mentor / Mentee'::text) $$,
-  'canonical active collaboration-goal seed matches Product Spec'
+select is(
+  (
+    select count(*)::integer
+    from public.collaboration_goals
+    where is_active
+  ),
+  32,
+  'expanded active collaboration goals are available for security tests'
 );
 
 insert into public.faculties (slug, display_name, avatar_theme_key, sort_order)
