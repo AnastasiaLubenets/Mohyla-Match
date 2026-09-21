@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { DeleteProfileDangerZone } from "@/components/profile/delete-profile-danger-zone";
 import { ProfileDetails } from "@/components/profile/profile-details";
 import { requireAccountState } from "@/lib/auth/guards";
 import { loadSafeProfile } from "@/lib/profile/data";
@@ -47,6 +48,7 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
   }
 
   const status = firstParam(params.status);
+  const error = firstParam(params.error);
 
   return (
     <main className="min-h-screen px-5 py-6 sm:px-8 sm:py-8">
@@ -70,8 +72,14 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
             Profile saved.
           </div>
         ) : null}
+        {error === "delete-failed" ? (
+          <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900">
+            We could not delete your profile. Try again in a moment.
+          </div>
+        ) : null}
 
         <ProfileDetails canEdit profile={profileResult.data} />
+        <DeleteProfileDangerZone />
       </section>
     </main>
   );
