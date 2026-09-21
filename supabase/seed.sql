@@ -1,45 +1,8 @@
 -- Phase 2 seed/reference data for local development.
--- Faculty/program rows below are development reference taxonomy, not verified
--- production-canonical NaUKMA data. Replace them with confirmed taxonomy before
--- production launch. Do not seed guessed corporate email domains here.
+-- Production faculty/program taxonomy is tracked in migrations, not seeded here.
+-- Do not seed guessed corporate email domains here.
 
 begin;
-
-insert into public.faculties (slug, display_name, avatar_theme_key, sort_order)
-values
-  ('development-humanities', 'Development Reference: Humanities', 'faculty-humanities', 10),
-  ('development-social-sciences', 'Development Reference: Social Sciences', 'faculty-social-sciences', 20),
-  ('development-economics', 'Development Reference: Economics', 'faculty-economics', 30),
-  ('development-informatics', 'Development Reference: Informatics', 'faculty-informatics', 40),
-  ('development-law', 'Development Reference: Law', 'faculty-law', 50),
-  ('development-natural-sciences', 'Development Reference: Natural Sciences', 'faculty-natural-sciences', 60)
-on conflict (slug) do update
-set display_name = excluded.display_name,
-    avatar_theme_key = excluded.avatar_theme_key,
-    sort_order = excluded.sort_order,
-    is_active = true,
-    updated_at = now();
-
-insert into public.academic_programs (faculty_id, slug, display_name, avatar_variant_key, sort_order)
-values
-  ((select id from public.faculties where slug = 'development-humanities'), 'development-literature', 'Development Reference: Literature', 'program-literature', 10),
-  ((select id from public.faculties where slug = 'development-humanities'), 'development-history', 'Development Reference: History', 'program-history', 20),
-  ((select id from public.faculties where slug = 'development-social-sciences'), 'development-sociology', 'Development Reference: Sociology', 'program-sociology', 10),
-  ((select id from public.faculties where slug = 'development-social-sciences'), 'development-political-science', 'Development Reference: Political Science', 'program-political-science', 20),
-  ((select id from public.faculties where slug = 'development-economics'), 'development-economics', 'Development Reference: Economics', 'program-economics', 10),
-  ((select id from public.faculties where slug = 'development-economics'), 'development-marketing', 'Development Reference: Marketing', 'program-marketing', 20),
-  ((select id from public.faculties where slug = 'development-informatics'), 'development-computer-science', 'Development Reference: Computer Science', 'program-computer-science', 10),
-  ((select id from public.faculties where slug = 'development-informatics'), 'development-software-engineering', 'Development Reference: Software Engineering', 'program-software-engineering', 20),
-  ((select id from public.faculties where slug = 'development-law'), 'development-law', 'Development Reference: Law', 'program-law', 10),
-  ((select id from public.faculties where slug = 'development-natural-sciences'), 'development-biology', 'Development Reference: Biology', 'program-biology', 10),
-  ((select id from public.faculties where slug = 'development-natural-sciences'), 'development-chemistry', 'Development Reference: Chemistry', 'program-chemistry', 20)
-on conflict (slug) do update
-set faculty_id = excluded.faculty_id,
-    display_name = excluded.display_name,
-    avatar_variant_key = excluded.avatar_variant_key,
-    sort_order = excluded.sort_order,
-    is_active = true,
-    updated_at = now();
 
 insert into public.skills (category, slug, name, sort_order)
 values
