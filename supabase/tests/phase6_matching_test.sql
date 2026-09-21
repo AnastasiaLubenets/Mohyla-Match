@@ -338,6 +338,7 @@ select is(
   'contact reveal click can be logged for a mutual match'
 );
 
+reset role;
 select is(
   (
     select count(*)::integer
@@ -409,6 +410,7 @@ select isnt(
   'authenticated user can report another profile'
 );
 
+reset role;
 select is(
   (
     select count(*)::integer
@@ -420,6 +422,9 @@ select is(
   1,
   'report product event is recorded'
 );
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000801', true);
 
 select throws_ok(
   $$ select * from public.set_discovery_action('00000000-0000-4000-8000-000000000801', 'connect') $$,
