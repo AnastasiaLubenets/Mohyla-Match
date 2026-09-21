@@ -798,7 +798,7 @@ async function runOnboardingFlow(cookieJar, userId) {
   const skippedLookingForSkills = await expectNoSupabaseError(
     await service
       .from("profile_skills")
-      .select("id")
+      .select("skill_id")
       .eq("user_id", userId)
       .eq("direction", "looking_for"),
     "load skipped looking-for skills",
