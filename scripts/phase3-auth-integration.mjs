@@ -390,21 +390,24 @@ async function loadOnboardingTaxonomy() {
     await service
       .from("skills")
       .select("id,slug")
-      .in("slug", ["react", "figma", "python", "ui-ux"]),
+      .in("slug", ["react", "figma", "python", "ui-ux"])
+      .eq("is_active", true),
     "load onboarding skills",
   );
   const interests = await expectNoSupabaseError(
     await service
       .from("interests")
       .select("id,slug")
-      .in("slug", ["technology", "education"]),
+      .in("slug", ["technology", "education"])
+      .eq("is_active", true),
     "load onboarding interests",
   );
   const goals = await expectNoSupabaseError(
     await service
       .from("collaboration_goals")
       .select("id,slug")
-      .in("slug", ["project-teammate", "study-partner"]),
+      .in("slug", ["project-teammate", "study-partner"])
+      .eq("is_active", true),
     "load onboarding goals",
   );
   const skillBySlug = new Map(skills.map((skill) => [skill.slug, skill]));
