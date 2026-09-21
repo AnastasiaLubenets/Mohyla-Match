@@ -139,13 +139,12 @@ export async function updateMyProfile(request: NextRequest) {
 
   if (
     offerSkillIds.length < 1 ||
-    lookingForSkillIds.length < 1 ||
     interestIds.length < 1 ||
     collaborationGoalIds.length < 1
   ) {
     return redirectTo(
       request,
-      profileEditPath("Choose at least one item in every required section."),
+      profileEditPath("Choose at least one offered skill, interest, and goal."),
     );
   }
 

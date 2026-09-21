@@ -40,6 +40,19 @@ test("onboarding blocks skipping past the first incomplete step", () => {
   assert.equal(canVisitOnboardingStep(1, 2), true);
 });
 
+test("onboarding treats looking-for skills as optional", () => {
+  const progress = {
+    hasBasicProfile: true,
+    offerSkillCount: 1,
+    lookingForSkillCount: 0,
+    interestCount: 0,
+    collaborationGoalCount: 0,
+  };
+
+  assert.equal(getFirstIncompleteOnboardingStep(progress), 4);
+  assert.equal(getCompletedOnboardingStepCount(progress), 3);
+});
+
 test("onboarding accepts revisiting completed steps", () => {
   assert.equal(canVisitOnboardingStep(2, 4), true);
 });

@@ -616,25 +616,32 @@ async function runOnboardingEligibilityRegression(
     restoredLabel: "restoring an offer skill restores /app eligibility",
   });
 
-  await verifyOnboardingEligibilityToggle({
-    cookieJar,
-    deleteTable: "profile_skills",
-    deleteFilters: [
-      ["user_id", userId],
-      ["skill_id", taxonomy.lookingForSkill.id],
-      ["direction", "looking_for"],
-    ],
-    restoreTable: "profile_skills",
-    restoreRow: {
+  await insertOnboardingRow(
+    "profile_skills",
+    {
       user_id: userId,
       skill_id: taxonomy.lookingForSkill.id,
       direction: "looking_for",
     },
-    missingLabel:
-      "deleting the last looking-for skill removes /app eligibility",
-    restoredLabel:
-      "restoring a looking-for skill restores /app eligibility",
-  });
+    "adding an optional looking-for skill succeeds",
+  );
+  await assertAppAccessible(
+    cookieJar,
+    "adding an optional looking-for skill keeps /app eligibility",
+  );
+  await deleteOnboardingRows(
+    "profile_skills",
+    [
+      ["user_id", userId],
+      ["skill_id", taxonomy.lookingForSkill.id],
+      ["direction", "looking_for"],
+    ],
+    "deleting an optional looking-for skill succeeds",
+  );
+  await assertAppAccessible(
+    cookieJar,
+    "deleting an optional looking-for skill keeps /app eligibility",
+  );
 
   await verifyOnboardingEligibilityToggle({
     cookieJar,
@@ -782,21 +789,24 @@ async function runOnboardingFlow(cookieJar, userId) {
   );
 
   assertRedirectWithParams(
-    await postForm("/account/setup/looking-for", {}, cookieJar),
-    "/account/setup",
-    { step: "3" },
-    "Step 3 cannot complete with zero looking-for skills",
-  );
-
-  assertRedirectWithParams(
-    await postForm(
-      "/account/setup/looking-for",
-      { skillId: taxonomy.lookingForSkill.id },
-      cookieJar,
-    ),
+    await postForm("/account/setup/looking-for", { skip: "true" }, cookieJar),
     "/account/setup",
     { step: "4" },
-    "Step 3 looking-for skill persists",
+    "Step 3 can be skipped with zero looking-for skills",
+  );
+
+  const skippedLookingForSkills = await expectNoSupabaseError(
+    await service
+      .from("profile_skills")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("direction", "looking_for"),
+    "load skipped looking-for skills",
+  );
+  assert.equal(
+    skippedLookingForSkills.length,
+    0,
+    "Step 3 skip stores zero looking-for skills",
   );
 
   assertRedirectWithParams(

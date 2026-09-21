@@ -266,7 +266,7 @@ export function ProfileEditForm({ data }: Readonly<{ data: EditProfileData }>) {
         defaultIds={wantedSkillIds}
         fieldName="lookingForSkillId"
         skills={data.skills}
-        title="Looking for · Required"
+        title="Looking for · Optional"
       />
 
       <NamedChoiceSection

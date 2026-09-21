@@ -1,6 +1,20 @@
 begin;
 
-select plan(6);
+select plan(9);
+
+select has_column(
+  'public',
+  'skills',
+  'is_featured',
+  'skills support featured suggested items'
+);
+
+select has_column(
+  'public',
+  'skills',
+  'search_aliases',
+  'skills support search aliases'
+);
 
 select is(
   (
@@ -8,8 +22,8 @@ select is(
     from public.skills
     where is_active
   ),
-  24,
-  'all production onboarding skills are active'
+  268,
+  'expanded production skills are active'
 );
 
 select results_eq(
@@ -22,52 +36,73 @@ select results_eq(
   $$,
   $$
     values
-      ('Design'::text, 3),
-      ('Development'::text, 5),
-      ('Finance'::text, 4),
-      ('Management'::text, 2),
-      ('Marketing'::text, 4),
-      ('Media'::text, 3),
-      ('Research'::text, 3)
+      ('Business, Sales & Entrepreneurship'::text, 24),
+      ('Data, AI & Analytics'::text, 29),
+      ('Design'::text, 20),
+      ('Finance & Economics'::text, 18),
+      ('General'::text, 9),
+      ('Languages & Writing'::text, 11),
+      ('Law, Policy & International Relations'::text, 16),
+      ('Marketing & Communications'::text, 21),
+      ('Media & Creative'::text, 18),
+      ('People, Education & Social'::text, 14),
+      ('Product & Project'::text, 17),
+      ('Research & Academia'::text, 15),
+      ('Science & Engineering'::text, 18),
+      ('Software & Web'::text, 38)
   $$,
-  'active skill counts match each production category'
+  'active skills match the expanded category distribution'
 );
 
 select results_eq(
   $$
-    select category, slug, name
+    select name
     from public.skills
     where is_active
-    order by category, sort_order, slug
+      and is_featured
+    order by sort_order
   $$,
   $$
     values
-      ('Design'::text, 'figma'::text, 'Figma'::text),
-      ('Design'::text, 'ui-ux'::text, 'UI/UX'::text),
-      ('Design'::text, 'graphic-design'::text, 'Graphic Design'::text),
-      ('Development'::text, 'react'::text, 'React'::text),
-      ('Development'::text, 'python'::text, 'Python'::text),
-      ('Development'::text, 'java'::text, 'Java'::text),
-      ('Development'::text, 'sql'::text, 'SQL'::text),
-      ('Development'::text, 'ai-data'::text, 'AI/Data'::text),
-      ('Finance'::text, 'excel'::text, 'Excel'::text),
-      ('Finance'::text, 'financial-analysis'::text, 'Financial Analysis'::text),
-      ('Finance'::text, 'accounting'::text, 'Accounting'::text),
-      ('Finance'::text, 'investments'::text, 'Investments'::text),
-      ('Management'::text, 'project-management'::text, 'Project Management'::text),
-      ('Management'::text, 'event-management'::text, 'Event Management'::text),
-      ('Marketing'::text, 'smm'::text, 'SMM'::text),
-      ('Marketing'::text, 'branding'::text, 'Branding'::text),
-      ('Marketing'::text, 'advertising'::text, 'Advertising'::text),
-      ('Marketing'::text, 'copywriting'::text, 'Copywriting'::text),
-      ('Media'::text, 'photography'::text, 'Photography'::text),
-      ('Media'::text, 'video'::text, 'Video'::text),
-      ('Media'::text, 'editing'::text, 'Editing'::text),
-      ('Research'::text, 'statistics'::text, 'Statistics'::text),
-      ('Research'::text, 'data-analysis'::text, 'Data Analysis'::text),
-      ('Research'::text, 'academic-research'::text, 'Academic Research'::text)
+      ('React'::text),
+      ('Python'::text),
+      ('SQL'::text),
+      ('Data Analysis'::text),
+      ('Excel'::text),
+      ('AI / LLMs'::text),
+      ('Figma'::text),
+      ('Project Management'::text),
+      ('Entrepreneurship'::text),
+      ('Financial Analysis'::text),
+      ('Marketing Strategy'::text),
+      ('SMM'::text),
+      ('Copywriting'::text),
+      ('Video Editing'::text),
+      ('Public Speaking'::text),
+      ('Research'::text)
   $$,
-  'active production skills match the canonical taxonomy'
+  'featured suggested skills match the curated default list'
+);
+
+select results_eq(
+  $$
+    select slug
+    from public.skills
+    where is_active
+      and (
+        (slug = 'project-management' and 'pm' = any(search_aliases))
+        or (slug = 'ai-data' and 'llms' = any(search_aliases))
+        or (slug = 'javascript' and 'js' = any(search_aliases))
+      )
+    order by slug
+  $$,
+  $$
+    values
+      ('ai-data'::text),
+      ('javascript'::text),
+      ('project-management'::text)
+  $$,
+  'search aliases cover important short queries'
 );
 
 select results_eq(
@@ -75,22 +110,69 @@ select results_eq(
     select slug, name
     from public.interests
     where is_active
-    order by sort_order, slug
+    order by sort_order
   $$,
   $$
     values
       ('startups'::text, 'Startups'::text),
-      ('education'::text, 'Education'::text),
-      ('technology'::text, 'Technology'::text),
+      ('entrepreneurship'::text, 'Entrepreneurship'::text),
+      ('artificial-intelligence'::text, 'Artificial Intelligence'::text),
+      ('machine-learning'::text, 'Machine Learning'::text),
+      ('data-analytics'::text, 'Data & Analytics'::text),
+      ('fintech'::text, 'FinTech'::text),
+      ('edtech'::text, 'EdTech'::text),
+      ('healthtech'::text, 'HealthTech'::text),
+      ('legaltech'::text, 'LegalTech'::text),
+      ('civictech'::text, 'CivicTech'::text),
+      ('govtech'::text, 'GovTech'::text),
+      ('climatetech'::text, 'ClimateTech'::text),
+      ('green-energy'::text, 'Green Energy'::text),
+      ('energy'::text, 'Energy'::text),
+      ('defensetech'::text, 'DefenseTech'::text),
+      ('drones-robotics'::text, 'Drones & Robotics'::text),
+      ('cybersecurity'::text, 'Cybersecurity'::text),
+      ('saas'::text, 'SaaS'::text),
+      ('mobile-apps'::text, 'Mobile Apps'::text),
+      ('web-apps'::text, 'Web Apps'::text),
+      ('ecommerce'::text, 'E-commerce'::text),
+      ('marketplaces'::text, 'Marketplaces'::text),
       ('finance'::text, 'Finance'::text),
-      ('culture'::text, 'Culture'::text),
-      ('volunteering'::text, 'Volunteering'::text),
-      ('research'::text, 'Research'::text),
-      ('social-impact'::text, 'Social Impact'::text),
+      ('investing'::text, 'Investing'::text),
+      ('economics'::text, 'Economics'::text),
+      ('marketing'::text, 'Marketing'::text),
+      ('design'::text, 'Design'::text),
       ('media'::text, 'Media'::text),
-      ('entrepreneurship'::text, 'Entrepreneurship'::text)
+      ('journalism'::text, 'Journalism'::text),
+      ('creator-economy'::text, 'Creator Economy'::text),
+      ('gaming'::text, 'Gaming'::text),
+      ('ar-vr'::text, 'AR/VR'::text),
+      ('education'::text, 'Education'::text),
+      ('research'::text, 'Research'::text),
+      ('science'::text, 'Science'::text),
+      ('biotechnology'::text, 'Biotechnology'::text),
+      ('healthcare'::text, 'Healthcare'::text),
+      ('psychology'::text, 'Psychology'::text),
+      ('international-relations'::text, 'International Relations'::text),
+      ('public-policy'::text, 'Public Policy'::text),
+      ('human-rights'::text, 'Human Rights'::text),
+      ('social-impact'::text, 'Social Impact'::text),
+      ('ngos'::text, 'NGOs'::text),
+      ('volunteering'::text, 'Volunteering'::text),
+      ('sustainability'::text, 'Sustainability'::text),
+      ('culture'::text, 'Culture'::text),
+      ('art'::text, 'Art'::text),
+      ('music'::text, 'Music'::text),
+      ('film-video'::text, 'Film & Video'::text),
+      ('books-literature'::text, 'Books & Literature'::text),
+      ('communities'::text, 'Communities'::text),
+      ('events'::text, 'Events'::text),
+      ('travel'::text, 'Travel'::text),
+      ('sports'::text, 'Sports'::text),
+      ('food'::text, 'Food'::text),
+      ('fashion'::text, 'Fashion'::text),
+      ('space-aerospace'::text, 'Space & Aerospace'::text)
   $$,
-  'active production interests match the canonical taxonomy'
+  'Step 4 interests match the expanded canonical list'
 );
 
 select results_eq(
@@ -98,20 +180,44 @@ select results_eq(
     select slug, name
     from public.collaboration_goals
     where is_active
-    order by sort_order, slug
+    order by sort_order
   $$,
   $$
     values
-      ('project-teammate'::text, 'Project teammate'::text),
-      ('startup-cofounder'::text, 'Startup / Co-founder'::text),
-      ('study-partner'::text, 'Study partner'::text),
-      ('research'::text, 'Research'::text),
-      ('volunteering'::text, 'Volunteering'::text),
-      ('event'::text, 'Event'::text),
-      ('creative-project'::text, 'Creative project'::text),
-      ('mentor-mentee'::text, 'Mentor / Mentee'::text)
+      ('build-startup'::text, 'Build a startup'::text),
+      ('startup-cofounder'::text, 'Find a co-founder'::text),
+      ('build-mvp'::text, 'Build an MVP'::text),
+      ('build-app'::text, 'Build an app'::text),
+      ('build-website'::text, 'Build a website'::text),
+      ('launch-business'::text, 'Launch a business'::text),
+      ('join-project-team'::text, 'Join a project team'::text),
+      ('project-teammate'::text, 'Find a project teammate'::text),
+      ('hackathon-team'::text, 'Hackathon team'::text),
+      ('case-competition-team'::text, 'Case competition team'::text),
+      ('study-partner'::text, 'Study together'::text),
+      ('research'::text, 'Research together'::text),
+      ('academic-paper'::text, 'Write an academic paper'::text),
+      ('portfolio-project'::text, 'Build a portfolio project'::text),
+      ('creative-project'::text, 'Create a design project'::text),
+      ('media-project'::text, 'Create a media project'::text),
+      ('create-content'::text, 'Create content together'::text),
+      ('launch-podcast'::text, 'Launch a podcast'::text),
+      ('event'::text, 'Organize an event'::text),
+      ('student-community'::text, 'Build a student community'::text),
+      ('start-club'::text, 'Start a club'::text),
+      ('volunteering'::text, 'Launch a volunteering initiative'::text),
+      ('ngo-social-project'::text, 'Build an NGO / social project'::text),
+      ('apply-grant'::text, 'Apply for a grant'::text),
+      ('validate-business-idea'::text, 'Validate a business idea'::text),
+      ('startup-pitch'::text, 'Prepare a startup pitch'::text),
+      ('mentor-mentee'::text, 'Find a mentor'::text),
+      ('mentor-someone'::text, 'Mentor someone'::text),
+      ('accountability-partner'::text, 'Find an accountability partner'::text),
+      ('practice-language'::text, 'Practice a language'::text),
+      ('network-meet-people'::text, 'Network and meet interesting people'::text),
+      ('explore-ideas'::text, 'Explore ideas without a fixed project yet'::text)
   $$,
-  'active production collaboration goals match the canonical taxonomy'
+  'Step 4 collaboration goals match the expanded canonical list'
 );
 
 select is(
@@ -119,65 +225,18 @@ select is(
     select count(*)::integer
     from public.skills
     where is_active
-      and slug not in (
-        'react',
-        'python',
-        'java',
-        'sql',
+      and slug in (
         'ai-data',
-        'figma',
-        'ui-ux',
-        'graphic-design',
-        'excel',
-        'financial-analysis',
-        'accounting',
-        'investments',
-        'smm',
-        'branding',
-        'advertising',
-        'copywriting',
-        'statistics',
-        'data-analysis',
-        'academic-research',
-        'photography',
-        'video',
-        'editing',
         'project-management',
-        'event-management'
-      )
-  ) + (
-    select count(*)::integer
-    from public.interests
-    where is_active
-      and slug not in (
-        'startups',
-        'education',
-        'technology',
-        'finance',
-        'culture',
-        'volunteering',
-        'research',
-        'social-impact',
-        'media',
+        'financial-analysis',
+        'marketing-strategy',
+        'public-speaking',
+        'video-editing',
         'entrepreneurship'
       )
-  ) + (
-    select count(*)::integer
-    from public.collaboration_goals
-    where is_active
-      and slug not in (
-        'project-teammate',
-        'startup-cofounder',
-        'study-partner',
-        'research',
-        'volunteering',
-        'event',
-        'creative-project',
-        'mentor-mentee'
-      )
   ),
-  0,
-  'only canonical onboarding reference rows are active'
+  7,
+  'important migrated and newly expanded skills remain active'
 );
 
 select * from finish();

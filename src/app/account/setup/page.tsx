@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { AuthSubmitButton } from "@/components/auth-submit-button";
+import { OnboardingSkillPicker } from "@/components/onboarding-skill-picker";
 import { OnboardingBasicForm } from "@/components/onboarding-basic-form";
 import { destinationForAccountState } from "@/lib/auth/routing";
 import { getCurrentAccountState } from "@/lib/auth/state";
@@ -40,7 +41,9 @@ type ProgramOption = Readonly<{
 type SkillOption = Readonly<{
   id: number;
   category: string;
+  is_featured: boolean;
   name: string;
+  search_aliases: string[];
 }>;
 
 type NamedOption = Readonly<{
@@ -59,14 +62,6 @@ type ProfileValue = Readonly<{
 
 function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
-}
-
-function groupSkillsByCategory(skills: SkillOption[]) {
-  return skills.reduce<Record<string, SkillOption[]>>((groups, skill) => {
-    groups[skill.category] ??= [];
-    groups[skill.category].push(skill);
-    return groups;
-  }, {});
 }
 
 function ProgressHeader({
@@ -172,6 +167,7 @@ function SkillStep({
   defaultSkillIds,
   description,
   fieldName,
+  isOptional = false,
   skills,
   title,
 }: Readonly<{
@@ -180,37 +176,21 @@ function SkillStep({
   defaultSkillIds: Set<number>;
   description: string;
   fieldName: string;
+  isOptional?: boolean;
   skills: SkillOption[];
   title: string;
 }>) {
-  const groupedSkills = groupSkillsByCategory(skills);
-
   return (
-    <form action={action} className="mt-8 space-y-7" method="post">
-      <div>
-        <h1 className="text-3xl font-semibold">{title}</h1>
-        <p className="mt-3 leading-7 text-muted">{description}</p>
-      </div>
-
-      {Object.entries(groupedSkills).map(([category, categorySkills]) => (
-        <fieldset className="space-y-3" key={category}>
-          <legend className="text-sm font-semibold">{category}</legend>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {categorySkills.map((skill) => (
-              <ChoiceCard
-                defaultChecked={defaultSkillIds.has(skill.id)}
-                fieldName={fieldName}
-                id={skill.id}
-                key={skill.id}
-                name={skill.name}
-              />
-            ))}
-          </div>
-        </fieldset>
-      ))}
-
-      <FormNavigation backHref={backHref} pendingLabel="Saving..." />
-    </form>
+    <OnboardingSkillPicker
+      action={action}
+      backHref={backHref}
+      defaultSkillIds={[...defaultSkillIds]}
+      description={description}
+      fieldName={fieldName}
+      isOptional={isOptional}
+      skills={skills}
+      title={title}
+    />
   );
 }
 
@@ -236,7 +216,7 @@ function BuildStep({
 
       <fieldset className="space-y-3">
         <legend className="text-sm font-semibold">Interests · Required</legend>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {interests.map((interest) => (
             <ChoiceCard
               defaultChecked={defaultInterestIds.has(interest.id)}
@@ -253,7 +233,7 @@ function BuildStep({
         <legend className="text-sm font-semibold">
           Collaboration goals · Required
         </legend>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {collaborationGoals.map((goal) => (
             <ChoiceCard
               defaultChecked={defaultCollaborationGoalIds.has(goal.id)}
@@ -310,9 +290,8 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
       .order("display_name", { ascending: true }),
     supabase
       .from("skills")
-      .select("id,category,name")
+      .select("id,category,is_featured,name,search_aliases")
       .eq("is_active", true)
-      .order("category", { ascending: true })
       .order("sort_order", { ascending: true })
       .order("name", { ascending: true }),
     supabase
@@ -452,8 +431,9 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
         action="/account/setup/looking-for"
         backHref="/account/setup?step=2"
         defaultSkillIds={lookingForSkillIds}
-        description="Choose at least one skill you would like to find in collaborators."
+        description="Choose skills you would like to find in collaborators, or skip this for now."
         fieldName="skillId"
+        isOptional
         skills={(skillsResult.data ?? []) as SkillOption[]}
         title="What are you looking for?"
       />
