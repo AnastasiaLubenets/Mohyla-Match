@@ -494,7 +494,7 @@ begin
 
   insert into public.interactions (source_user_id, target_user_id, action)
   values (caller_id, target_user_id, requested_action)
-  on conflict (source_user_id, target_user_id) do update
+  on conflict on constraint interactions_pkey do update
   set action = excluded.action,
       updated_at = now();
 
