@@ -357,16 +357,14 @@ select lives_ok(
        full_name,
        faculty_id,
        academic_program_id,
-       year_of_study,
-       profile_status
+       year_of_study
      )
      values (
        '00000000-0000-4000-8000-000000000701',
        'Profile Delete Recreated',
        (select id from public.faculties where slug = 'profile-delete-faculty'),
        (select id from public.academic_programs where slug = 'profile-delete-program'),
-       2,
-       'active'
+       2
      ) $$,
   'same authenticated account can create a fresh profile again'
 );
