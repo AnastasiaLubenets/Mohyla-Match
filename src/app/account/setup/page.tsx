@@ -423,8 +423,8 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
         <div className="mt-8">
           <h1 className="text-3xl font-semibold">Basic profile</h1>
           <p className="mt-3 leading-7 text-muted">
-            Tell collaborators who you are. Your corporate email is already
-            verified and is not part of this form.
+            Tell collaborators who you are. Your student email is already
+            linked to your account and is not part of this form.
           </p>
         </div>
         <OnboardingBasicForm

@@ -353,7 +353,7 @@ async function loadOnboardingTaxonomy() {
     await service
       .from("faculties")
       .select("id,avatar_theme_key")
-      .eq("slug", "development-informatics")
+      .eq("slug", "faculty-informatics")
       .single(),
     "load onboarding faculty",
   );
@@ -361,7 +361,7 @@ async function loadOnboardingTaxonomy() {
     await service
       .from("faculties")
       .select("id,avatar_theme_key")
-      .eq("slug", "development-humanities")
+      .eq("slug", "faculty-humanities")
       .single(),
     "load second onboarding faculty",
   );
@@ -369,7 +369,7 @@ async function loadOnboardingTaxonomy() {
     await service
       .from("academic_programs")
       .select("id,faculty_id,avatar_variant_key")
-      .eq("slug", "development-computer-science")
+      .eq("slug", "computer-science")
       .single(),
     "load onboarding program",
   );
@@ -377,7 +377,7 @@ async function loadOnboardingTaxonomy() {
     await service
       .from("academic_programs")
       .select("id,faculty_id,avatar_variant_key")
-      .eq("slug", "development-literature")
+      .eq("slug", "history")
       .single(),
     "load other faculty program",
   );
@@ -1216,7 +1216,7 @@ async function seedSuspendedProfile(userId) {
     await service
       .from("faculties")
       .select("id")
-      .eq("slug", "development-informatics")
+      .eq("slug", "faculty-informatics")
       .single(),
     "load seeded faculty",
   );
@@ -1224,7 +1224,7 @@ async function seedSuspendedProfile(userId) {
     await service
       .from("academic_programs")
       .select("id")
-      .eq("slug", "development-computer-science")
+      .eq("slug", "computer-science")
       .single(),
     "load seeded program",
   );
