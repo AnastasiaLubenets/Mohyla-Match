@@ -535,6 +535,71 @@ async function seedProfileRelations(userId, taxonomy) {
   );
 }
 
+async function replaceProfileRelations(
+  userId,
+  { goalIds, interestIds, lookingForSkillIds = [], offerSkillIds },
+) {
+  await expectNoSupabaseError(
+    await service.from("profile_skills").delete().eq("user_id", userId),
+    "clear profile skill relations",
+  );
+  await expectNoSupabaseError(
+    await service.from("profile_interests").delete().eq("user_id", userId),
+    "clear profile interest relations",
+  );
+  await expectNoSupabaseError(
+    await service
+      .from("profile_collaboration_goals")
+      .delete()
+      .eq("user_id", userId),
+    "clear profile collaboration goal relations",
+  );
+
+  const skillRows = [
+    ...offerSkillIds.map((skillId) => ({
+      direction: "offer",
+      skill_id: skillId,
+      user_id: userId,
+    })),
+    ...lookingForSkillIds.map((skillId) => ({
+      direction: "looking_for",
+      skill_id: skillId,
+      user_id: userId,
+    })),
+  ];
+
+  if (skillRows.length > 0) {
+    await expectNoSupabaseError(
+      await service.from("profile_skills").insert(skillRows),
+      "replace profile skill relations",
+    );
+  }
+
+  if (interestIds.length > 0) {
+    await expectNoSupabaseError(
+      await service.from("profile_interests").insert(
+        interestIds.map((interestId) => ({
+          interest_id: interestId,
+          user_id: userId,
+        })),
+      ),
+      "replace profile interest relations",
+    );
+  }
+
+  if (goalIds.length > 0) {
+    await expectNoSupabaseError(
+      await service.from("profile_collaboration_goals").insert(
+        goalIds.map((goalId) => ({
+          collaboration_goal_id: goalId,
+          user_id: userId,
+        })),
+      ),
+      "replace profile collaboration goal relations",
+    );
+  }
+}
+
 async function seedCompletedProfile(
   userId,
   taxonomy,
@@ -1229,6 +1294,217 @@ async function runProfileFlow(
   );
 }
 
+async function countActiveMatches(userA, userB) {
+  const low = userA < userB ? userA : userB;
+  const high = userA < userB ? userB : userA;
+  const result = await service
+    .from("matches")
+    .select("id", { count: "exact", head: true })
+    .eq("user_low", low)
+    .eq("user_high", high)
+    .eq("status", "active");
+
+  if (result.error) {
+    throw new Error(`count active matches: ${result.error.message}`);
+  }
+
+  return result.count ?? 0;
+}
+
+async function runMatchingFlow(cookieJar, userId, userEmail, taxonomy) {
+  const peer = await createConfirmedUser(
+    `matching-peer-${suffix}@${allowedDomain}`,
+  );
+  await seedCompletedProfile(peer.id, taxonomy, {
+    fullName: "Phase Six Match Peer",
+  });
+  await replaceProfileRelations(peer.id, {
+    goalIds: [taxonomy.editGoal.id],
+    interestIds: [taxonomy.editInterest.id],
+    lookingForSkillIds: [taxonomy.editOfferSkill.id],
+    offerSkillIds: [taxonomy.editLookingForSkill.id],
+  });
+
+  const discoverBody = await readPageText(
+    await getPath("/app", cookieJar),
+    "discover page",
+  );
+  assertTextContains(discoverBody, "Discover", "app route renders discovery");
+  assertTextContains(
+    discoverBody,
+    "Phase Six Match Peer",
+    "discover page renders a compatible candidate",
+  );
+  assertTextExcludes(
+    discoverBody,
+    peer.email,
+    "discover page never renders candidate email",
+  );
+
+  assertRedirectWithParams(
+    await postForm(
+      "/app/action",
+      {
+        action: "connect",
+        returnTo: "/app",
+        targetUserId: peer.id,
+      },
+      cookieJar,
+    ),
+    "/app",
+    { status: "connected" },
+    "discover connect records one-way action",
+  );
+  assert.equal(
+    await countActiveMatches(userId, peer.id),
+    0,
+    "one-way integration connect does not create a match",
+  );
+
+  const peerCookies = new Map();
+  assertRedirect(
+    await postForm(
+      "/auth/login",
+      {
+        email: peer.email,
+        next: "/app",
+        password,
+      },
+      peerCookies,
+    ),
+    "/app",
+    "matching peer can log in",
+  );
+
+  const primaryProfileForPeer = await readPageText(
+    await getPath(`/profiles/${userId}`, peerCookies),
+    "peer views primary profile",
+  );
+  assertTextContains(
+    primaryProfileForPeer,
+    "Phase Five Integration Updated",
+    "peer can view active primary profile",
+  );
+  assertTextContains(
+    primaryProfileForPeer,
+    "Connect",
+    "other profile renders connect action",
+  );
+  assertTextExcludes(
+    primaryProfileForPeer,
+    userEmail,
+    "other profile does not reveal primary email before match",
+  );
+
+  assertRedirectWithParams(
+    await postForm(
+      "/profiles/action",
+      {
+        action: "connect",
+        returnTo: `/profiles/${userId}`,
+        targetUserId: userId,
+      },
+      peerCookies,
+    ),
+    `/profiles/${userId}`,
+    { status: "matched" },
+    "reciprocal profile connect creates match",
+  );
+  assert.equal(
+    await countActiveMatches(userId, peer.id),
+    1,
+    "reciprocal integration connect creates exactly one active match",
+  );
+
+  const peerMatchesBody = await readPageText(
+    await getPath("/matches", peerCookies),
+    "peer matches page",
+  );
+  assertTextContains(
+    peerMatchesBody,
+    "Phase Five Integration Updated",
+    "matches page shows mutual match",
+  );
+  assertTextContains(
+    peerMatchesBody,
+    "Reveal student email",
+    "matches page renders secure contact reveal action",
+  );
+  assertTextExcludes(
+    peerMatchesBody,
+    userEmail,
+    "matches page does not render email before reveal action",
+  );
+
+  const primaryMatchesBody = await readPageText(
+    await getPath("/matches", cookieJar),
+    "primary matches page",
+  );
+  assertTextContains(
+    primaryMatchesBody,
+    "Phase Six Match Peer",
+    "primary matches page shows peer",
+  );
+  assertTextExcludes(
+    primaryMatchesBody,
+    peer.email,
+    "primary matches page does not render peer email before reveal action",
+  );
+
+  assertRedirectWithParams(
+    await postForm(
+      "/profiles/report",
+      {
+        details: "Integration safety report",
+        reasonCode: "spam",
+        returnTo: `/profiles/${peer.id}`,
+        targetUserId: peer.id,
+      },
+      cookieJar,
+    ),
+    `/profiles/${peer.id}`,
+    { status: "reported" },
+    "profile report route succeeds",
+  );
+
+  const reportEvents = await expectNoSupabaseError(
+    await service
+      .from("product_events")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("subject_user_id", peer.id)
+      .eq("event_name", "report_created"),
+    "load integration report event",
+  );
+  assert.ok(
+    reportEvents.length >= 1,
+    "profile report records a product event",
+  );
+
+  assertRedirectWithParams(
+    await postForm(
+      "/profiles/block",
+      {
+        targetUserId: peer.id,
+      },
+      cookieJar,
+    ),
+    "/app",
+    { status: "blocked" },
+    "profile block route succeeds",
+  );
+  await assertProfileUnavailable(
+    cookieJar,
+    peer.id,
+    "blocked matched profile becomes unavailable",
+  );
+  assert.equal(
+    await countActiveMatches(userId, peer.id),
+    0,
+    "blocking closes the active integration match",
+  );
+}
+
 async function runProfileDeletionFlow(cookieJar, userId, userEmail) {
   const profileBody = await readPageText(
     await getPath("/profile", cookieJar),
@@ -1394,6 +1670,12 @@ async function run() {
     realEmailSignupAddress,
     onboardingResult.taxonomy,
     onboardingResult.completedAt,
+  );
+  await runMatchingFlow(
+    realConfirmationCookies,
+    allowedSignup.data.user.id,
+    realEmailSignupAddress,
+    onboardingResult.taxonomy,
   );
   await runProfileDeletionFlow(
     realConfirmationCookies,
