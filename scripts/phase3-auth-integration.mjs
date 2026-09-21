@@ -398,7 +398,7 @@ async function loadOnboardingTaxonomy() {
     await service
       .from("interests")
       .select("id,slug")
-      .in("slug", ["technology", "education"])
+      .in("slug", ["startups", "education"])
       .eq("is_active", true),
     "load onboarding interests",
   );
@@ -424,7 +424,7 @@ async function loadOnboardingTaxonomy() {
     "edit looking-for skill fixture exists",
   );
   assert.ok(
-    interestBySlug.get("technology")?.id,
+    interestBySlug.get("startups")?.id,
     "interest fixture exists",
   );
   assert.ok(
@@ -454,7 +454,7 @@ async function loadOnboardingTaxonomy() {
     editOfferSkill: skillBySlug.get("python"),
     faculty,
     goal: goalBySlug.get("project-teammate"),
-    interest: interestBySlug.get("technology"),
+    interest: interestBySlug.get("startups"),
     offerSkill: skillBySlug.get("react"),
     lookingForSkill: skillBySlug.get("figma"),
     otherFaculty,
