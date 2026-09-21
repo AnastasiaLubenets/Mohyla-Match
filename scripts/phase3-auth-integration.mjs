@@ -294,7 +294,12 @@ function assertRedirect(response, expectedPathname, label) {
 
   const location = response.headers.get("location");
   assert.ok(location, `${label}: redirect must include location`);
-  assert.equal(new URL(location, appBaseUrl).pathname, expectedPathname, label);
+  const actualUrl = new URL(location, appBaseUrl);
+  assert.equal(
+    actualUrl.pathname,
+    expectedPathname,
+    `${label}: redirected to ${actualUrl.pathname}${actualUrl.search}`,
+  );
 }
 
 function assertRedirectWithParams(
