@@ -1229,6 +1229,89 @@ async function runProfileFlow(
   );
 }
 
+async function runProfileDeletionFlow(cookieJar, userId, userEmail) {
+  const profileBody = await readPageText(
+    await getPath("/profile", cookieJar),
+    "profile view before profile deletion",
+  );
+  assertTextContains(
+    profileBody,
+    "Danger zone",
+    "own profile includes danger zone",
+  );
+  assertTextContains(
+    profileBody,
+    "Delete profile",
+    "own profile includes delete profile action",
+  );
+  assertTextContains(
+    profileBody,
+    "This permanently deletes your Mohyla Match profile and its related data.",
+    "delete profile confirmation copy is rendered",
+  );
+
+  assertRedirectWithParams(
+    await postForm("/profile/delete", { confirmation: "NOT DELETE" }, cookieJar),
+    "/profile",
+    { error: "delete-failed" },
+    "profile deletion requires exact confirmation",
+  );
+  const unchangedProfile = await expectNoSupabaseError(
+    await service
+      .from("profiles")
+      .select("user_id")
+      .eq("user_id", userId)
+      .single(),
+    "load profile after rejected deletion",
+  );
+  assert.equal(
+    unchangedProfile.user_id,
+    userId,
+    "rejected profile deletion leaves profile unchanged",
+  );
+
+  assertRedirectWithParams(
+    await postForm("/profile/delete", { confirmation: "DELETE" }, cookieJar),
+    "/account/setup",
+    { step: "1" },
+    "profile deletion redirects to setup step 1",
+  );
+
+  const deletedProfile = await expectNoSupabaseError(
+    await service
+      .from("profiles")
+      .select("user_id")
+      .eq("user_id", userId)
+      .maybeSingle(),
+    "load deleted profile row",
+  );
+  assert.equal(deletedProfile, null, "profile row is deleted");
+
+  const authUser = await expectNoSupabaseError(
+    await service.auth.admin.getUserById(userId),
+    "load auth user after profile deletion",
+  );
+  assert.equal(
+    authUser.user?.email,
+    userEmail,
+    "profile deletion keeps the auth account and login email",
+  );
+
+  assertRedirect(
+    await getPath("/profile", cookieJar),
+    "/account/setup",
+    "deleted profile user is treated as onboarding incomplete",
+  );
+
+  const recreated = await runOnboardingFlow(cookieJar, userId);
+  await assertAppAccessible(
+    cookieJar,
+    "same authenticated user can access app after recreating profile",
+  );
+
+  return recreated;
+}
+
 async function seedSuspendedProfile(userId) {
   const faculty = await expectNoSupabaseError(
     await service
@@ -1311,6 +1394,11 @@ async function run() {
     realEmailSignupAddress,
     onboardingResult.taxonomy,
     onboardingResult.completedAt,
+  );
+  await runProfileDeletionFlow(
+    realConfirmationCookies,
+    allowedSignup.data.user.id,
+    realEmailSignupAddress,
   );
 
   const caseInsensitiveSignup = await anon.auth.signUp({

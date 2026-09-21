@@ -343,6 +343,10 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: string;
       };
+      delete_my_profile: {
+        Args: Record<PropertyKey, never>;
+        Returns: boolean;
+      };
       get_current_account_state: {
         Args: Record<PropertyKey, never>;
         Returns: "onboarding_incomplete" | "active" | "suspended" | "deleted";
