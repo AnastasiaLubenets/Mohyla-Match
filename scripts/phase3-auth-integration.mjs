@@ -1603,33 +1603,20 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
     0,
     "simplified discovery flow does not create a match",
   );
-  const peerInteractions = await expectNoSupabaseError(
-    await service
-      .from("interactions")
-      .select("action")
-      .eq("source_user_id", userId)
-      .eq("target_user_id", peer.id)
-      .order("updated_at", { ascending: true }),
-    "load simplified discovery interactions",
-  );
-  assert.deepEqual(
-    peerInteractions.map((interaction) => interaction.action),
-    ["skip"],
-    "simplified discovery product UI creates skip but no connect interaction",
-  );
-  const connectEvents = await expectNoSupabaseError(
+  const discoveryEvents = await expectNoSupabaseError(
     await service
       .from("product_events")
-      .select("id")
+      .select("event_name")
       .eq("user_id", userId)
       .eq("subject_user_id", peer.id)
-      .eq("event_name", "discover_action_connect"),
-    "load simplified discovery connect events",
+      .in("event_name", ["discover_action_skip", "discover_action_connect"])
+      .order("created_at", { ascending: true }),
+    "load simplified discovery action events",
   );
-  assert.equal(
-    connectEvents.length,
-    0,
-    "simplified discovery product UI emits no connect events",
+  assert.deepEqual(
+    discoveryEvents.map((event) => event.event_name),
+    ["discover_action_skip"],
+    "simplified discovery product UI emits skip but no connect event",
   );
   assertTextExcludes(
     await readPageText(await getPath("/app", cookieJar), "discover after skip"),
