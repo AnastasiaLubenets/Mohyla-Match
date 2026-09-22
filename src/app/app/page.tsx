@@ -4,7 +4,11 @@ import type { ReactNode } from "react";
 import { DiscoveryCard } from "@/components/matching/discovery-card";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import { requireAccountState } from "@/lib/auth/guards";
-import { loadDiscoveryCandidates, type DiscoveryCandidate } from "@/lib/matching/data";
+import {
+  loadDiscoveryCandidates,
+  loadSavedProfiles,
+  type DiscoveryCandidate,
+} from "@/lib/matching/data";
 import {
   buildDiscoveryFilterOptions,
   createDiscoveryFilters,
@@ -108,32 +112,14 @@ function SearchIcon() {
   );
 }
 
-function ArrowIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-4 w-4"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-    >
-      <path d="M7 17 17 7" />
-      <path d="M7 7h10v10" />
-    </svg>
-  );
-}
-
 function SidebarLink({ active = false, children, href, label }: SidebarLinkProps) {
   return (
     <Link
       aria-current={active ? "page" : undefined}
       className={
         active
-          ? "inline-flex items-center gap-3 rounded-lg bg-blue-100 px-4 py-3 text-sm font-semibold text-blue-950 shadow-sm"
-          : "inline-flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold text-blue-900 transition hover:bg-blue-50"
+          ? "inline-flex items-center gap-4 rounded-md bg-blue-100/90 px-5 py-4 text-sm font-bold text-blue-950 shadow-sm"
+          : "inline-flex items-center gap-4 rounded-md px-5 py-4 text-sm font-bold text-blue-900 transition hover:bg-blue-50"
       }
       href={href}
     >
@@ -145,27 +131,29 @@ function SidebarLink({ active = false, children, href, label }: SidebarLinkProps
 
 function DiscoverSidebar() {
   return (
-    <aside className="border-b border-blue-100 bg-white/85 px-4 py-4 backdrop-blur lg:sticky lg:top-0 lg:flex lg:min-h-screen lg:flex-col lg:border-b-0 lg:border-r lg:px-5 lg:py-6">
+    <aside className="border-b border-blue-100 bg-white/90 px-4 py-4 backdrop-blur xl:sticky xl:top-0 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r xl:px-5 xl:py-6">
       <div className="flex items-center gap-3">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 font-serif text-xl font-semibold text-blue-900">
-          MM
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-md border border-blue-200 bg-blue-50 font-serif text-3xl font-bold leading-none text-blue-900">
+          M
         </div>
         <div>
           <Link
-            className="font-serif text-2xl font-semibold leading-none text-blue-950"
+            className="font-serif text-3xl font-bold uppercase leading-[0.82] text-blue-950"
             href="/app"
           >
             Mohyla
             <br />
             Match
           </Link>
-          <p className="mt-2 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-blue-700">
+          <p className="mt-2 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-blue-700">
             Find people
+            <br />
+            Build something together
           </p>
         </div>
       </div>
 
-      <nav className="mt-5 grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
+      <nav className="mt-5 grid gap-2 sm:grid-cols-3 xl:mt-7 xl:grid-cols-1">
         <SidebarLink active href="/app" label="Discover">
           <CompassIcon />
         </SidebarLink>
@@ -177,20 +165,35 @@ function DiscoverSidebar() {
         </SidebarLink>
       </nav>
 
-      <div className="mt-6 hidden flex-1 flex-col justify-end lg:flex">
-        <div className="border-t border-blue-100 pt-6">
-          <p className="font-serif text-2xl leading-tight text-blue-950">
-            Більше людей.
+      <div className="mt-8 hidden flex-1 flex-col justify-end xl:flex">
+        <div className="mb-10 px-3 pb-2">
+          <div className="mb-8 border-y border-blue-100 py-8">
+            <p className="font-serif text-6xl font-bold leading-none text-blue-100">
+              MM
+            </p>
+            <div className="mt-5 grid grid-cols-3 gap-2" aria-hidden="true">
+              <span className="h-px bg-blue-100" />
+              <span className="h-px bg-blue-200" />
+              <span className="h-px bg-blue-100" />
+            </div>
+          </div>
+          <p className="font-serif text-3xl font-semibold uppercase leading-[0.95] text-blue-950">
+            Більше
             <br />
-            Більше можливостей.
+            людей
+            <br />
+            Більше
+            <br />
+            можливостей
           </p>
-          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-blue-500">
+          <div className="mt-6 h-px w-16 bg-blue-300" />
+          <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-blue-500">
             Спільнота
             <br />
             що створює майбутнє
           </p>
         </div>
-        <form action="/auth/logout" className="mt-8" method="post">
+        <form action="/auth/logout" className="mt-8 px-3" method="post">
           <button
             className="text-sm font-semibold text-slate-500 transition hover:text-blue-900"
             type="submit"
@@ -239,9 +242,9 @@ function TopBar({
   filters: DiscoveryFilters;
 }>) {
   return (
-    <header className="border-b border-blue-100 bg-white/85 px-4 py-4 backdrop-blur sm:px-6 lg:px-8">
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <form action="/app" className="relative w-full xl:max-w-md">
+    <header className="border-b border-blue-100 bg-white/80 px-4 py-3 backdrop-blur sm:px-6 xl:px-8">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <form action="/app" className="relative w-full lg:max-w-md">
           <label className="sr-only" htmlFor="discover-search">
             Search students, skills or interests
           </label>
@@ -249,7 +252,7 @@ function TopBar({
             <SearchIcon />
           </span>
           <input
-            className="h-12 w-full rounded-full border border-blue-100 bg-blue-50/70 pl-12 pr-5 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
+            className="h-11 w-full rounded-lg border border-blue-100 bg-blue-50/80 pl-12 pr-5 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
             defaultValue={filters.searchQuery}
             id="discover-search"
             name="q"
@@ -262,9 +265,9 @@ function TopBar({
           </button>
         </form>
 
-        <div className="flex items-center justify-between gap-4 xl:justify-end">
+        <div className="flex items-center justify-between gap-4 lg:justify-end">
           <Link
-            className="inline-flex items-center gap-3 rounded-full border border-blue-100 bg-white px-3 py-2 text-blue-950 shadow-sm transition hover:border-blue-300"
+            className="inline-flex items-center gap-3 rounded-lg px-2 py-1.5 text-blue-950 transition hover:bg-blue-50"
             href="/profile"
           >
             {currentProfile ? (
@@ -294,22 +297,24 @@ function SelectField({
   label,
   name,
   options,
+  placeholder = "Any",
   value,
 }: Readonly<{
   label: string;
   name: string;
   options: readonly { label: string; value: string }[];
+  placeholder?: string;
   value: string;
 }>) {
   return (
     <label className="block">
-      <span className="text-sm font-semibold text-blue-900">{label}</span>
+      <span className="text-sm font-bold text-blue-900">{label}</span>
       <select
-        className="mt-2 h-11 w-full rounded-lg border border-blue-100 bg-white px-3 text-sm font-medium text-blue-900 outline-none transition focus:border-blue-300"
+        className="mt-1.5 h-10 w-full rounded-md border border-blue-100 bg-white px-3 text-sm font-medium text-blue-900 outline-none transition focus:border-blue-300"
         defaultValue={value}
         name={name}
       >
-        <option value="">Any</option>
+        <option value="">{placeholder}</option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -334,36 +339,32 @@ function DiscoveryFilterRail({
   totalCount: number;
 }>) {
   return (
-    <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
-      <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_50px_rgba(15,94,156,0.10)]">
+    <aside className="space-y-4 xl:sticky xl:top-20 xl:self-start">
+      <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_50px_rgba(15,94,156,0.09)]">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="font-serif text-3xl font-semibold text-blue-950">
+          <h2 className="font-serif text-3xl font-bold leading-none text-blue-950">
             Filters
           </h2>
-          {hasActiveFilters ? (
-            <Link
-              className="text-sm font-semibold text-blue-700 transition hover:text-blue-950"
-              href="/app"
-            >
-              Reset
-            </Link>
-          ) : null}
+          <Link
+            className={
+              hasActiveFilters
+                ? "text-sm font-bold text-blue-700 transition hover:text-blue-950"
+                : "text-sm font-bold text-blue-300"
+            }
+            href="/app"
+          >
+            Reset
+          </Link>
         </div>
 
-        <p className="mt-3 text-sm text-slate-500">
+        <p className="sr-only">
           Showing {resultCount} of {totalCount} available profiles.
         </p>
 
-        <form action="/app" className="mt-5 space-y-4">
+        <form action="/app" className="mt-4 space-y-3">
           {filters.searchQuery ? (
             <input name="q" type="hidden" value={filters.searchQuery} />
           ) : null}
-          <SelectField
-            label="Looking for"
-            name="skill"
-            options={options.skills}
-            value={filters.skillSlug}
-          />
           <SelectField
             label="Collaboration goal"
             name="goal"
@@ -383,13 +384,21 @@ function DiscoveryFilterRail({
             value={filters.yearOfStudy}
           />
           <SelectField
+            label="Skills"
+            name="skill"
+            options={options.skills}
+            placeholder="Select skills"
+            value={filters.skillSlug}
+          />
+          <SelectField
             label="Interests"
             name="interest"
             options={options.interests}
+            placeholder="Select interests"
             value={filters.interestSlug}
           />
           <button
-            className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-blue-800 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-900"
+            className="mt-2 inline-flex h-12 w-full items-center justify-center rounded-md bg-blue-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900"
             type="submit"
           >
             Apply filters
@@ -397,13 +406,13 @@ function DiscoveryFilterRail({
         </form>
       </section>
 
-      <section className="rounded-lg border border-blue-100 bg-white p-6 shadow-[0_18px_50px_rgba(15,94,156,0.08)]">
-        <p className="font-serif text-5xl leading-none text-blue-800">“</p>
-        <p className="mt-2 font-serif text-3xl italic leading-tight text-blue-950">
+      <section className="rounded-lg border border-blue-50 bg-[#fffaf0] p-7 shadow-[0_18px_50px_rgba(15,94,156,0.06)]">
+        <p className="font-serif text-6xl font-bold leading-none text-blue-800">“</p>
+        <p className="mt-1 font-serif text-3xl font-semibold italic leading-[1.02] text-blue-950">
           Great things happen when Mohylians find each other.
         </p>
         <div className="mt-6 h-px w-16 bg-blue-300" />
-        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.22em] text-blue-400">
+        <p className="mt-5 text-xs font-bold uppercase tracking-[0.22em] text-blue-500">
           Community
           <br />
           Ideas
@@ -413,81 +422,64 @@ function DiscoveryFilterRail({
           Impact
         </p>
       </section>
-
-      <Link
-        className="flex items-center justify-between gap-4 rounded-lg border border-blue-100 bg-white px-5 py-4 text-blue-950 shadow-sm transition hover:border-blue-300"
-        href="/profile"
-      >
-        <span>
-          <span className="block text-sm font-semibold">Tune discovery</span>
-          <span className="block text-xs text-slate-500">
-            Update skills and goals
-          </span>
-        </span>
-        <ArrowIcon />
-      </Link>
     </aside>
   );
 }
 
 function Hero() {
   return (
-    <header className="mb-8 text-center lg:text-left">
-      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-500">
-        Discover Mohyla students
-      </p>
-      <h1 className="mt-4 font-serif text-5xl font-semibold leading-[1.02] text-blue-950 sm:text-6xl xl:text-7xl">
+    <header className="mb-6 text-center">
+      <h1 className="font-serif text-6xl font-bold leading-[0.92] text-blue-950 sm:text-7xl 2xl:text-8xl">
         Find your people.
         <br />
-        <span className="italic">Build something together.</span>
+        <span className="font-semibold italic">Build something together.</span>
       </h1>
-      <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600 lg:mx-0">
-        Discover Mohyla students for projects, research, study groups and
-        collaborations that start with a useful conversation.
+      <p className="mx-auto mt-5 max-w-3xl text-lg leading-7 text-blue-900/75">
+        Connect with fellow Mohylians for projects, studies, research and more.
       </p>
     </header>
   );
 }
 
-function NextCandidateList({
+function DiscoveryFeed({
   candidates,
+  emptyDescription,
+  emptyTitle,
+  error,
+  savedProfileIds,
+  status,
 }: Readonly<{
   candidates: readonly DiscoveryCandidate[];
+  emptyDescription?: string;
+  emptyTitle?: string;
+  error?: string;
+  savedProfileIds: ReadonlySet<string>;
+  status?: string;
 }>) {
   if (candidates.length === 0) {
-    return null;
+    return (
+      <DiscoveryCard
+        candidate={null}
+        emptyDescription={emptyDescription}
+        emptyTitle={emptyTitle}
+        error={error}
+        status={status}
+      />
+    );
   }
 
   return (
-    <section className="mt-6 rounded-lg border border-blue-100 bg-white p-5 shadow-sm">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-900">
-          Next in discovery
-        </h2>
-        <span className="text-sm font-medium text-slate-500">
-          {candidates.length} queued
-        </span>
-      </div>
-      <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-        {candidates.map((nextCandidate) => (
-          <li
-            className="rounded-lg border border-blue-100 bg-blue-50/50 p-4"
-            key={nextCandidate.userId}
-          >
-            <p className="font-serif text-xl font-semibold text-blue-950">
-              {nextCandidate.fullName}
-            </p>
-            <p className="mt-1 text-sm text-slate-600">
-              {nextCandidate.academicProgramName} · Year{" "}
-              {nextCandidate.yearOfStudy}
-            </p>
-            <p className="mt-3 text-sm font-semibold text-blue-700">
-              {nextCandidate.compatibilityScore}% compatibility
-            </p>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <div className="space-y-5">
+      {candidates.map((candidate, index) => (
+        <DiscoveryCard
+          candidate={candidate}
+          error={index === 0 ? error : undefined}
+          key={candidate.userId}
+          saved={savedProfileIds.has(candidate.userId)}
+          status={index === 0 ? status : undefined}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -503,24 +495,31 @@ export default async function AppPage({ searchParams }: PageProps) {
     yearOfStudy: firstParam(params.year),
   });
   const supabase = await createSupabaseServerClient();
-  const [candidatesResult, currentProfileResult] = await Promise.all([
-    loadDiscoveryCandidates(supabase, 50),
-    accountState.userId
-      ? loadSafeProfile(supabase, accountState.userId)
-      : Promise.resolve({ data: null, error: false }),
-  ]);
+  const [candidatesResult, currentProfileResult, savedProfilesResult] =
+    await Promise.all([
+      loadDiscoveryCandidates(supabase, 50),
+      accountState.userId
+        ? loadSafeProfile(supabase, accountState.userId)
+        : Promise.resolve({ data: null, error: false }),
+      loadSavedProfiles(supabase, 50),
+    ]);
   const currentProfile = currentProfileResult.error
     ? null
     : currentProfileResult.data;
+  const savedProfileIds = new Set(
+    savedProfilesResult.error
+      ? []
+      : (savedProfilesResult.data ?? []).map((profile) => profile.userId),
+  );
 
   if (candidatesResult.error) {
     return (
-      <main className="min-h-screen bg-[#f5f9fd] text-blue-950">
-        <div className="mx-auto grid max-w-[96rem] lg:grid-cols-[17rem_minmax(0,1fr)]">
+      <main className="min-h-screen bg-[#eef6fb] text-blue-950">
+        <div className="grid min-h-screen xl:grid-cols-[18rem_minmax(0,1fr)]">
           <DiscoverSidebar />
           <div className="min-w-0">
             <TopBar currentProfile={currentProfile} filters={filters} />
-            <section className="px-4 py-8 sm:px-6 lg:px-8">
+            <section className="px-4 py-8 sm:px-6 xl:px-8">
               <div className="mx-auto max-w-4xl rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
                 <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
                   Discover
@@ -541,21 +540,20 @@ export default async function AppPage({ searchParams }: PageProps) {
 
   const allCandidates = candidatesResult.data ?? [];
   const filteredCandidates = filterDiscoveryCandidates(allCandidates, filters);
-  const candidate = filteredCandidates[0] ?? null;
   const activeFilters = hasActiveDiscoveryFilters(filters);
   const options = buildDiscoveryFilterOptions(allCandidates);
 
   return (
-    <main className="min-h-screen bg-[#f5f9fd] text-blue-950">
-      <div className="mx-auto grid max-w-[96rem] lg:grid-cols-[17rem_minmax(0,1fr)]">
+    <main className="min-h-screen bg-[#eef6fb] text-blue-950">
+      <div className="grid min-h-screen xl:grid-cols-[18rem_minmax(0,1fr)]">
         <DiscoverSidebar />
         <div className="min-w-0">
           <TopBar currentProfile={currentProfile} filters={filters} />
-          <div className="grid gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,47rem)_18rem] lg:px-8 xl:grid-cols-[minmax(0,52rem)_20rem]">
+          <div className="grid gap-6 px-4 py-6 sm:px-6 xl:grid-cols-[minmax(0,1fr)_22rem] xl:px-8 2xl:gap-8">
             <section className="min-w-0">
               <Hero />
-              <DiscoveryCard
-                candidate={candidate}
+              <DiscoveryFeed
+                candidates={filteredCandidates}
                 emptyDescription={
                   activeFilters
                     ? "Try clearing filters or broadening your search to see more Mohyla students."
@@ -565,9 +563,9 @@ export default async function AppPage({ searchParams }: PageProps) {
                   activeFilters ? "No profiles match these filters." : undefined
                 }
                 error={firstParam(params.error)}
+                savedProfileIds={savedProfileIds}
                 status={firstParam(params.status)}
               />
-              <NextCandidateList candidates={filteredCandidates.slice(1, 7)} />
             </section>
 
             <DiscoveryFilterRail

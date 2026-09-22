@@ -7,13 +7,33 @@ import {
   requestAndCopyProfileEmail,
 } from "@/lib/matching/contact-copy";
 
+function EnvelopeIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <rect height="16" rx="2" width="20" x="2" y="4" />
+      <path d="m22 7-10 6L2 7" />
+    </svg>
+  );
+}
+
 export function ContactReveal({
   buttonClassName,
   className,
+  showIcon = false,
   targetUserId,
 }: Readonly<{
   buttonClassName?: string;
   className?: string;
+  showIcon?: boolean;
   targetUserId: string;
 }>) {
   const [copiedName, setCopiedName] = useState<string | null>(null);
@@ -72,6 +92,7 @@ export function ContactReveal({
         onClick={handleGetEmail}
         type="button"
       >
+        {showIcon ? <EnvelopeIcon /> : null}
         {isPending ? "Getting email..." : "Get email"}
       </button>
 

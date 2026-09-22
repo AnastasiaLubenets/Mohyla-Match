@@ -23,6 +23,7 @@
   --color-primary-strong: var(--primary-strong);
   --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
+  --font-serif: var(--font-display);
   --font-mono: var(--font-geist-mono);
 }
 
