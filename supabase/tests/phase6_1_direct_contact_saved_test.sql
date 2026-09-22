@@ -247,6 +247,8 @@ select is_empty(
   'saved profile is excluded from normal discovery'
 );
 
+reset role;
+
 select is(
   (
     select count(*)::integer
@@ -269,6 +271,9 @@ select is(
   0,
   'saving through the private toggle does not create a target-addressed save event'
 );
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000901', true);
 
 select is(
   (
