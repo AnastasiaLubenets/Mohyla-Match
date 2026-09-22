@@ -8,8 +8,12 @@ import {
 } from "@/lib/matching/contact-copy";
 
 export function ContactReveal({
+  buttonClassName,
+  className,
   targetUserId,
 }: Readonly<{
+  buttonClassName?: string;
+  className?: string;
   targetUserId: string;
 }>) {
   const [copiedName, setCopiedName] = useState<string | null>(null);
@@ -58,9 +62,12 @@ export function ContactReveal({
   }
 
   return (
-    <div className="space-y-2">
+    <div className={className ?? "space-y-2"}>
       <button
-        className="inline-flex h-11 w-full items-center justify-center rounded-full bg-primary px-4 text-sm font-semibold text-white transition hover:bg-primary-strong disabled:cursor-not-allowed disabled:opacity-70"
+        className={
+          buttonClassName ??
+          "inline-flex h-11 w-full items-center justify-center rounded-full bg-primary px-4 text-sm font-semibold text-white transition hover:bg-primary-strong disabled:cursor-not-allowed disabled:opacity-70"
+        }
         disabled={isPending}
         onClick={handleGetEmail}
         type="button"

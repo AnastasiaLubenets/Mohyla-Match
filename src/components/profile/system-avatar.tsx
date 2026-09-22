@@ -3,7 +3,7 @@ type SystemAvatarProps = Readonly<{
   facultyName?: string | null;
   fullName: string;
   programName?: string | null;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   systemAvatarKey: string;
 }>;
 
@@ -20,6 +20,7 @@ const sizeClasses = {
   sm: "h-14 w-14 text-lg",
   md: "h-24 w-24 text-3xl",
   lg: "h-32 w-32 text-4xl",
+  xl: "h-52 w-full text-5xl sm:w-52",
 };
 
 function hashIdentity(value: string): number {

@@ -19,12 +19,12 @@ export function TaxonomyChipList<TItem extends MatchingItem | MatchingSkill>({
     <ul className="flex flex-wrap gap-2">
       {items.map((item) => (
         <li
-          className="rounded-full border border-border bg-surface px-3 py-1 text-sm font-semibold"
+          className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-800"
           key={`${item.slug}-${item.id}`}
         >
           {item.name}
           {showCategory && "category" in item ? (
-            <span className="ml-2 text-xs font-medium text-muted">
+            <span className="ml-2 text-xs font-medium text-blue-500">
               {item.category}
             </span>
           ) : null}
