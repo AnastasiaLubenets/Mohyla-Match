@@ -32,10 +32,13 @@ function ProfileStatusMessage({
     matched: "It is a mutual match. You can reveal contact details now.",
     passed: "Passed.",
     reported: "Report submitted. Thank you for helping keep Mohyla Match safe.",
+    saved: "Saved for later.",
+    unsaved: "Removed from Saved.",
   };
   const errorMessages: Record<string, string> = {
     "action-failed": "We could not save that action. Try again.",
     "report-failed": "We could not submit that report. Try again.",
+    "save-failed": "We could not update Saved. Try again.",
   };
 
   if (error && errorMessages[error]) {

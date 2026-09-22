@@ -48,6 +48,7 @@ export type EditProfileData = Readonly<{
   offeredSkillIds: number[];
   profile: {
     academic_program_id: number;
+    allow_direct_contact: boolean;
     availability: string | null;
     bio: string | null;
     faculty_id: number;
@@ -289,7 +290,7 @@ export async function loadProfileEditData(
     supabase
       .from("profiles")
       .select(
-        "full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key",
+        "full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key,allow_direct_contact",
       )
       .eq("user_id", userId)
       .maybeSingle(),

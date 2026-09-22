@@ -15,7 +15,7 @@ export const initialContactRevealState: ContactRevealState = {
   fullName: null,
 };
 
-export async function revealMatchedContact(
+export async function revealProfileContact(
   _previousState: ContactRevealState,
   formData: FormData,
 ): Promise<ContactRevealState> {
@@ -24,7 +24,7 @@ export async function revealMatchedContact(
   if (typeof targetUserId !== "string" || !targetUserId.trim()) {
     return {
       email: null,
-      error: "We could not reveal this contact. Try again in a moment.",
+      error: "We could not prepare this email. Try again in a moment.",
       fullName: null,
     };
   }
@@ -35,12 +35,12 @@ export async function revealMatchedContact(
   if (accountState.state !== "active") {
     return {
       email: null,
-      error: "Sign in with an active profile to reveal contact details.",
+      error: "Sign in with an active profile to write by email.",
       fullName: null,
     };
   }
 
-  const contactResult = await supabase.rpc("get_matched_contact_email", {
+  const contactResult = await supabase.rpc("get_profile_contact_email", {
     target_user_id: targetUserId,
   });
   const contact = contactResult.data?.[0] ?? null;
@@ -48,7 +48,7 @@ export async function revealMatchedContact(
   if (contactResult.error || !contact) {
     return {
       email: null,
-      error: "Contact details are available only after a mutual match.",
+      error: "Direct email contact is not available for this profile.",
       fullName: null,
     };
   }
@@ -60,13 +60,13 @@ export async function revealMatchedContact(
   if (logResult.error || logResult.data !== true) {
     return {
       email: null,
-      error: "We could not reveal this contact. Try again in a moment.",
+      error: "We could not prepare this email. Try again in a moment.",
       fullName: null,
     };
   }
 
   return {
-    email: contact.corporate_email,
+    email: contact.contact_email,
     error: null,
     fullName: contact.full_name,
   };

@@ -100,7 +100,49 @@ function actionStatus(action: DiscoveryAction, matched: boolean) {
     return "matched";
   }
 
-  return action === "connect" ? "connected" : "passed";
+  if (action === "connect") {
+    return "connected";
+  }
+
+  if (action === "save") {
+    return "saved";
+  }
+
+  return "passed";
+}
+
+export async function performSavedProfileAction(
+  request: NextRequest,
+  fallbackPath = "/saved",
+) {
+  const formData = await request.formData();
+  const returnPath = safeReturnPath(formData.get("returnTo"), fallbackPath);
+  const context = await requireActiveMatchingAction(request, returnPath);
+
+  if (context.response) {
+    return context.response;
+  }
+
+  const targetUserId = readRequiredFormString(formData, "targetUserId");
+  const intent = readRequiredFormString(formData, "intent");
+
+  if (!targetUserId || (intent !== "save" && intent !== "remove")) {
+    return redirectTo(request, errorPath(returnPath, "save-failed"));
+  }
+
+  const result = await context.supabase.rpc("set_saved_profile", {
+    should_save: intent === "save",
+    target_user_id: targetUserId,
+  });
+
+  if (result.error) {
+    return redirectTo(request, errorPath(returnPath, "save-failed"));
+  }
+
+  return redirectTo(
+    request,
+    statusPath(returnPath, intent === "save" ? "saved" : "unsaved"),
+  );
 }
 
 export async function blockProfile(request: NextRequest) {

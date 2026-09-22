@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { AuthSubmitButton } from "@/components/auth-submit-button";
 import { ContactReveal } from "@/components/matching/contact-reveal";
+import { SaveProfileButton } from "@/components/matching/save-profile-button";
 import type { ProfileConnectionStatus } from "@/lib/matching/data";
 import { reportReasons } from "@/lib/matching/view-model";
 
@@ -49,17 +50,23 @@ export function ProfileActionPanel({
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
   const alreadyConnected = status?.outgoingAction === "connect";
   const passed = status?.outgoingAction === "skip";
+  const saved = status?.outgoingAction === "save";
+  const canToggleSave = !status?.isMatched && !alreadyConnected && !passed;
 
   return (
     <aside className="mt-6 rounded-lg border border-border bg-surface p-5 shadow-sm">
       <h2 className="text-lg font-semibold">Profile actions</h2>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {status?.isMatched ? (
-          <div className="sm:col-span-2 lg:col-span-2">
-            <ContactReveal fullName={fullName} targetUserId={targetUserId} />
-          </div>
-        ) : (
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        {canToggleSave ? (
+          <SaveProfileButton
+            returnTo={`/profiles/${targetUserId}`}
+            saved={Boolean(saved)}
+            targetUserId={targetUserId}
+          />
+        ) : null}
+
+        {!status?.isMatched ? (
           <>
             <ConnectForm
               action="connect"
@@ -76,7 +83,13 @@ export function ProfileActionPanel({
               {passed ? "Passed" : "Pass"}
             </ConnectForm>
           </>
-        )}
+        ) : null}
+
+        {status?.canDirectContact ? (
+          <div className="sm:col-span-2">
+            <ContactReveal fullName={fullName} targetUserId={targetUserId} />
+          </div>
+        ) : null}
 
         <button
           className="inline-flex h-11 items-center justify-center rounded-full border border-red-300 px-4 text-sm font-semibold text-red-700 transition hover:bg-red-50"

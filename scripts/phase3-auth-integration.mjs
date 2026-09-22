@@ -1018,6 +1018,11 @@ async function runProfileFlow(
     "Edit profile",
     "edit profile page renders",
   );
+  assertTextContains(
+    editProfileBody,
+    "Allow direct email contact",
+    "edit profile page renders the direct contact preference",
+  );
   assertTextExcludes(
     editProfileBody,
     userEmail,
@@ -1083,6 +1088,7 @@ async function runProfileFlow(
         facultyId: taxonomy.otherFaculty.id,
         academicProgramId: taxonomy.otherProgram.id,
         yearOfStudy: 4,
+        allowDirectContact: "on",
         bio: "Updated profile bio",
         availability: "Evenings after classes",
         offerSkillId: taxonomy.editOfferSkill.id,
@@ -1125,7 +1131,7 @@ async function runProfileFlow(
     await service
       .from("profiles")
       .select(
-        "full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key,onboarding_completed_at",
+        "full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key,onboarding_completed_at,allow_direct_contact",
       )
       .eq("user_id", userId)
       .single(),
@@ -1137,6 +1143,11 @@ async function runProfileFlow(
   assert.equal(updatedProfile.year_of_study, 4);
   assert.equal(updatedProfile.bio, "Updated profile bio");
   assert.equal(updatedProfile.availability, "Evenings after classes");
+  assert.equal(
+    updatedProfile.allow_direct_contact,
+    true,
+    "profile edit preserves checked direct contact preference",
+  );
   assert.equal(
     updatedProfile.system_avatar_key,
     expectedAvatarKey(taxonomy.otherFaculty, taxonomy.otherProgram),
@@ -1340,6 +1351,97 @@ async function runMatchingFlow(cookieJar, userId, userEmail, taxonomy) {
     peer.email,
     "discover page never renders candidate email",
   );
+  assertTextContains(
+    discoverBody,
+    "Save for later",
+    "discover page renders the heart save action",
+  );
+
+  const peerProfileBody = await readPageText(
+    await getPath(`/profiles/${peer.id}`, cookieJar),
+    "primary views peer profile",
+  );
+  assertTextContains(
+    peerProfileBody,
+    "Save for later",
+    "other profile renders the heart save action",
+  );
+  assertTextContains(
+    peerProfileBody,
+    "Write by email",
+    "other profile renders direct email contact action",
+  );
+  assertTextContains(
+    peerProfileBody,
+    "Connect",
+    "other profile keeps connect as a separate action",
+  );
+  assertTextExcludes(
+    peerProfileBody,
+    peer.email,
+    "other profile does not render peer email before direct contact reveal",
+  );
+
+  assertRedirectWithParams(
+    await postForm(
+      "/saved/action",
+      {
+        intent: "save",
+        returnTo: "/app",
+        targetUserId: peer.id,
+      },
+      cookieJar,
+    ),
+    "/app",
+    { status: "saved" },
+    "discover heart saves the profile privately",
+  );
+
+  const savedBody = await readPageText(
+    await getPath("/saved", cookieJar),
+    "saved profiles page",
+  );
+  assertTextContains(savedBody, "Saved", "saved page renders");
+  assertTextContains(
+    savedBody,
+    "Phase Six Match Peer",
+    "saved page shows saved peer",
+  );
+  assertTextContains(
+    savedBody,
+    "Remove from saved",
+    "saved page renders filled heart remove action",
+  );
+  assertTextContains(
+    savedBody,
+    "Connect",
+    "saved page keeps connect as a separate action",
+  );
+  assertTextContains(
+    savedBody,
+    "Write by email",
+    "saved page renders direct email contact action when allowed",
+  );
+  assertTextExcludes(
+    savedBody,
+    peer.email,
+    "saved page never renders peer email before reveal action",
+  );
+
+  assertRedirectWithParams(
+    await postForm(
+      "/saved/action",
+      {
+        intent: "remove",
+        returnTo: "/saved",
+        targetUserId: peer.id,
+      },
+      cookieJar,
+    ),
+    "/saved",
+    { status: "unsaved" },
+    "saved page heart removes the profile",
+  );
 
   assertRedirectWithParams(
     await postForm(
@@ -1427,7 +1529,7 @@ async function runMatchingFlow(cookieJar, userId, userEmail, taxonomy) {
   );
   assertTextContains(
     peerMatchesBody,
-    "Reveal student email",
+    "Write by email",
     "matches page renders secure contact reveal action",
   );
   assertTextExcludes(
