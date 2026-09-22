@@ -33,7 +33,7 @@ function SaveSubmitButton({
   showLabel: boolean;
 }>) {
   const { pending } = useFormStatus();
-  const actionLabel = saved ? "Remove from saved" : "Save for later";
+  const actionLabel = saved ? "Remove from saved" : "Save profile";
 
   return (
     <button
@@ -91,7 +91,7 @@ export function SaveProfileButton({
               : "inline-flex h-11 w-11 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-70"
             : undefined)
         }
-        label={label ?? (saved ? "Remove from saved" : "Save for later")}
+        label={label ?? (saved ? "Remove from saved" : "Save profile")}
         pendingLabel={pendingLabel ?? (saved ? "Removing..." : "Saving...")}
         saved={saved}
         showLabel={showLabel}
