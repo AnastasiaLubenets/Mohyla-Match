@@ -1,27 +1,10 @@
 import Link from "next/link";
 
-import { AuthSubmitButton } from "@/components/auth-submit-button";
 import { ContactReveal } from "@/components/matching/contact-reveal";
 import { SaveProfileButton } from "@/components/matching/save-profile-button";
 import { TaxonomyChipList } from "@/components/matching/taxonomy-chip-list";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import type { SavedProfileSummary } from "@/lib/matching/data";
-
-function ConnectForm({ targetUserId }: Readonly<{ targetUserId: string }>) {
-  return (
-    <form action="/profiles/action" method="post">
-      <input name="targetUserId" type="hidden" value={targetUserId} />
-      <input name="action" type="hidden" value="connect" />
-      <input name="returnTo" type="hidden" value="/saved" />
-      <AuthSubmitButton
-        className="inline-flex h-11 w-full items-center justify-center rounded-full bg-primary px-4 text-sm font-semibold text-white transition hover:bg-primary-strong disabled:cursor-not-allowed disabled:opacity-70"
-        pendingLabel="Connecting..."
-      >
-        Connect
-      </AuthSubmitButton>
-    </form>
-  );
-}
 
 export function SavedProfileCard({
   profile,
@@ -50,7 +33,7 @@ export function SavedProfileCard({
           </div>
         </div>
         <SaveProfileButton
-          label="Remove"
+          label="Remove from saved"
           pendingLabel="Removing..."
           returnTo="/saved"
           saved
@@ -81,19 +64,15 @@ export function SavedProfileCard({
         </section>
       </div>
 
-      <div className="mt-6 grid gap-3 border-t border-border pt-5 sm:grid-cols-3">
+      <div className="mt-6 grid gap-3 border-t border-border pt-5 sm:grid-cols-2">
         <Link
           className="inline-flex h-11 items-center justify-center rounded-full border border-border px-4 text-sm font-semibold transition hover:border-primary"
           href={`/profiles/${profile.userId}`}
         >
           View profile
         </Link>
-        <ConnectForm targetUserId={profile.userId} />
         {profile.canDirectContact ? (
-          <ContactReveal
-            fullName={profile.fullName}
-            targetUserId={profile.userId}
-          />
+          <ContactReveal targetUserId={profile.userId} />
         ) : null}
       </div>
     </article>

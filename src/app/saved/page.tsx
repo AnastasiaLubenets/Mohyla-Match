@@ -25,8 +25,6 @@ function SavedStatusMessage({
   status,
 }: Readonly<{ error?: string; status?: string }>) {
   const statusMessages: Record<string, string> = {
-    connected: "Connect sent. We will create a match if they connect too.",
-    matched: "It is a mutual match.",
     saved: "Saved for later.",
     unsaved: "Removed from Saved.",
   };

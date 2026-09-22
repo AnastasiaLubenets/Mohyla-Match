@@ -8,42 +8,10 @@ import { SaveProfileButton } from "@/components/matching/save-profile-button";
 import type { ProfileConnectionStatus } from "@/lib/matching/data";
 import { reportReasons } from "@/lib/matching/view-model";
 
-function ConnectForm({
-  action,
-  children,
-  pendingLabel,
-  targetUserId,
-}: Readonly<{
-  action: "connect" | "skip";
-  children: string;
-  pendingLabel: string;
-  targetUserId: string;
-}>) {
-  return (
-    <form action="/profiles/action" method="post">
-      <input name="targetUserId" type="hidden" value={targetUserId} />
-      <input name="action" type="hidden" value={action} />
-      <input name="returnTo" type="hidden" value={`/profiles/${targetUserId}`} />
-      <AuthSubmitButton
-        className={
-          action === "connect"
-            ? "inline-flex h-11 w-full items-center justify-center rounded-full bg-primary px-4 text-sm font-semibold text-white transition hover:bg-primary-strong disabled:cursor-not-allowed disabled:opacity-70"
-            : "inline-flex h-11 w-full items-center justify-center rounded-full border border-border px-4 text-sm font-semibold text-foreground transition hover:border-primary disabled:cursor-not-allowed disabled:opacity-70"
-        }
-        pendingLabel={pendingLabel}
-      >
-        {children}
-      </AuthSubmitButton>
-    </form>
-  );
-}
-
 export function ProfileActionPanel({
-  fullName,
   status,
   targetUserId,
 }: Readonly<{
-  fullName: string;
   status: ProfileConnectionStatus | null;
   targetUserId: string;
 }>) {
@@ -57,7 +25,7 @@ export function ProfileActionPanel({
     <aside className="mt-6 rounded-lg border border-border bg-surface p-5 shadow-sm">
       <h2 className="text-lg font-semibold">Profile actions</h2>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {canToggleSave ? (
           <SaveProfileButton
             returnTo={`/profiles/${targetUserId}`}
@@ -66,28 +34,9 @@ export function ProfileActionPanel({
           />
         ) : null}
 
-        {!status?.isMatched ? (
-          <>
-            <ConnectForm
-              action="connect"
-              pendingLabel="Connecting..."
-              targetUserId={targetUserId}
-            >
-              {alreadyConnected ? "Connect sent" : "Connect"}
-            </ConnectForm>
-            <ConnectForm
-              action="skip"
-              pendingLabel="Passing..."
-              targetUserId={targetUserId}
-            >
-              {passed ? "Passed" : "Pass"}
-            </ConnectForm>
-          </>
-        ) : null}
-
         {status?.canDirectContact ? (
           <div className="sm:col-span-2">
-            <ContactReveal fullName={fullName} targetUserId={targetUserId} />
+            <ContactReveal targetUserId={targetUserId} />
           </div>
         ) : null}
 

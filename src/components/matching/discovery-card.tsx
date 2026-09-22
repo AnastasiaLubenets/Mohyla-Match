@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AuthSubmitButton } from "@/components/auth-submit-button";
+import { ContactReveal } from "@/components/matching/contact-reveal";
 import { SaveProfileButton } from "@/components/matching/save-profile-button";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import { TaxonomyChipList } from "@/components/matching/taxonomy-chip-list";
@@ -16,9 +17,7 @@ function StatusMessage({
 }: Readonly<{ error?: string; status?: string }>) {
   const statusMessages: Record<string, string> = {
     blocked: "Profile blocked. They will not appear in discovery.",
-    connected: "Connect sent. We will create a match if they connect too.",
-    matched: "It is a mutual match. You can reveal contact details in Matches.",
-    passed: "Passed. Showing the next available profile.",
+    passed: "Skipped. Showing the next available profile.",
     reported: "Report submitted. Thank you for helping keep Mohyla Match safe.",
     saved: "Saved for later. You can find this profile in Saved.",
     unsaved: "Removed from Saved.",
@@ -55,24 +54,18 @@ function DiscoveryActionForm({
   pendingLabel,
   targetUserId,
 }: Readonly<{
-  action: "connect" | "skip";
+  action: "skip";
   children: string;
   pendingLabel: string;
   targetUserId: string;
 }>) {
-  const isConnect = action === "connect";
-
   return (
     <form action="/app/action" method="post">
       <input name="targetUserId" type="hidden" value={targetUserId} />
       <input name="action" type="hidden" value={action} />
       <input name="returnTo" type="hidden" value="/app" />
       <AuthSubmitButton
-        className={
-          isConnect
-            ? "inline-flex h-12 w-full items-center justify-center rounded-full bg-primary px-5 text-sm font-semibold text-white transition hover:bg-primary-strong disabled:cursor-not-allowed disabled:opacity-70"
-            : "inline-flex h-12 w-full items-center justify-center rounded-full border border-border px-5 text-sm font-semibold text-foreground transition hover:border-primary disabled:cursor-not-allowed disabled:opacity-70"
-        }
+        className="inline-flex h-12 w-full items-center justify-center rounded-full border border-border px-5 text-sm font-semibold text-foreground transition hover:border-primary disabled:cursor-not-allowed disabled:opacity-70"
         pendingLabel={pendingLabel}
       >
         {children}
@@ -102,17 +95,10 @@ export function DiscoveryCard({
             No new profiles right now.
           </h1>
           <p className="mt-4 max-w-2xl leading-7 text-muted">
-            Your previous actions, blocks, and existing matches are already
-            filtered out. Check your matches or come back after more students
-            complete onboarding.
+            Your previous actions and blocks are already filtered out. Come
+            back after more students complete onboarding.
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link
-              className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-5 text-sm font-semibold text-white transition hover:bg-primary-strong"
-              href="/matches"
-            >
-              View matches
-            </Link>
             <Link
               className="inline-flex h-12 items-center justify-center rounded-full border border-border px-5 text-sm font-semibold transition hover:border-primary"
               href="/profile"
@@ -136,8 +122,17 @@ export function DiscoveryCard({
   return (
     <>
       <StatusMessage error={error} status={status} />
-      <article className="rounded-lg border border-border bg-surface p-5 shadow-sm sm:p-8">
-        <header className="grid gap-6 lg:grid-cols-[1fr_13rem]">
+      <article className="relative rounded-lg border border-border bg-surface p-5 shadow-sm sm:p-8">
+        <div className="absolute right-5 top-5 sm:right-8 sm:top-8">
+          <SaveProfileButton
+            returnTo="/app"
+            saved={false}
+            targetUserId={candidate.userId}
+            variant="icon"
+          />
+        </div>
+
+        <header className="grid gap-6 pr-14 lg:grid-cols-[1fr_13rem]">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
             <SystemAvatar
               availability={candidate.availability}
@@ -234,25 +229,14 @@ export function DiscoveryCard({
           >
             View profile
           </Link>
-          <div className="grid gap-3 sm:w-[32rem] sm:grid-cols-3">
-            <SaveProfileButton
-              returnTo="/app"
-              saved={false}
-              targetUserId={candidate.userId}
-            />
+          <div className="grid gap-3 sm:w-[24rem] sm:grid-cols-2">
+            <ContactReveal targetUserId={candidate.userId} />
             <DiscoveryActionForm
               action="skip"
-              pendingLabel="Passing..."
+              pendingLabel="Skipping..."
               targetUserId={candidate.userId}
             >
-              Pass
-            </DiscoveryActionForm>
-            <DiscoveryActionForm
-              action="connect"
-              pendingLabel="Connecting..."
-              targetUserId={candidate.userId}
-            >
-              Connect
+              Skip
             </DiscoveryActionForm>
           </div>
         </footer>
