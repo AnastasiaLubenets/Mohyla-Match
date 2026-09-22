@@ -61,7 +61,7 @@ export function MatchCard({ match }: Readonly<{ match: MatchSummary }>) {
 
       {match.canDirectContact ? (
         <div className="mt-6 border-t border-border pt-5">
-          <ContactReveal fullName={match.fullName} targetUserId={match.userId} />
+          <ContactReveal targetUserId={match.userId} />
         </div>
       ) : null}
     </article>

@@ -28,9 +28,7 @@ function ProfileStatusMessage({
   status,
 }: Readonly<{ error?: string; status?: string }>) {
   const statusMessages: Record<string, string> = {
-    connected: "Connect sent. We will create a match if they connect too.",
-    matched: "It is a mutual match. You can reveal contact details now.",
-    passed: "Passed.",
+    passed: "Skipped.",
     reported: "Report submitted. Thank you for helping keep Mohyla Match safe.",
     saved: "Saved for later.",
     unsaved: "Removed from Saved.",
@@ -97,7 +95,6 @@ export default async function StudentProfilePage({
         />
         <ProfileDetails profile={profileResult.data} />
         <ProfileActionPanel
-          fullName={profileResult.data.fullName}
           status={statusResult.data}
           targetUserId={profileResult.data.userId}
         />

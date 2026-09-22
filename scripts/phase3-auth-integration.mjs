@@ -276,6 +276,21 @@ async function postForm(pathname, fields, cookieJar = new Map()) {
   return response;
 }
 
+async function postJson(pathname, body, cookieJar = new Map()) {
+  const response = await fetch(appUrl(pathname), {
+    method: "POST",
+    redirect: "manual",
+    headers: {
+      "content-type": "application/json",
+      ...(cookieJar.size ? { cookie: cookieHeader(cookieJar) } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+
+  applySetCookies(cookieJar, response);
+  return response;
+}
+
 async function getPath(pathname, cookieJar = new Map()) {
   const response = await fetch(appUrl(pathname), {
     redirect: "manual",
@@ -1322,7 +1337,7 @@ async function countActiveMatches(userA, userB) {
   return result.count ?? 0;
 }
 
-async function runMatchingFlow(cookieJar, userId, userEmail, taxonomy) {
+async function runMatchingFlow(cookieJar, userId, taxonomy) {
   const peer = await createConfirmedUser(
     `matching-peer-${suffix}@${allowedDomain}`,
   );
@@ -1353,8 +1368,29 @@ async function runMatchingFlow(cookieJar, userId, userEmail, taxonomy) {
   );
   assertTextContains(
     discoverBody,
-    "Save for later",
-    "discover page renders the heart save action",
+    "Save profile",
+    "discover page renders the blue bookmark save action",
+  );
+  assertTextContains(
+    discoverBody,
+    "Get email",
+    "discover page renders direct email copy action",
+  );
+  assertTextContains(discoverBody, "Skip", "discover page renders skip action");
+  assertTextExcludes(
+    discoverBody,
+    "Connect",
+    "discover page removes connect action",
+  );
+  assertTextExcludes(
+    discoverBody,
+    "Matches",
+    "primary navigation hides matches from discovery",
+  );
+  assertTextExcludes(
+    discoverBody,
+    "mailto:",
+    "discover page does not render mailto links",
   );
 
   const peerProfileBody = await readPageText(
@@ -1363,23 +1399,95 @@ async function runMatchingFlow(cookieJar, userId, userEmail, taxonomy) {
   );
   assertTextContains(
     peerProfileBody,
-    "Save for later",
-    "other profile renders the heart save action",
+    "Save profile",
+    "other profile renders the blue bookmark save action",
   );
   assertTextContains(
     peerProfileBody,
-    "Write by email",
-    "other profile renders direct email contact action",
+    "Get email",
+    "other profile renders direct email copy action",
   );
   assertTextContains(
+    peerProfileBody,
+    "Block",
+    "other profile keeps block action",
+  );
+  assertTextContains(
+    peerProfileBody,
+    "Report",
+    "other profile keeps report action",
+  );
+  assertTextExcludes(
     peerProfileBody,
     "Connect",
-    "other profile keeps connect as a separate action",
+    "other profile removes connect action",
   );
   assertTextExcludes(
     peerProfileBody,
     peer.email,
     "other profile does not render peer email before direct contact reveal",
+  );
+  assertTextExcludes(
+    peerProfileBody,
+    "mailto:",
+    "other profile does not render mailto links",
+  );
+
+  const contactResponse = await postJson(
+    "/profiles/contact",
+    { targetUserId: peer.id },
+    cookieJar,
+  );
+  const contactPayload = await readJson(
+    contactResponse,
+    "profile direct email contact endpoint",
+  );
+  assert.equal(
+    contactPayload.email,
+    peer.email,
+    "direct email endpoint returns peer email only after explicit request",
+  );
+  assert.equal(
+    contactPayload.fullName,
+    "Phase Six Match Peer",
+    "direct email endpoint returns peer display name",
+  );
+  const unauthenticatedContactResponse = await postJson(
+    "/profiles/contact",
+    { targetUserId: peer.id },
+    new Map(),
+  );
+  assert.equal(
+    unauthenticatedContactResponse.status,
+    401,
+    "unauthenticated direct email contact endpoint request is rejected",
+  );
+  const incompleteUser = await createConfirmedUser(
+    `matching-incomplete-${suffix}@${allowedDomain}`,
+  );
+  const incompleteCookies = new Map();
+  assertRedirect(
+    await postForm(
+      "/auth/login",
+      {
+        email: incompleteUser.email,
+        next: "/app",
+        password,
+      },
+      incompleteCookies,
+    ),
+    "/account/setup",
+    "onboarding-incomplete matching user is sent to setup",
+  );
+  const incompleteContactResponse = await postJson(
+    "/profiles/contact",
+    { targetUserId: peer.id },
+    incompleteCookies,
+  );
+  assert.equal(
+    incompleteContactResponse.status,
+    401,
+    "onboarding-incomplete direct email contact endpoint request is rejected",
   );
 
   assertRedirectWithParams(
@@ -1394,7 +1502,35 @@ async function runMatchingFlow(cookieJar, userId, userEmail, taxonomy) {
     ),
     "/app",
     { status: "saved" },
-    "discover heart saves the profile privately",
+    "discover bookmark saves the profile privately",
+  );
+  assertTextExcludes(
+    await readPageText(await getPath("/app", cookieJar), "discover after save"),
+    "Phase Six Match Peer",
+    "saved profile is removed from normal discovery",
+  );
+  const peerCookies = new Map();
+  assertRedirect(
+    await postForm(
+      "/auth/login",
+      {
+        email: peer.email,
+        next: "/saved",
+        password,
+      },
+      peerCookies,
+    ),
+    "/saved",
+    "matching peer can log in after being saved",
+  );
+  const peerSavedBody = await readPageText(
+    await getPath("/saved", peerCookies),
+    "peer saved profiles page",
+  );
+  assertTextExcludes(
+    peerSavedBody,
+    "Phase Five Integration Updated",
+    "saved profiles remain private from the saved target",
   );
 
   const savedBody = await readPageText(
@@ -1410,22 +1546,27 @@ async function runMatchingFlow(cookieJar, userId, userEmail, taxonomy) {
   assertTextContains(
     savedBody,
     "Remove from saved",
-    "saved page renders filled heart remove action",
+    "saved page renders filled bookmark remove action",
   );
   assertTextContains(
+    savedBody,
+    "Get email",
+    "saved page renders direct email copy action when allowed",
+  );
+  assertTextExcludes(
     savedBody,
     "Connect",
-    "saved page keeps connect as a separate action",
-  );
-  assertTextContains(
-    savedBody,
-    "Write by email",
-    "saved page renders direct email contact action when allowed",
+    "saved page removes connect action",
   );
   assertTextExcludes(
     savedBody,
     peer.email,
     "saved page never renders peer email before reveal action",
+  );
+  assertTextExcludes(
+    savedBody,
+    "mailto:",
+    "saved page does not render mailto links",
   );
 
   assertRedirectWithParams(
@@ -1440,117 +1581,47 @@ async function runMatchingFlow(cookieJar, userId, userEmail, taxonomy) {
     ),
     "/saved",
     { status: "unsaved" },
-    "saved page heart removes the profile",
+    "saved page bookmark removes the profile",
   );
 
   assertRedirectWithParams(
     await postForm(
       "/app/action",
       {
-        action: "connect",
+        action: "skip",
         returnTo: "/app",
         targetUserId: peer.id,
       },
       cookieJar,
     ),
     "/app",
-    { status: "connected" },
-    "discover connect records one-way action",
+    { status: "passed" },
+    "discover skip records the simplified dismissal action",
   );
   assert.equal(
     await countActiveMatches(userId, peer.id),
     0,
-    "one-way integration connect does not create a match",
+    "simplified discovery flow does not create a match",
   );
-
-  const peerCookies = new Map();
-  assertRedirect(
-    await postForm(
-      "/auth/login",
-      {
-        email: peer.email,
-        next: "/app",
-        password,
-      },
-      peerCookies,
-    ),
-    "/app",
-    "matching peer can log in",
+  const discoveryEvents = await expectNoSupabaseError(
+    await service
+      .from("product_events")
+      .select("event_name")
+      .eq("user_id", userId)
+      .eq("subject_user_id", peer.id)
+      .in("event_name", ["discover_action_skip", "discover_action_connect"])
+      .order("created_at", { ascending: true }),
+    "load simplified discovery action events",
   );
-
-  const primaryProfileForPeer = await readPageText(
-    await getPath(`/profiles/${userId}`, peerCookies),
-    "peer views primary profile",
-  );
-  assertTextContains(
-    primaryProfileForPeer,
-    "Phase Five Integration Updated",
-    "peer can view active primary profile",
-  );
-  assertTextContains(
-    primaryProfileForPeer,
-    "Connect",
-    "other profile renders connect action",
+  assert.deepEqual(
+    discoveryEvents.map((event) => event.event_name),
+    ["discover_action_skip"],
+    "simplified discovery product UI emits skip but no connect event",
   );
   assertTextExcludes(
-    primaryProfileForPeer,
-    userEmail,
-    "other profile does not reveal primary email before match",
-  );
-
-  assertRedirectWithParams(
-    await postForm(
-      "/profiles/action",
-      {
-        action: "connect",
-        returnTo: `/profiles/${userId}`,
-        targetUserId: userId,
-      },
-      peerCookies,
-    ),
-    `/profiles/${userId}`,
-    { status: "matched" },
-    "reciprocal profile connect creates match",
-  );
-  assert.equal(
-    await countActiveMatches(userId, peer.id),
-    1,
-    "reciprocal integration connect creates exactly one active match",
-  );
-
-  const peerMatchesBody = await readPageText(
-    await getPath("/matches", peerCookies),
-    "peer matches page",
-  );
-  assertTextContains(
-    peerMatchesBody,
-    "Phase Five Integration Updated",
-    "matches page shows mutual match",
-  );
-  assertTextContains(
-    peerMatchesBody,
-    "Write by email",
-    "matches page renders secure contact reveal action",
-  );
-  assertTextExcludes(
-    peerMatchesBody,
-    userEmail,
-    "matches page does not render email before reveal action",
-  );
-
-  const primaryMatchesBody = await readPageText(
-    await getPath("/matches", cookieJar),
-    "primary matches page",
-  );
-  assertTextContains(
-    primaryMatchesBody,
+    await readPageText(await getPath("/app", cookieJar), "discover after skip"),
     "Phase Six Match Peer",
-    "primary matches page shows peer",
-  );
-  assertTextExcludes(
-    primaryMatchesBody,
-    peer.email,
-    "primary matches page does not render peer email before reveal action",
+    "skipped profile is removed from discovery",
   );
 
   assertRedirectWithParams(
@@ -1598,12 +1669,28 @@ async function runMatchingFlow(cookieJar, userId, userEmail, taxonomy) {
   await assertProfileUnavailable(
     cookieJar,
     peer.id,
-    "blocked matched profile becomes unavailable",
+    "blocked profile becomes unavailable",
+  );
+  const blockedContactResponse = await postJson(
+    "/profiles/contact",
+    { targetUserId: peer.id },
+    cookieJar,
+  );
+  assert.equal(
+    blockedContactResponse.status,
+    404,
+    "blocked profile email contact request is rejected",
+  );
+  const blockedContactPayload = await blockedContactResponse.json();
+  assert.deepEqual(
+    blockedContactPayload,
+    { error: "Direct email contact is not available for this profile." },
+    "blocked profile email contact returns a safe error",
   );
   assert.equal(
     await countActiveMatches(userId, peer.id),
     0,
-    "blocking closes the active integration match",
+    "blocking leaves no active integration match",
   );
 }
 
@@ -1776,7 +1863,6 @@ async function run() {
   await runMatchingFlow(
     realConfirmationCookies,
     allowedSignup.data.user.id,
-    realEmailSignupAddress,
     onboardingResult.taxonomy,
   );
   await runProfileDeletionFlow(
