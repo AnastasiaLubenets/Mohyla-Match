@@ -457,8 +457,10 @@ export function ProfileCompletenessCard({
 }
 
 export function MyAccountCard({
+  loginEmail,
   profile,
 }: Readonly<{
+  loginEmail: string | null;
   profile: SafeProfile;
 }>) {
   return (
@@ -473,7 +475,9 @@ export function MyAccountCard({
         </AccountFact>
         <AccountFact icon={<EnvelopeIcon />}>
           <strong className="block text-blue-950">Login email</strong>
-          Kept private in Supabase Auth
+          <span className="break-all">
+            {loginEmail ?? "Unavailable for this session"}
+          </span>
         </AccountFact>
         <AccountFact icon={<LinkIcon />}>
           <strong className="block text-blue-950">Direct email contact</strong>

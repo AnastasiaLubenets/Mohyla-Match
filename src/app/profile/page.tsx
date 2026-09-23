@@ -43,15 +43,17 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
   const accountState = await requireAccountState("/profile", ["active"]);
   const params = await searchParams;
   const supabase = await createSupabaseServerClient();
-  const [profileResult, editDataResult] = await Promise.all([
+  const [profileResult, editDataResult, userResult] = await Promise.all([
     loadSafeProfile(supabase, accountState.userId ?? ""),
     loadProfileEditData(supabase, accountState.userId ?? ""),
+    supabase.auth.getUser(),
   ]);
+  const loginEmail = userResult.data.user?.email ?? null;
 
   if (profileResult.error || editDataResult.error) {
     return (
       <AppChrome active="profile" currentProfile={null}>
-        <section className="px-4 py-8 sm:px-6 xl:h-full xl:overflow-y-auto xl:px-8">
+        <section className="scrollbar-hidden px-4 py-8 sm:px-6 xl:h-full xl:overflow-y-auto xl:px-8">
           <div className="mx-auto max-w-4xl rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
               My profile
@@ -78,7 +80,7 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
   return (
     <AppChrome active="profile" currentProfile={profile}>
       <div className="grid gap-6 px-4 py-6 sm:px-6 xl:h-full xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_20rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
-        <section className="min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
+        <section className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
           <header className="mb-5">
             <h1 className="font-serif text-6xl font-bold leading-none text-blue-950 sm:text-7xl">
               My profile
@@ -98,7 +100,7 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
 
         <aside className="space-y-4 xl:h-full xl:min-h-0 xl:overflow-hidden">
           <ProfileCompletenessCard profile={profile} />
-          <MyAccountCard profile={profile} />
+          <MyAccountCard loginEmail={loginEmail} profile={profile} />
         </aside>
       </div>
     </AppChrome>

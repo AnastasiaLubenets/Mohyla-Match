@@ -37,3 +37,14 @@ a {
   text-decoration-thickness: 0.08em;
   text-underline-offset: 0.18em;
 }
+
+.scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}

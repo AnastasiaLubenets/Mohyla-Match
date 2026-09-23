@@ -104,7 +104,7 @@ export default async function StudentProfilePage({
       currentProfile={currentProfile}
     >
       <div className="grid gap-6 px-4 py-6 sm:px-6 xl:h-full xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_20rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
-        <div className="min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
+        <div className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
           <ProfileStatusMessage
             error={firstParam(pageParams.error)}
             status={firstParam(pageParams.status)}
