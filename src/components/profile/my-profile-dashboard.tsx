@@ -681,6 +681,7 @@ export function MyProfileDashboard({
             >
               <EditIcon />
               Edit full profile
+              <span className="sr-only">Edit profile</span>
             </Link>
             <p className="text-center text-xs font-semibold text-blue-600/80">
               Open full edit page
