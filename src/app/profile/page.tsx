@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { AppChrome } from "@/components/matching/app-chrome";
 import { DeleteProfileDangerZone } from "@/components/profile/delete-profile-danger-zone";
 import {
+  type LoginEmailParts,
   MyAccountCard,
   MyProfileDashboard,
   ProfileCompletenessCard,
@@ -23,6 +24,23 @@ type PageProps = Readonly<{
 
 function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
+}
+
+function splitLoginEmail(email: string | null): LoginEmailParts | null {
+  if (!email) {
+    return null;
+  }
+
+  const atIndex = email.indexOf("@");
+
+  if (atIndex === -1) {
+    return { domain: null, localPart: email };
+  }
+
+  return {
+    domain: email.slice(atIndex + 1),
+    localPart: email.slice(0, atIndex),
+  };
 }
 
 function ProfileStatusMessage({
@@ -48,7 +66,7 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
     loadProfileEditData(supabase, accountState.userId ?? ""),
     supabase.auth.getUser(),
   ]);
-  const loginEmail = userResult.data.user?.email ?? null;
+  const loginEmail = splitLoginEmail(userResult.data.user?.email ?? null);
 
   if (profileResult.error || editDataResult.error) {
     return (
