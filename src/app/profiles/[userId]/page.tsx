@@ -1,8 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 
-import { MatchingNav } from "@/components/matching/matching-nav";
-import { ProfileActionPanel } from "@/components/matching/profile-action-panel";
-import { ProfileDetails } from "@/components/profile/profile-details";
+import { AppChrome, BrandQuoteCard } from "@/components/matching/app-chrome";
+import { FullStudentProfile } from "@/components/profile/full-student-profile";
 import { requireAccountState } from "@/lib/auth/guards";
 import { loadProfileConnectionStatus } from "@/lib/matching/data";
 import { isUuid, loadSafeProfile } from "@/lib/profile/data";
@@ -41,7 +40,7 @@ function ProfileStatusMessage({
 
   if (error && errorMessages[error]) {
     return (
-      <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900">
+      <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900 shadow-sm">
         {errorMessages[error]}
       </div>
     );
@@ -49,13 +48,17 @@ function ProfileStatusMessage({
 
   if (status && statusMessages[status]) {
     return (
-      <div className="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-950">
+      <div className="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-950 shadow-sm">
         {statusMessages[status]}
       </div>
     );
   }
 
   return null;
+}
+
+function profileSource(value?: string) {
+  return value === "saved" ? "saved" : "discover";
 }
 
 export default async function StudentProfilePage({
@@ -74,31 +77,54 @@ export default async function StudentProfilePage({
     redirect("/profile");
   }
 
+  const source = profileSource(firstParam(pageParams.from));
+  const backHref = source === "saved" ? "/saved" : "/app";
+  const backLabel = source === "saved" ? "Back to saved" : "Back to discover";
+  const returnTo = `/profiles/${userId}?from=${source}`;
   const supabase = await createSupabaseServerClient();
-  const [profileResult, statusResult] = await Promise.all([
+  const [profileResult, statusResult, currentProfileResult] = await Promise.all([
     loadSafeProfile(supabase, userId),
     loadProfileConnectionStatus(supabase, userId),
+    accountState.userId
+      ? loadSafeProfile(supabase, accountState.userId)
+      : Promise.resolve({ data: null, error: false }),
   ]);
 
   if (profileResult.error || !profileResult.data) {
     notFound();
   }
 
-  return (
-    <main className="min-h-screen px-5 py-6 sm:px-8 sm:py-8">
-      <section className="mx-auto w-full max-w-5xl">
-        <MatchingNav />
+  const currentProfile = currentProfileResult.error
+    ? null
+    : currentProfileResult.data;
 
-        <ProfileStatusMessage
-          error={firstParam(pageParams.error)}
-          status={firstParam(pageParams.status)}
-        />
-        <ProfileDetails profile={profileResult.data} />
-        <ProfileActionPanel
-          status={statusResult.data}
-          targetUserId={profileResult.data.userId}
-        />
-      </section>
-    </main>
+  return (
+    <AppChrome
+      active={source === "saved" ? "saved" : "discover"}
+      currentProfile={currentProfile}
+    >
+      <div className="grid gap-6 px-4 py-6 sm:px-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:px-8 2xl:gap-8">
+        <div>
+          <ProfileStatusMessage
+            error={firstParam(pageParams.error)}
+            status={firstParam(pageParams.status)}
+          />
+          <FullStudentProfile
+            backHref={backHref}
+            backLabel={backLabel}
+            profile={profileResult.data}
+            returnTo={returnTo}
+            status={statusResult.error ? null : statusResult.data}
+          />
+        </div>
+
+        <aside className="space-y-4 xl:sticky xl:top-20 xl:self-start">
+          <BrandQuoteCard
+            lines={["People", "Ideas", "Collaboration", "Impact"]}
+            text="Great ideas start with real conversations."
+          />
+        </aside>
+      </div>
+    </AppChrome>
   );
 }

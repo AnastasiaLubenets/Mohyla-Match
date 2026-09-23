@@ -1,12 +1,36 @@
+"use client";
+
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useTransition, type ReactNode } from "react";
 
 import { SystemAvatar } from "@/components/profile/system-avatar";
-import type { SafeProfile } from "@/lib/profile/data";
+import {
+  TaxonomyMultiSelect,
+  type TaxonomyPickerOption,
+} from "@/components/profile/taxonomy-multi-select";
+import type { EditProfileData, SafeProfile } from "@/lib/profile/data";
 
 type CompletionItem = Readonly<{
   complete: boolean;
   label: string;
+}>;
+
+type EditableSection =
+  | "availability"
+  | "bio"
+  | "collaborationGoals"
+  | "interests"
+  | "lookingForSkills"
+  | "offeredSkills";
+
+type EditableState = Readonly<{
+  availability: string | null;
+  bio: string | null;
+  collaborationGoalIds: number[];
+  interestIds: number[];
+  offeredSkillIds: number[];
+  wantedSkillIds: number[];
 }>;
 
 function UserIcon() {
@@ -244,6 +268,25 @@ function computeCompletion(items: readonly CompletionItem[]) {
   return Math.round((completeCount / items.length) * 100);
 }
 
+function normalizeText(value: string): string | null {
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
+}
+
+function namedOptions(options: readonly { id: number; name: string }[]) {
+  return options.map((option) => ({ id: option.id, name: option.name }));
+}
+
+function namesFromIds(
+  options: readonly TaxonomyPickerOption[],
+  ids: readonly number[],
+): string[] {
+  const selected = new Set(ids);
+  return options
+    .filter((option) => selected.has(option.id))
+    .map((option) => option.name);
+}
+
 function ChipList({
   emptyLabel,
   items,
@@ -270,14 +313,23 @@ function ChipList({
 }
 
 function DashboardCard({
+  activeSection,
   children,
   icon,
+  onEdit,
+  section,
   title,
 }: Readonly<{
+  activeSection: EditableSection | null;
   children: ReactNode;
   icon: ReactNode;
+  onEdit: (section: EditableSection) => void;
+  section: EditableSection;
   title: string;
 }>) {
+  const isEditing = activeSection === section;
+  const otherSectionActive = Boolean(activeSection && activeSection !== section);
+
   return (
     <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_55px_rgba(15,94,156,0.08)] sm:p-6">
       <div className="flex items-start justify-between gap-4">
@@ -287,12 +339,14 @@ function DashboardCard({
           </span>
           {title}
         </h2>
-        <Link
-          className="text-sm font-bold text-blue-700 transition hover:text-blue-950"
-          href="/profile/edit"
+        <button
+          className="text-sm font-bold text-blue-700 transition hover:text-blue-950 disabled:cursor-not-allowed disabled:text-blue-300"
+          disabled={otherSectionActive}
+          onClick={() => onEdit(section)}
+          type="button"
         >
-          Edit
-        </Link>
+          {isEditing ? "Editing" : "Edit"}
+        </button>
       </div>
       <div className="mt-4">{children}</div>
     </section>
@@ -313,6 +367,37 @@ function AccountFact({
       </span>
       <span>{children}</span>
     </li>
+  );
+}
+
+function InlineActionButtons({
+  isSaving,
+  onCancel,
+  onSave,
+}: Readonly<{
+  isSaving: boolean;
+  onCancel: () => void;
+  onSave: () => void;
+}>) {
+  return (
+    <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <button
+        className="inline-flex h-10 items-center justify-center rounded-md border border-blue-200 px-5 text-sm font-bold text-blue-800 transition hover:border-blue-300 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-60"
+        disabled={isSaving}
+        onClick={onCancel}
+        type="button"
+      >
+        Cancel
+      </button>
+      <button
+        className="inline-flex h-10 items-center justify-center rounded-md bg-blue-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-60"
+        disabled={isSaving}
+        onClick={onSave}
+        type="button"
+      >
+        {isSaving ? "Saving..." : "Save"}
+      </button>
+    </div>
   );
 }
 
@@ -404,22 +489,157 @@ export function MyAccountCard({
 }
 
 export function MyProfileDashboard({
+  editData,
   profile,
 }: Readonly<{
+  editData: EditProfileData;
   profile: SafeProfile;
 }>) {
+  const router = useRouter();
+  const [, startTransition] = useTransition();
+  const skillOptions = editData.skills;
+  const interestOptions = namedOptions(editData.interests);
+  const collaborationGoalOptions = namedOptions(editData.collaborationGoals);
+  const [state, setState] = useState<EditableState>(() => ({
+    availability: profile.availability,
+    bio: profile.bio,
+    collaborationGoalIds: editData.collaborationGoalIds,
+    interestIds: editData.interestIds,
+    offeredSkillIds: editData.offeredSkillIds,
+    wantedSkillIds: editData.wantedSkillIds,
+  }));
+  const [editingSection, setEditingSection] = useState<EditableSection | null>(
+    null,
+  );
+  const [draftText, setDraftText] = useState("");
+  const [draftIds, setDraftIds] = useState<number[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const offeredSkillNames = namesFromIds(skillOptions, state.offeredSkillIds);
+  const wantedSkillNames = namesFromIds(skillOptions, state.wantedSkillIds);
+  const interestNames = namesFromIds(interestOptions, state.interestIds);
+  const collaborationGoalNames = namesFromIds(
+    collaborationGoalOptions,
+    state.collaborationGoalIds,
+  );
   const heroChips = [
-    ...profile.interests.slice(0, 3),
-    ...profile.collaborationGoals.slice(0, 2),
+    ...interestNames.slice(0, 3),
+    ...collaborationGoalNames.slice(0, 2),
   ].slice(0, 4);
+
+  function startEdit(section: EditableSection) {
+    if (editingSection && editingSection !== section) {
+      setError("Save or cancel the current edit before opening another section.");
+      return;
+    }
+
+    setError(null);
+    setSuccess(null);
+    setEditingSection(section);
+
+    if (section === "bio") {
+      setDraftText(state.bio ?? "");
+    } else if (section === "availability") {
+      setDraftText(state.availability ?? "");
+    } else if (section === "offeredSkills") {
+      setDraftIds(state.offeredSkillIds);
+    } else if (section === "interests") {
+      setDraftIds(state.interestIds);
+    } else if (section === "collaborationGoals") {
+      setDraftIds(state.collaborationGoalIds);
+    } else {
+      setDraftIds(state.wantedSkillIds);
+    }
+  }
+
+  function cancelEdit() {
+    setEditingSection(null);
+    setDraftText("");
+    setDraftIds([]);
+    setError(null);
+  }
+
+  async function saveSection() {
+    if (!editingSection || isSaving) {
+      return;
+    }
+
+    if (
+      (editingSection === "offeredSkills" ||
+        editingSection === "interests" ||
+        editingSection === "collaborationGoals") &&
+      draftIds.length < 1
+    ) {
+      setError("Choose at least one item before saving this section.");
+      return;
+    }
+
+    setIsSaving(true);
+    setError(null);
+
+    const requestBody =
+      editingSection === "bio"
+        ? { bio: draftText, section: editingSection }
+        : editingSection === "availability"
+          ? { availability: draftText, section: editingSection }
+          : { ids: draftIds, section: editingSection };
+
+    const response = await fetch("/profile/section-update", {
+      body: JSON.stringify(requestBody),
+      headers: { "content-type": "application/json" },
+      method: "POST",
+    });
+    const payload = (await response.json().catch(() => null)) as
+      | { error?: string; ok?: boolean }
+      | null;
+
+    if (!response.ok || !payload?.ok) {
+      setError(payload?.error ?? "We could not save this section. Try again.");
+      setIsSaving(false);
+      return;
+    }
+
+    setState((current) => {
+      if (editingSection === "bio") {
+        return { ...current, bio: normalizeText(draftText) };
+      }
+
+      if (editingSection === "availability") {
+        return { ...current, availability: normalizeText(draftText) };
+      }
+
+      if (editingSection === "offeredSkills") {
+        return { ...current, offeredSkillIds: draftIds };
+      }
+
+      if (editingSection === "interests") {
+        return { ...current, interestIds: draftIds };
+      }
+
+      if (editingSection === "collaborationGoals") {
+        return { ...current, collaborationGoalIds: draftIds };
+      }
+
+      return { ...current, wantedSkillIds: draftIds };
+    });
+
+    setSuccess("Profile section saved.");
+    setEditingSection(null);
+    setDraftText("");
+    setDraftIds([]);
+    setIsSaving(false);
+    startTransition(() => router.refresh());
+  }
 
   return (
     <div className="space-y-4">
       <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_55px_rgba(15,94,156,0.09)] sm:p-6">
-        <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)_12rem] lg:items-start">
+        <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)_14rem] lg:items-start">
           <div className="overflow-hidden rounded-lg border border-blue-100 bg-blue-50">
             <SystemAvatar
-              availability={profile.availability}
+              availability={state.availability}
               facultyName={profile.facultyName}
               fullName={profile.fullName}
               programName={profile.academicProgramName}
@@ -439,13 +659,13 @@ export function MyProfileDashboard({
             <p className="mt-1 text-sm font-medium text-blue-700/80">
               {profile.facultyName}
             </p>
-            {profile.availability ? (
+            {state.availability ? (
               <p className="mt-3 text-sm font-semibold text-blue-700">
-                {profile.availability}
+                {state.availability}
               </p>
             ) : null}
             <p className="mt-5 max-w-2xl text-base leading-7 text-blue-900/80">
-              {profile.bio || "No bio yet."}
+              {state.bio || "No bio yet."}
             </p>
             {heroChips.length > 0 ? (
               <div className="mt-5">
@@ -454,58 +674,244 @@ export function MyProfileDashboard({
             ) : null}
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
             <Link
               className="inline-flex h-12 items-center justify-center gap-3 rounded-md border border-blue-200 bg-white px-5 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
               href="/profile/edit"
             >
               <EditIcon />
-              Edit profile
+              Edit full profile
             </Link>
+            <p className="text-center text-xs font-semibold text-blue-600/80">
+              Open full edit page
+            </p>
           </div>
         </div>
       </section>
 
+      {error ? (
+        <div
+          className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900"
+          role="alert"
+        >
+          {error}
+        </div>
+      ) : null}
+      {success ? (
+        <div
+          aria-live="polite"
+          className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-950"
+        >
+          {success}
+        </div>
+      ) : null}
+
       <div className="grid gap-4 lg:grid-cols-2">
-        <DashboardCard icon={<UserIcon />} title="About me">
-          <p className="leading-7 text-blue-900/80">
-            {profile.bio || "Add a bio so other students understand what you want to build."}
-          </p>
+        <DashboardCard
+          activeSection={editingSection}
+          icon={<UserIcon />}
+          onEdit={startEdit}
+          section="bio"
+          title="About me"
+        >
+          {editingSection === "bio" ? (
+            <div>
+              <label className="sr-only" htmlFor="inline-bio">
+                About me
+              </label>
+              <textarea
+                className="min-h-28 w-full resize-y rounded-md border border-blue-200 bg-white px-4 py-3 text-sm font-medium leading-6 text-blue-950 outline-none transition focus:border-blue-400 disabled:cursor-not-allowed disabled:bg-blue-50"
+                disabled={isSaving}
+                id="inline-bio"
+                maxLength={500}
+                onChange={(event) => setDraftText(event.target.value)}
+                value={draftText}
+              />
+              <p className="mt-1 text-right text-xs font-semibold text-blue-500">
+                {draftText.length}/500
+              </p>
+              <InlineActionButtons
+                isSaving={isSaving}
+                onCancel={cancelEdit}
+                onSave={saveSection}
+              />
+            </div>
+          ) : (
+            <p className="leading-7 text-blue-900/80">
+              {state.bio ||
+                "Add a bio so other students understand what you want to build."}
+            </p>
+          )}
         </DashboardCard>
 
-        <DashboardCard icon={<BarsIcon />} title="Skills">
-          <ChipList
-            emptyLabel="No offered skills are visible."
-            items={profile.offeredSkills}
-          />
+        <DashboardCard
+          activeSection={editingSection}
+          icon={<BarsIcon />}
+          onEdit={startEdit}
+          section="offeredSkills"
+          title="Skills"
+        >
+          {editingSection === "offeredSkills" ? (
+            <div>
+              <TaxonomyMultiSelect
+                disabled={isSaving}
+                emptyLabel="Choose at least one offered skill."
+                label="Skills"
+                onChange={setDraftIds}
+                options={skillOptions}
+                placeholder="Search skills..."
+                required
+                selectedIds={draftIds}
+              />
+              <InlineActionButtons
+                isSaving={isSaving}
+                onCancel={cancelEdit}
+                onSave={saveSection}
+              />
+            </div>
+          ) : (
+            <ChipList
+              emptyLabel="No offered skills are visible."
+              items={offeredSkillNames}
+            />
+          )}
         </DashboardCard>
 
-        <DashboardCard icon={<SparkIcon />} title="Academic interests">
-          <ChipList
-            emptyLabel="No academic interests are visible."
-            items={profile.interests}
-          />
+        <DashboardCard
+          activeSection={editingSection}
+          icon={<SparkIcon />}
+          onEdit={startEdit}
+          section="interests"
+          title="Academic interests"
+        >
+          {editingSection === "interests" ? (
+            <div>
+              <TaxonomyMultiSelect
+                disabled={isSaving}
+                emptyLabel="Choose at least one academic interest."
+                label="Academic interests"
+                onChange={setDraftIds}
+                options={interestOptions}
+                placeholder="Search academic interests..."
+                required
+                selectedIds={draftIds}
+              />
+              <InlineActionButtons
+                isSaving={isSaving}
+                onCancel={cancelEdit}
+                onSave={saveSection}
+              />
+            </div>
+          ) : (
+            <ChipList
+              emptyLabel="No academic interests are visible."
+              items={interestNames}
+            />
+          )}
         </DashboardCard>
 
-        <DashboardCard icon={<TargetIcon />} title="Looking for">
-          <ChipList
-            emptyLabel="No collaboration goals are visible."
-            items={profile.collaborationGoals}
-          />
+        <DashboardCard
+          activeSection={editingSection}
+          icon={<TargetIcon />}
+          onEdit={startEdit}
+          section="collaborationGoals"
+          title="Looking for"
+        >
+          {editingSection === "collaborationGoals" ? (
+            <div>
+              <TaxonomyMultiSelect
+                disabled={isSaving}
+                emptyLabel="Choose at least one collaboration goal."
+                label="Collaboration goals"
+                onChange={setDraftIds}
+                options={collaborationGoalOptions}
+                placeholder="Search collaboration goals..."
+                required
+                selectedIds={draftIds}
+              />
+              <InlineActionButtons
+                isSaving={isSaving}
+                onCancel={cancelEdit}
+                onSave={saveSection}
+              />
+            </div>
+          ) : (
+            <ChipList
+              emptyLabel="No collaboration goals are visible."
+              items={collaborationGoalNames}
+            />
+          )}
         </DashboardCard>
 
-        <DashboardCard icon={<CalendarIcon />} title="Availability">
-          <ChipList
-            emptyLabel="No availability is listed."
-            items={profile.availability ? [profile.availability] : []}
-          />
+        <DashboardCard
+          activeSection={editingSection}
+          icon={<CalendarIcon />}
+          onEdit={startEdit}
+          section="availability"
+          title="Availability"
+        >
+          {editingSection === "availability" ? (
+            <div>
+              <label className="sr-only" htmlFor="inline-availability">
+                Availability
+              </label>
+              <input
+                className="h-11 w-full rounded-md border border-blue-200 bg-white px-4 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400 disabled:cursor-not-allowed disabled:bg-blue-50"
+                disabled={isSaving}
+                id="inline-availability"
+                maxLength={160}
+                onChange={(event) => setDraftText(event.target.value)}
+                placeholder='e.g. hours per week, "evenings", or a short note'
+                type="text"
+                value={draftText}
+              />
+              <p className="mt-1 text-xs font-semibold text-blue-500">
+                e.g. hours per week, &quot;evenings&quot;, or a short note
+              </p>
+              <InlineActionButtons
+                isSaving={isSaving}
+                onCancel={cancelEdit}
+                onSave={saveSection}
+              />
+            </div>
+          ) : (
+            <ChipList
+              emptyLabel="No availability is listed."
+              items={state.availability ? [state.availability] : []}
+            />
+          )}
         </DashboardCard>
 
-        <DashboardCard icon={<LinkIcon />} title="Looking-for skills">
-          <ChipList
-            emptyLabel="No looking-for skills are visible."
-            items={profile.wantedSkills}
-          />
+        <DashboardCard
+          activeSection={editingSection}
+          icon={<LinkIcon />}
+          onEdit={startEdit}
+          section="lookingForSkills"
+          title="Looking-for skills"
+        >
+          {editingSection === "lookingForSkills" ? (
+            <div>
+              <TaxonomyMultiSelect
+                disabled={isSaving}
+                emptyLabel="No looking-for skills selected."
+                label="Looking-for skills"
+                onChange={setDraftIds}
+                options={skillOptions}
+                placeholder="Search skills you're looking for..."
+                selectedIds={draftIds}
+              />
+              <InlineActionButtons
+                isSaving={isSaving}
+                onCancel={cancelEdit}
+                onSave={saveSection}
+              />
+            </div>
+          ) : (
+            <ChipList
+              emptyLabel="No looking-for skills are visible."
+              items={wantedSkillNames}
+            />
+          )}
         </DashboardCard>
       </div>
     </div>

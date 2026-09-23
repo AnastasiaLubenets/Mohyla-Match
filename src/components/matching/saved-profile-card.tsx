@@ -136,7 +136,7 @@ export function SavedProfileCard({
         <Link
           aria-label={`Open ${profile.fullName}'s profile`}
           className="block overflow-hidden rounded-lg border border-blue-100 bg-blue-50 transition hover:border-blue-300"
-          href={`/profiles/${profile.userId}`}
+          href={`/profiles/${profile.userId}?from=saved`}
         >
           <SystemAvatar
             availability={profile.availability}
@@ -152,7 +152,7 @@ export function SavedProfileCard({
           <h2 className="font-serif text-4xl font-semibold leading-none text-blue-950">
             <Link
               className="transition hover:text-blue-800"
-              href={`/profiles/${profile.userId}`}
+              href={`/profiles/${profile.userId}?from=saved`}
             >
               {profile.fullName}
             </Link>
@@ -199,7 +199,7 @@ export function SavedProfileCard({
       <footer className="mt-5 grid gap-3 border-t border-blue-100 pt-5 sm:grid-cols-2">
         <Link
           className="inline-flex h-12 items-center justify-center gap-3 rounded-md border border-blue-200 bg-white px-5 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
-          href={`/profiles/${profile.userId}`}
+          href={`/profiles/${profile.userId}?from=saved`}
         >
           <ExternalIcon />
           View profile

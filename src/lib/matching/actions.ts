@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { NextRequest, NextResponse } from "next/server";
 
-import { pathWithParams, readRequiredFormString, redirectTo } from "@/lib/auth/http";
+import { readRequiredFormString, redirectTo } from "@/lib/auth/http";
 import {
   destinationForAccountState,
   sanitizeNextPath,
@@ -13,6 +13,7 @@ import {
   isReportReason,
   type DiscoveryAction,
 } from "@/lib/matching/view-model";
+import { pathWithMergedParams } from "@/lib/matching/return-path";
 import type { Database } from "@/types/database";
 
 type MatchingActionContext =
@@ -54,11 +55,11 @@ function safeReturnPath(value: FormDataEntryValue | null, fallbackPath: string) 
 }
 
 function statusPath(pathname: string, status: string) {
-  return pathWithParams(pathname, { status });
+  return pathWithMergedParams(pathname, { status });
 }
 
 function errorPath(pathname: string, error: string) {
-  return pathWithParams(pathname, { error });
+  return pathWithMergedParams(pathname, { error });
 }
 
 export async function performDiscoveryAction(

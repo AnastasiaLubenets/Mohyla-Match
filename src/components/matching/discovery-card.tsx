@@ -227,7 +227,7 @@ export function DiscoveryCard({
           <Link
             aria-label={`Open ${candidate.fullName}'s profile`}
             className="block overflow-hidden rounded-lg border border-blue-100 bg-blue-50 transition hover:border-blue-300"
-            href={`/profiles/${candidate.userId}`}
+            href={`/profiles/${candidate.userId}?from=discover`}
           >
             <SystemAvatar
               availability={candidate.availability}
@@ -243,7 +243,7 @@ export function DiscoveryCard({
             <h2 className="font-serif text-4xl font-semibold leading-none text-blue-950">
               <Link
                 className="transition hover:text-blue-800"
-                href={`/profiles/${candidate.userId}`}
+                href={`/profiles/${candidate.userId}?from=discover`}
               >
                 {candidate.fullName}
               </Link>
@@ -267,7 +267,7 @@ export function DiscoveryCard({
             </p>
             <Link
               className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-blue-800 transition hover:text-blue-950"
-              href={`/profiles/${candidate.userId}`}
+              href={`/profiles/${candidate.userId}?from=discover`}
             >
               View full profile
               <ArrowRightIcon />
