@@ -17,7 +17,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      SUPABASE_INTERNAL_IMAGE_REGISTRY: public.ecr.aws/supabase
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout
@@ -28,26 +42,109 @@ jobs:
         with:
           version: 2.117.0
 
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
       - name: Show Supabase CLI version
         run: supabase --version
 
-      - name: Start local Supabase database
-        run: supabase db start
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
-      - name: Recreate database from migrations and seed
-        run: supabase db reset
+      - name: Install pgTAP in Postgres service
+        run: |
+          docker exec "${{ job.services.postgres.id }}" bash -lc "apt-get update && apt-get install -y postgresql-17-pgtap"
+
+      - name: Bootstrap Supabase-compatible database roles
+        shell: bash
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
+          create schema if not exists auth;
+          create schema if not exists extensions;
+          create extension if not exists pgcrypto with schema extensions;
+          create extension if not exists pgtap with schema public;
+
+          do $$
+          begin
+            create role anon nologin;
+          exception when duplicate_object then null;
+          end $$;
+
+          do $$
+          begin
+            create role authenticated nologin;
+          exception when duplicate_object then null;
+          end $$;
+
+          do $$
+          begin
+            create role service_role nologin bypassrls;
+          exception when duplicate_object then null;
+          end $$;
+
+          do $$
+          begin
+            create role supabase_auth_admin nologin;
+          exception when duplicate_object then null;
+          end $$;
+
+          grant usage on schema auth to anon, authenticated, service_role, supabase_auth_admin;
+          grant usage on schema extensions to anon, authenticated, service_role, supabase_auth_admin;
+
+          create table if not exists auth.users (
+            instance_id uuid,
+            id uuid primary key,
+            aud varchar(255),
+            role varchar(255),
+            email varchar(255) unique,
+            encrypted_password varchar(255),
+            email_confirmed_at timestamptz,
+            invited_at timestamptz,
+            confirmation_token varchar(255),
+            confirmation_sent_at timestamptz,
+            recovery_token varchar(255),
+            recovery_sent_at timestamptz,
+            email_change_token_new varchar(255),
+            email_change varchar(255),
+            email_change_sent_at timestamptz,
+            last_sign_in_at timestamptz,
+            raw_app_meta_data jsonb,
+            raw_user_meta_data jsonb,
+            is_super_admin boolean,
+            created_at timestamptz,
+            updated_at timestamptz,
+            phone text,
+            phone_confirmed_at timestamptz,
+            phone_change text,
+            phone_change_token varchar(255),
+            phone_change_sent_at timestamptz,
+            email_change_token_current varchar(255),
+            email_change_confirm_status smallint default 0,
+            banned_until timestamptz,
+            reauthentication_token varchar(255),
+            reauthentication_sent_at timestamptz,
+            is_sso_user boolean not null default false,
+            deleted_at timestamptz,
+            is_anonymous boolean not null default false
+          );
+
+          grant select, insert, update, delete on auth.users to service_role, supabase_auth_admin;
+          grant select on auth.users to authenticated;
+
+          create or replace function auth.uid()
+          returns uuid
+          language sql
+          stable
+          as $$
+            select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
+          $$;
+          SQL
+
+      - name: Apply migrations
+        run: supabase migration up --db-url "$DATABASE_URL" --include-all
+
+      - name: Apply seed data
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/seed.sql
 
       - name: Run pgTAP database tests
-        run: supabase test db
+        run: supabase test db --db-url "$DATABASE_URL"
 
       - name: Run Supabase database advisors
-        run: supabase db advisors --local --type all --level warn --fail-on error
+        run: supabase db advisors --db-url "$DATABASE_URL" --type all --level warn --fail-on error
