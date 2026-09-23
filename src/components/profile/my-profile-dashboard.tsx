@@ -33,6 +33,11 @@ type EditableState = Readonly<{
   wantedSkillIds: number[];
 }>;
 
+export type LoginEmailParts = Readonly<{
+  domain: string | null;
+  localPart: string;
+}>;
+
 function UserIcon() {
   return (
     <svg
@@ -249,22 +254,20 @@ function formatMonthYear(value: string) {
   }).format(date);
 }
 
-function LoginEmailText({ email }: Readonly<{ email: string | null }>) {
+function LoginEmailText({ email }: Readonly<{ email: LoginEmailParts | null }>) {
   if (!email) {
     return <>Unavailable for this session</>;
   }
 
-  const atIndex = email.indexOf("@");
-
-  if (atIndex === -1) {
-    return <>{email}</>;
+  if (!email.domain) {
+    return <>{email.localPart}</>;
   }
 
   return (
     <>
-      <span>{email.slice(0, atIndex)}</span>
+      <span>{email.localPart}</span>
       <span>@</span>
-      <span>{email.slice(atIndex + 1)}</span>
+      <span>{email.domain}</span>
     </>
   );
 }
@@ -480,7 +483,7 @@ export function MyAccountCard({
   loginEmail,
   profile,
 }: Readonly<{
-  loginEmail: string | null;
+  loginEmail: LoginEmailParts | null;
   profile: SafeProfile;
 }>) {
   return (
