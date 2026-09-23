@@ -42,7 +42,7 @@ jobs:
         run: echo "${{ github.token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Start local Supabase stack
-        run: supabase start
+        run: supabase start --exclude realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
 
       - name: Export local Supabase environment
         shell: bash
