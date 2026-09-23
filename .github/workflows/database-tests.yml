@@ -38,6 +38,9 @@ jobs:
       - name: Show Supabase CLI version
         run: supabase --version
 
+      - name: Authenticate GHCR for Supabase images
+        run: echo "${{ github.token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
       - name: Start local Supabase stack
         run: supabase start
 
