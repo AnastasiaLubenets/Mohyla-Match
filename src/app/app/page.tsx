@@ -6,7 +6,7 @@ import { SystemAvatar } from "@/components/profile/system-avatar";
 import { requireAccountState } from "@/lib/auth/guards";
 import {
   loadDiscoveryCandidates,
-  loadSavedProfiles,
+  loadSavedProfileIds,
   type DiscoveryCandidate,
 } from "@/lib/matching/data";
 import {
@@ -17,7 +17,10 @@ import {
   type DiscoveryFilterOptions,
   type DiscoveryFilters,
 } from "@/lib/matching/discovery-filters";
-import { loadSafeProfile, type SafeProfile } from "@/lib/profile/data";
+import {
+  loadProfileChromeSummary,
+  type ProfileChromeSummary,
+} from "@/lib/profile/data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -238,7 +241,7 @@ function TopBar({
   currentProfile,
   filters,
 }: Readonly<{
-  currentProfile: SafeProfile | null;
+  currentProfile: ProfileChromeSummary | null;
   filters: DiscoveryFilters;
 }>) {
   return (
@@ -496,21 +499,21 @@ export default async function AppPage({ searchParams }: PageProps) {
     yearOfStudy: firstParam(params.year),
   });
   const supabase = await createSupabaseServerClient();
-  const [candidatesResult, currentProfileResult, savedProfilesResult] =
+  const [candidatesResult, currentProfileResult, savedProfileIdsResult] =
     await Promise.all([
       loadDiscoveryCandidates(supabase, 50),
       accountState.userId
-        ? loadSafeProfile(supabase, accountState.userId)
+        ? loadProfileChromeSummary(supabase, accountState.userId)
         : Promise.resolve({ data: null, error: false }),
-      loadSavedProfiles(supabase, 50),
+      accountState.userId
+        ? loadSavedProfileIds(supabase, accountState.userId)
+        : Promise.resolve({ data: [], error: false }),
     ]);
   const currentProfile = currentProfileResult.error
     ? null
     : currentProfileResult.data;
   const savedProfileIds = new Set(
-    savedProfilesResult.error
-      ? []
-      : (savedProfilesResult.data ?? []).map((profile) => profile.userId),
+    savedProfileIdsResult.error ? [] : (savedProfileIdsResult.data ?? []),
   );
 
   if (candidatesResult.error) {

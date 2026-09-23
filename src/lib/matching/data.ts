@@ -251,6 +251,29 @@ export async function loadSavedProfiles(
   };
 }
 
+export async function loadSavedProfileIds(
+  supabase: SupabaseServerClient,
+  sourceUserId: string,
+  limit = 100,
+): Promise<LoadResult<string[]>> {
+  const result = await supabase
+    .from("interactions")
+    .select("target_user_id")
+    .eq("source_user_id", sourceUserId)
+    .eq("action", "save")
+    .order("updated_at", { ascending: false })
+    .limit(Math.min(Math.max(limit, 1), 100));
+
+  if (result.error) {
+    return { data: null, error: true };
+  }
+
+  return {
+    data: (result.data ?? []).map((interaction) => interaction.target_user_id),
+    error: false,
+  };
+}
+
 export async function loadProfileConnectionStatus(
   supabase: SupabaseServerClient,
   targetUserId: string,

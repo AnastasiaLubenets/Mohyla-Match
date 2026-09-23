@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { cache } from "react";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AccountState } from "@/lib/auth/routing";
@@ -24,7 +25,7 @@ function isRoutableAccountState(value: unknown): value is AccountState {
   );
 }
 
-export async function getCurrentAccountState(
+async function resolveCurrentAccountState(
   supabaseClient?: SupabaseServerClient,
 ): Promise<AuthStateResult> {
   const supabase = supabaseClient ?? (await createSupabaseServerClient());
@@ -62,4 +63,18 @@ export async function getCurrentAccountState(
   }
 
   return { state: "onboarding_incomplete", userId };
+}
+
+const getCurrentRequestAccountState = cache(async () =>
+  resolveCurrentAccountState(),
+);
+
+export async function getCurrentAccountState(
+  supabaseClient?: SupabaseServerClient,
+): Promise<AuthStateResult> {
+  if (supabaseClient) {
+    return resolveCurrentAccountState(supabaseClient);
+  }
+
+  return getCurrentRequestAccountState();
 }
