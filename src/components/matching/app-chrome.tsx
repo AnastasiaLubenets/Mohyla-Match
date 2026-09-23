@@ -1,10 +1,24 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import type { SafeProfile } from "@/lib/profile/data";
 
-type NavKey = "discover" | "profile" | "saved";
+export type NavKey = "discover" | "profile" | "saved";
+
+const sidebarLogo = {
+  alt: "Mohyla Match — go to Discover",
+  height: 657,
+  src: "/branding/mohyla-match-logo.png",
+  width: 1920,
+} as const;
+
+const sidebarBuilding = {
+  height: 1620,
+  src: "/branding/mohyla-building.png",
+  width: 971,
+} as const;
 
 type AppChromeProps = Readonly<{
   active: NavKey;
@@ -107,29 +121,46 @@ function SidebarLink({ active = false, children, href, label }: SidebarLinkProps
   );
 }
 
-function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
+function SidebarBrandLogo() {
+  return (
+    <Link
+      aria-label={sidebarLogo.alt}
+      className="block w-[86%] max-w-[15.5rem] transition-opacity hover:opacity-90"
+      href="/app"
+    >
+      <Image
+        alt={sidebarLogo.alt}
+        className="h-auto w-full object-contain"
+        height={sidebarLogo.height}
+        priority
+        sizes="(min-width: 1280px) 15.5rem, 16rem"
+        src={sidebarLogo.src}
+        width={sidebarLogo.width}
+      />
+    </Link>
+  );
+}
+
+function SidebarBuildingArt() {
+  return (
+    <div className="mb-5 flex min-h-0 justify-center 2xl:mb-7">
+      <Image
+        alt=""
+        aria-hidden="true"
+        className="max-h-[26vh] w-full max-w-[15rem] object-contain object-bottom 2xl:max-h-[34vh]"
+        height={sidebarBuilding.height}
+        sizes="15rem"
+        src={sidebarBuilding.src}
+        width={sidebarBuilding.width}
+      />
+    </div>
+  );
+}
+
+export function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
   return (
     <aside className="border-b border-blue-100 bg-white/90 px-4 py-4 backdrop-blur xl:flex xl:h-screen xl:min-h-0 xl:flex-col xl:overflow-hidden xl:border-b-0 xl:border-r xl:px-5 xl:py-5 2xl:py-6">
-      <div className="flex items-center gap-3">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-md border border-blue-200 bg-blue-50 font-serif text-3xl font-bold leading-none text-blue-900">
-          M
-        </div>
-        <div>
-          <Link
-            className="font-serif text-3xl font-bold uppercase leading-[0.82] text-blue-950"
-            href="/app"
-          >
-            Mohyla
-            <br />
-            Match
-          </Link>
-          <p className="mt-2 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-blue-700">
-            Find people
-            <br />
-            Build something together
-          </p>
-        </div>
-      </div>
+      <SidebarBrandLogo />
 
       <nav className="mt-5 grid gap-2 sm:grid-cols-3 xl:grid-cols-1 2xl:mt-7">
         <SidebarLink active={active === "discover"} href="/app" label="Discover">
@@ -144,18 +175,9 @@ function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
       </nav>
 
       <div className="mt-6 hidden min-h-0 flex-1 flex-col justify-end xl:flex">
-        <div className="mb-10 px-3 pb-2">
-          <div className="mb-6 border-y border-blue-100 py-6 2xl:mb-8 2xl:py-8">
-            <p className="font-serif text-6xl font-bold leading-none text-blue-100">
-              MM
-            </p>
-            <div className="mt-5 grid grid-cols-3 gap-2" aria-hidden="true">
-              <span className="h-px bg-blue-100" />
-              <span className="h-px bg-blue-200" />
-              <span className="h-px bg-blue-100" />
-            </div>
-          </div>
-          <p className="font-serif text-3xl font-semibold uppercase leading-[0.95] text-blue-950">
+        <div className="mb-5 px-3 pb-2 2xl:mb-8">
+          <SidebarBuildingArt />
+          <p className="font-serif text-2xl font-semibold uppercase leading-[0.95] text-blue-950 2xl:text-3xl">
             Більше
             <br />
             людей
@@ -164,14 +186,14 @@ function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
             <br />
             можливостей
           </p>
-          <div className="mt-6 h-px w-16 bg-blue-300" />
-          <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-blue-500">
+          <div className="mt-4 h-px w-16 bg-blue-300 2xl:mt-6" />
+          <p className="mt-4 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-blue-500 2xl:mt-6 2xl:text-xs">
             Спільнота
             <br />
             що створює майбутнє
           </p>
         </div>
-        <form action="/auth/logout" className="mt-5 px-3 2xl:mt-8" method="post">
+        <form action="/auth/logout" className="px-3" method="post">
           <button
             className="text-sm font-semibold text-slate-500 transition hover:text-blue-900"
             type="submit"
