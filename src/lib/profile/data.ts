@@ -28,9 +28,11 @@ export type NamedOption = Readonly<{
 
 export type SafeProfile = Readonly<{
   academicProgramName: string;
+  allowDirectContact: boolean;
   availability: string | null;
   bio: string | null;
   collaborationGoals: string[];
+  createdAt: string;
   facultyName: string;
   fullName: string;
   interests: string[];
@@ -133,7 +135,7 @@ export async function loadSafeProfile(
   const profileResult = await supabase
     .from("profiles")
     .select(
-      "user_id,full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key",
+      "user_id,full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key,allow_direct_contact,created_at",
     )
     .eq("user_id", userId)
     .maybeSingle();
@@ -216,9 +218,11 @@ export async function loadSafeProfile(
   return {
     data: {
       academicProgramName: programResult.data.display_name,
+      allowDirectContact: profile.allow_direct_contact,
       availability: profile.availability,
       bio: profile.bio,
       collaborationGoals: namesFromMap(goalIds, goalNames.namesById),
+      createdAt: profile.created_at,
       facultyName: facultyResult.data.display_name,
       fullName: profile.full_name,
       interests: namesFromMap(interestIds, interestNames.namesById),
