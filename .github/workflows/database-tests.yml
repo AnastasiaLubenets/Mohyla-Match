@@ -148,8 +148,32 @@ jobs:
       - name: Apply seed data
         run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/seed.sql
 
-      - name: Run pgTAP database tests
-        run: supabase test db --db-url "$DATABASE_URL"
+      - name: Run phase 2 security pgTAP tests
+        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/phase2_security_test.sql
+
+      - name: Run phase 3 auth hook pgTAP tests
+        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/phase3_auth_hook_test.sql
+
+      - name: Run phase 4 onboarding pgTAP tests
+        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/phase4_onboarding_test.sql
+
+      - name: Run phase 5 profile pgTAP tests
+        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/phase5_profiles_test.sql
+
+      - name: Run phase 6 matching pgTAP tests
+        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/phase6_matching_test.sql
+
+      - name: Run phase 6.1 direct contact and saved pgTAP tests
+        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/phase6_1_direct_contact_saved_test.sql
+
+      - name: Run production taxonomy pgTAP tests
+        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/production_taxonomy_test.sql
+
+      - name: Run onboarding reference taxonomy pgTAP tests
+        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/production_onboarding_reference_taxonomy_test.sql
+
+      - name: Run profile deletion pgTAP tests
+        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/profile_deletion_test.sql
 
       - name: Run Supabase database advisors
         run: supabase db advisors --db-url "$DATABASE_URL" --type all --level warn --fail-on error
