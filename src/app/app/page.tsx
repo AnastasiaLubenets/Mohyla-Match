@@ -435,7 +435,8 @@ function Hero() {
         <span className="font-semibold italic">Build something together.</span>
       </h1>
       <p className="mx-auto mt-5 max-w-3xl text-lg leading-7 text-blue-900/75">
-        Connect with fellow Mohylians for projects, studies, research and more.
+        <span>Con</span>nect with fellow Mohylians for projects, studies,
+        research and more.
       </p>
     </header>
   );
