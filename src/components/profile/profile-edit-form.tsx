@@ -1,125 +1,146 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 
 import { AuthSubmitButton } from "@/components/auth-submit-button";
 import { SystemAvatar } from "@/components/profile/system-avatar";
-import type {
-  EditProfileData,
-  NamedOption,
-  SkillOption,
-} from "@/lib/profile/data";
+import {
+  TaxonomyMultiSelect,
+  type TaxonomyPickerOption,
+} from "@/components/profile/taxonomy-multi-select";
+import type { EditProfileData } from "@/lib/profile/data";
 
-function groupSkillsByCategory(skills: SkillOption[]) {
-  return skills.reduce<Record<string, SkillOption[]>>((groups, skill) => {
-    groups[skill.category] ??= [];
-    groups[skill.category].push(skill);
-    return groups;
-  }, {});
-}
-
-function ChoiceCard({
-  defaultChecked,
-  fieldName,
-  id,
-  name,
-}: Readonly<{
-  defaultChecked: boolean;
-  fieldName: string;
-  id: number;
-  name: string;
-}>) {
-  const inputId = `${fieldName}-${id}`;
-
-  return (
-    <div>
-      <input
-        className="peer sr-only"
-        defaultChecked={defaultChecked}
-        id={inputId}
-        name={fieldName}
-        type="checkbox"
-        value={id}
-      />
-      <label
-        className="flex min-h-12 cursor-pointer items-center rounded-lg border border-border bg-surface px-4 py-3 text-sm font-semibold transition peer-checked:border-primary peer-checked:bg-surface-strong peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary"
-        htmlFor={inputId}
-      >
-        {name}
-      </label>
-    </div>
-  );
-}
-
-function NamedChoiceSection({
-  defaultIds,
-  fieldName,
-  items,
-  title,
-}: Readonly<{
-  defaultIds: Set<number>;
-  fieldName: string;
-  items: NamedOption[];
+type PickerCardProps = Readonly<{
+  children: ReactNode;
+  icon: ReactNode;
   title: string;
-}>) {
+}>;
+
+function BarsIcon() {
   return (
-    <fieldset className="space-y-3">
-      <legend className="text-sm font-semibold">{title}</legend>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {items.map((item) => (
-          <ChoiceCard
-            defaultChecked={defaultIds.has(item.id)}
-            fieldName={fieldName}
-            id={item.id}
-            key={item.id}
-            name={item.name}
-          />
-        ))}
-      </div>
-    </fieldset>
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <path d="M5 19V9" />
+      <path d="M12 19V5" />
+      <path d="M19 19v-7" />
+    </svg>
   );
 }
 
-function SkillChoiceSection({
-  defaultIds,
-  fieldName,
-  skills,
-  title,
+function LinkIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1" />
+      <path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.1-1.1" />
+    </svg>
+  );
+}
+
+function SparkIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <path d="m12 3 2.3 5.7L20 11l-5.7 2.3L12 19l-2.3-5.7L4 11l5.7-2.3L12 3Z" />
+    </svg>
+  );
+}
+
+function TargetIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <circle cx="12" cy="12" r="8" />
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 2v4" />
+      <path d="M12 18v4" />
+      <path d="M2 12h4" />
+      <path d="M18 12h4" />
+    </svg>
+  );
+}
+
+function yearLabel(year: number) {
+  return `${year}${year === 1 ? "st" : year === 2 ? "nd" : year === 3 ? "rd" : "th"} year`;
+}
+
+function fieldClassName() {
+  return "mt-2 h-11 w-full rounded-md border border-blue-200 bg-white px-4 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400";
+}
+
+function PickerCard({ children, icon, title }: PickerCardProps) {
+  return (
+    <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_55px_rgba(15,94,156,0.08)]">
+      <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
+        <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
+          {icon}
+        </span>
+        {title}
+      </h2>
+      <div className="mt-4">{children}</div>
+    </section>
+  );
+}
+
+function namedOptions(options: EditProfileData["interests"]): TaxonomyPickerOption[] {
+  return options.map((option) => ({
+    id: option.id,
+    name: option.name,
+  }));
+}
+
+export function ProfileEditForm({
+  data,
+  error,
 }: Readonly<{
-  defaultIds: Set<number>;
-  fieldName: string;
-  skills: SkillOption[];
-  title: string;
+  data: EditProfileData;
+  error?: string;
 }>) {
-  const groupedSkills = groupSkillsByCategory(skills);
-
-  return (
-    <fieldset className="space-y-4">
-      <legend className="text-sm font-semibold">{title}</legend>
-      {Object.entries(groupedSkills).map(([category, categorySkills]) => (
-        <div className="space-y-3" key={category}>
-          <p className="text-sm font-medium text-muted">{category}</p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {categorySkills.map((skill) => (
-              <ChoiceCard
-                defaultChecked={defaultIds.has(skill.id)}
-                fieldName={fieldName}
-                id={skill.id}
-                key={skill.id}
-                name={skill.name}
-              />
-            ))}
-          </div>
-        </div>
-      ))}
-    </fieldset>
-  );
-}
-
-export function ProfileEditForm({ data }: Readonly<{ data: EditProfileData }>) {
   const initialFacultyId = data.profile.faculty_id;
   const [selectedFacultyId, setSelectedFacultyId] = useState(initialFacultyId);
+  const [selectedProgramId, setSelectedProgramId] = useState(
+    data.profile.academic_program_id,
+  );
+  const [offeredSkillIds, setOfferedSkillIds] = useState(data.offeredSkillIds);
+  const [wantedSkillIds, setWantedSkillIds] = useState(data.wantedSkillIds);
+  const [interestIds, setInterestIds] = useState(data.interestIds);
+  const [collaborationGoalIds, setCollaborationGoalIds] = useState(
+    data.collaborationGoalIds,
+  );
+  const [bioValue, setBioValue] = useState(data.profile.bio ?? "");
+  const [clientError, setClientError] = useState<string | null>(null);
   const availablePrograms = useMemo(
     () =>
       data.programs.filter(
@@ -127,13 +148,6 @@ export function ProfileEditForm({ data }: Readonly<{ data: EditProfileData }>) {
       ),
     [data.programs, selectedFacultyId],
   );
-  const [selectedProgramId, setSelectedProgramId] = useState(
-    data.profile.academic_program_id,
-  );
-  const offeredSkillIds = new Set(data.offeredSkillIds);
-  const wantedSkillIds = new Set(data.wantedSkillIds);
-  const interestIds = new Set(data.interestIds);
-  const collaborationGoalIds = new Set(data.collaborationGoalIds);
 
   function handleFacultyChange(value: string) {
     const nextFacultyId = Number(value);
@@ -145,174 +159,272 @@ export function ProfileEditForm({ data }: Readonly<{ data: EditProfileData }>) {
     setSelectedProgramId(nextPrograms[0]?.id ?? 0);
   }
 
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    if (offeredSkillIds.length < 1) {
+      event.preventDefault();
+      setClientError("Choose at least one offered skill.");
+      return;
+    }
+
+    if (interestIds.length < 1) {
+      event.preventDefault();
+      setClientError("Choose at least one academic interest.");
+      return;
+    }
+
+    if (collaborationGoalIds.length < 1) {
+      event.preventDefault();
+      setClientError("Choose at least one collaboration goal.");
+      return;
+    }
+
+    setClientError(null);
+  }
+
   return (
-    <form action="/profile/update" className="space-y-8" method="post">
-      <section className="flex flex-col gap-5 sm:flex-row sm:items-center">
-        <SystemAvatar
-          fullName={data.profile.full_name}
-          size="md"
-          systemAvatarKey={data.profile.system_avatar_key}
-        />
+    <form
+      action="/profile/update"
+      className="space-y-5"
+      id="profile-edit-form"
+      method="post"
+      onSubmit={handleSubmit}
+    >
+      <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 className="text-3xl font-semibold">Edit profile</h1>
-          <p className="mt-2 leading-7 text-muted">
-            Keep the required profile details complete so your profile stays
-            visible to eligible students.
+          <h1 className="font-serif text-6xl font-bold leading-none text-blue-950 sm:text-7xl">
+            Edit profile
+          </h1>
+          <p className="mt-3 text-xl leading-8 text-blue-900/80 sm:text-2xl">
+            Update your information and shape how you appear to the Mohyla Match
+            community.
           </p>
         </div>
-      </section>
-
-      <section className="space-y-5">
-        <label className="block">
-          <span className="text-sm font-semibold">Full name · Required</span>
-          <input
-            className="mt-2 h-12 w-full rounded-lg border border-border bg-surface px-4 text-foreground outline-none transition focus:border-primary"
-            defaultValue={data.profile.full_name}
-            maxLength={120}
-            minLength={2}
-            name="fullName"
-            required
-            type="text"
-          />
-        </label>
-
-        <div className="grid gap-5 sm:grid-cols-2">
-          <label className="block">
-            <span className="text-sm font-semibold">Faculty · Required</span>
-            <select
-              className="mt-2 h-12 w-full rounded-lg border border-border bg-surface px-4 text-foreground outline-none transition focus:border-primary"
-              name="facultyId"
-              onChange={(event) => handleFacultyChange(event.target.value)}
-              required
-              value={selectedFacultyId}
-            >
-              {data.faculties.map((faculty) => (
-                <option key={faculty.id} value={faculty.id}>
-                  {faculty.display_name}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="block">
-            <span className="text-sm font-semibold">
-              Academic program · Required
-            </span>
-            <select
-              className="mt-2 h-12 w-full rounded-lg border border-border bg-surface px-4 text-foreground outline-none transition focus:border-primary"
-              disabled={availablePrograms.length === 0}
-              name="academicProgramId"
-              onChange={(event) =>
-                setSelectedProgramId(Number(event.target.value))
-              }
-              required
-              value={selectedProgramId}
-            >
-              {availablePrograms.map((program) => (
-                <option key={program.id} value={program.id}>
-                  {program.display_name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        <label className="block">
-          <span className="text-sm font-semibold">Year of study · Required</span>
-          <select
-            className="mt-2 h-12 w-full rounded-lg border border-border bg-surface px-4 text-foreground outline-none transition focus:border-primary"
-            defaultValue={data.profile.year_of_study}
-            name="yearOfStudy"
-            required
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
+          <Link
+            className="inline-flex h-12 items-center justify-center rounded-md border border-blue-300 bg-white px-8 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
+            href="/profile"
           >
-            {[1, 2, 3, 4, 5, 6].map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
-        </label>
+            Cancel
+          </Link>
+          <AuthSubmitButton
+            className="inline-flex h-12 items-center justify-center rounded-md bg-blue-800 px-8 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+            pendingLabel="Saving..."
+          >
+            Save changes
+          </AuthSubmitButton>
+        </div>
+      </header>
 
-        <label className="block">
-          <span className="text-sm font-semibold">Bio · Optional</span>
-          <textarea
-            className="mt-2 min-h-28 w-full resize-y rounded-lg border border-border bg-surface px-4 py-3 text-foreground outline-none transition focus:border-primary"
-            defaultValue={data.profile.bio ?? ""}
-            maxLength={500}
-            name="bio"
-          />
-        </label>
+      {error || clientError ? (
+        <div
+          className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900"
+          role="alert"
+        >
+          {clientError ?? error}
+        </div>
+      ) : null}
 
-        <label className="block">
-          <span className="text-sm font-semibold">Availability · Optional</span>
-          <input
-            className="mt-2 h-12 w-full rounded-lg border border-border bg-surface px-4 text-foreground outline-none transition focus:border-primary"
-            defaultValue={data.profile.availability ?? ""}
-            maxLength={160}
-            name="availability"
-            type="text"
-          />
-        </label>
+      <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_55px_rgba(15,94,156,0.08)] sm:p-6">
+        <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)]">
+          <div className="overflow-hidden rounded-lg border border-blue-100 bg-blue-50">
+            <SystemAvatar
+              availability={data.profile.availability}
+              fullName={data.profile.full_name}
+              size="xl"
+              systemAvatarKey={data.profile.system_avatar_key}
+            />
+          </div>
 
-        <label className="flex items-start gap-3 rounded-lg border border-border bg-surface px-4 py-4">
-          <input
-            className="mt-1 h-4 w-4 accent-primary"
-            defaultChecked={data.profile.allow_direct_contact}
-            name="allowDirectContact"
-            type="checkbox"
-          />
-          <span>
-            <span className="block text-sm font-semibold">
-              Allow direct email contact
-            </span>
-            <span className="mt-1 block text-sm leading-6 text-muted">
-              Other Mohyla Match students can use your student email to contact
-              you directly.
-            </span>
-          </span>
-        </label>
+          <div className="grid gap-4 lg:grid-cols-3">
+            <label className="block">
+              <span className="text-sm font-bold text-blue-900">
+                Full name <span className="text-red-600">*</span>
+              </span>
+              <input
+                className={fieldClassName()}
+                defaultValue={data.profile.full_name}
+                maxLength={120}
+                minLength={2}
+                name="fullName"
+                required
+                type="text"
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-bold text-blue-900">
+                Faculty <span className="text-red-600">*</span>
+              </span>
+              <select
+                className={fieldClassName()}
+                name="facultyId"
+                onChange={(event) => handleFacultyChange(event.target.value)}
+                required
+                value={selectedFacultyId}
+              >
+                {data.faculties.map((faculty) => (
+                  <option key={faculty.id} value={faculty.id}>
+                    {faculty.display_name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-bold text-blue-900">
+                Academic program <span className="text-red-600">*</span>
+              </span>
+              <select
+                className={fieldClassName()}
+                disabled={availablePrograms.length === 0}
+                name="academicProgramId"
+                onChange={(event) =>
+                  setSelectedProgramId(Number(event.target.value))
+                }
+                required
+                value={selectedProgramId}
+              >
+                {availablePrograms.map((program) => (
+                  <option key={program.id} value={program.id}>
+                    {program.display_name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-bold text-blue-900">
+                Year of study <span className="text-red-600">*</span>
+              </span>
+              <select
+                className={fieldClassName()}
+                defaultValue={data.profile.year_of_study}
+                name="yearOfStudy"
+                required
+              >
+                {[1, 2, 3, 4, 5, 6].map((year) => (
+                  <option key={year} value={year}>
+                    {yearLabel(year)}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block lg:col-span-2">
+              <span className="text-sm font-bold text-blue-900">
+                Availability
+              </span>
+              <input
+                className={fieldClassName()}
+                defaultValue={data.profile.availability ?? ""}
+                maxLength={160}
+                name="availability"
+                placeholder='e.g. hours per week, "evenings", or a short note'
+                type="text"
+              />
+            </label>
+
+            <label className="block lg:col-span-3">
+              <span className="text-sm font-bold text-blue-900">Bio</span>
+              <textarea
+                className="mt-2 min-h-28 w-full resize-y rounded-md border border-blue-200 bg-white px-4 py-3 text-sm font-medium leading-6 text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400"
+                maxLength={500}
+                name="bio"
+                onChange={(event) => setBioValue(event.target.value)}
+                value={bioValue}
+              />
+              <span className="mt-1 block text-right text-xs font-semibold text-blue-500">
+                {bioValue.length}/500
+              </span>
+            </label>
+
+            <label className="flex items-start gap-3 rounded-md border border-blue-100 bg-blue-50/60 px-4 py-3 lg:col-span-3">
+              <input
+                className="mt-1 h-4 w-4 accent-blue-800"
+                defaultChecked={data.profile.allow_direct_contact}
+                name="allowDirectContact"
+                type="checkbox"
+              />
+              <span>
+                <span className="block text-sm font-bold text-blue-950">
+                  Allow direct email contact
+                </span>
+                <span className="mt-1 block text-sm leading-6 text-blue-800/75">
+                  Other Mohyla Match students can request and copy your student
+                  email after an explicit Get email click.
+                </span>
+              </span>
+            </label>
+          </div>
+        </div>
       </section>
 
-      <SkillChoiceSection
-        defaultIds={offeredSkillIds}
-        fieldName="offerSkillId"
-        skills={data.skills}
-        title="Can offer · Required"
-      />
+      <div className="grid gap-5 xl:grid-cols-2">
+        <PickerCard icon={<BarsIcon />} title="Skills">
+          <TaxonomyMultiSelect
+            emptyLabel="Choose at least one offered skill."
+            fieldName="offerSkillId"
+            label="Skills"
+            onChange={setOfferedSkillIds}
+            options={data.skills}
+            placeholder="Search skills..."
+            required
+            selectedIds={offeredSkillIds}
+          />
+        </PickerCard>
 
-      <SkillChoiceSection
-        defaultIds={wantedSkillIds}
-        fieldName="lookingForSkillId"
-        skills={data.skills}
-        title="Looking for · Optional"
-      />
+        <PickerCard icon={<SparkIcon />} title="Academic interests">
+          <TaxonomyMultiSelect
+            emptyLabel="Choose at least one academic interest."
+            fieldName="interestId"
+            label="Academic interests"
+            onChange={setInterestIds}
+            options={namedOptions(data.interests)}
+            placeholder="Search academic interests..."
+            required
+            selectedIds={interestIds}
+          />
+        </PickerCard>
 
-      <NamedChoiceSection
-        defaultIds={interestIds}
-        fieldName="interestId"
-        items={data.interests}
-        title="Interests · Required"
-      />
+        <PickerCard icon={<TargetIcon />} title="Collaboration goals">
+          <TaxonomyMultiSelect
+            emptyLabel="Choose at least one collaboration goal."
+            fieldName="collaborationGoalId"
+            label="Collaboration goals"
+            onChange={setCollaborationGoalIds}
+            options={namedOptions(data.collaborationGoals)}
+            placeholder="Search collaboration goals..."
+            required
+            selectedIds={collaborationGoalIds}
+          />
+        </PickerCard>
 
-      <NamedChoiceSection
-        defaultIds={collaborationGoalIds}
-        fieldName="collaborationGoalId"
-        items={data.collaborationGoals}
-        title="Collaboration goals · Required"
-      />
+        <PickerCard icon={<LinkIcon />} title="Looking-for skills">
+          <TaxonomyMultiSelect
+            emptyLabel="No looking-for skills selected."
+            fieldName="lookingForSkillId"
+            label="Looking-for skills"
+            onChange={setWantedSkillIds}
+            options={data.skills}
+            placeholder="Search skills you're looking for..."
+            selectedIds={wantedSkillIds}
+          />
+        </PickerCard>
+      </div>
 
-      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
         <Link
-          className="inline-flex h-12 items-center justify-center rounded-full border border-border px-5 text-sm font-semibold text-foreground transition hover:border-primary"
+          className="inline-flex h-12 items-center justify-center rounded-md border border-blue-300 bg-white px-8 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
           href="/profile"
         >
           Cancel
         </Link>
-        <div className="sm:w-52">
-          <AuthSubmitButton pendingLabel="Saving...">
-            Save profile
-          </AuthSubmitButton>
-        </div>
+        <AuthSubmitButton
+          className="inline-flex h-12 items-center justify-center rounded-md bg-blue-800 px-8 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+          pendingLabel="Saving..."
+        >
+          Save changes
+        </AuthSubmitButton>
       </div>
     </form>
   );

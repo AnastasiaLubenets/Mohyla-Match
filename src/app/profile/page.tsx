@@ -8,7 +8,7 @@ import {
   ProfileCompletenessCard,
 } from "@/components/profile/my-profile-dashboard";
 import { requireAccountState } from "@/lib/auth/guards";
-import { loadSafeProfile } from "@/lib/profile/data";
+import { loadProfileEditData, loadSafeProfile } from "@/lib/profile/data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -52,9 +52,12 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
   const accountState = await requireAccountState("/profile", ["active"]);
   const params = await searchParams;
   const supabase = await createSupabaseServerClient();
-  const profileResult = await loadSafeProfile(supabase, accountState.userId ?? "");
+  const [profileResult, editDataResult] = await Promise.all([
+    loadSafeProfile(supabase, accountState.userId ?? ""),
+    loadProfileEditData(supabase, accountState.userId ?? ""),
+  ]);
 
-  if (profileResult.error) {
+  if (profileResult.error || editDataResult.error) {
     return (
       <AppChrome active="profile" currentProfile={null}>
         <section className="px-4 py-8 sm:px-6 xl:px-8">
@@ -74,11 +77,12 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
     );
   }
 
-  if (!profileResult.data) {
+  if (!profileResult.data || !editDataResult.data) {
     notFound();
   }
 
   const profile = profileResult.data;
+  const editData = editDataResult.data;
 
   return (
     <AppChrome active="profile" currentProfile={profile}>
@@ -98,7 +102,7 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
             error={firstParam(params.error)}
             status={firstParam(params.status)}
           />
-          <MyProfileDashboard profile={profile} />
+          <MyProfileDashboard editData={editData} profile={profile} />
           <DeleteProfileDangerZone />
         </section>
 

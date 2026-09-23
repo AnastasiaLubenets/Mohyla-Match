@@ -4,8 +4,16 @@ import type { NextRequest, NextResponse } from "next/server";
 import { destinationForAccountState } from "@/lib/auth/routing";
 import { getCurrentAccountState } from "@/lib/auth/state";
 import { pathWithParams, redirectTo } from "@/lib/auth/http";
+import {
+  validateProfileUpdatePayload,
+  type ProfileUpdatePayload,
+} from "@/lib/profile/update-payload";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
+
+export type ProfileUpdateSaveResult =
+  | Readonly<{ ok: true }>
+  | Readonly<{ error: string; ok: false }>;
 
 type ProfileUpdateContext =
   | {
@@ -87,6 +95,40 @@ function readIdList(formData: FormData, fieldName: string): number[] {
   return [...new Set(ids)];
 }
 
+export async function saveProfileUpdate(
+  supabase: SupabaseClient<Database>,
+  payload: ProfileUpdatePayload,
+): Promise<ProfileUpdateSaveResult> {
+  const validation = validateProfileUpdatePayload(payload);
+
+  if (!validation.ok) {
+    return validation;
+  }
+
+  const result = await supabase.rpc("update_my_profile", {
+    collaboration_goal_ids: payload.collaborationGoalIds,
+    interest_ids: payload.interestIds,
+    looking_for_skill_ids: payload.lookingForSkillIds,
+    offer_skill_ids: payload.offerSkillIds,
+    profile_academic_program_id: payload.academicProgramId,
+    profile_allow_direct_contact: payload.allowDirectContact,
+    profile_availability: payload.availability,
+    profile_bio: payload.bio,
+    profile_faculty_id: payload.facultyId,
+    profile_full_name: payload.fullName,
+    profile_year_of_study: payload.yearOfStudy,
+  });
+
+  if (result.error) {
+    return {
+      error: "We could not save your profile. Check your selections.",
+      ok: false,
+    };
+  }
+
+  return { ok: true };
+}
+
 export async function updateMyProfile(request: NextRequest) {
   const formData = await request.formData();
   const context = await requireActiveProfileUpdate(request);
@@ -95,79 +137,24 @@ export async function updateMyProfile(request: NextRequest) {
     return context.response;
   }
 
-  const fullName = readRequiredString(formData, "fullName");
-  const facultyId = readRequiredInteger(formData, "facultyId");
-  const academicProgramId = readRequiredInteger(formData, "academicProgramId");
-  const yearOfStudy = readRequiredInteger(formData, "yearOfStudy");
-  const bio = readOptionalString(formData, "bio");
-  const availability = readOptionalString(formData, "availability");
-  const allowDirectContact = formData.get("allowDirectContact") === "on";
-  const offerSkillIds = readIdList(formData, "offerSkillId");
-  const lookingForSkillIds = readIdList(formData, "lookingForSkillId");
-  const interestIds = readIdList(formData, "interestId");
-  const collaborationGoalIds = readIdList(formData, "collaborationGoalId");
+  const payload: ProfileUpdatePayload = {
+    academicProgramId: readRequiredInteger(formData, "academicProgramId") ?? 0,
+    allowDirectContact: formData.get("allowDirectContact") === "on",
+    availability: readOptionalString(formData, "availability"),
+    bio: readOptionalString(formData, "bio"),
+    collaborationGoalIds: readIdList(formData, "collaborationGoalId"),
+    facultyId: readRequiredInteger(formData, "facultyId") ?? 0,
+    fullName: readRequiredString(formData, "fullName") ?? "",
+    interestIds: readIdList(formData, "interestId"),
+    lookingForSkillIds: readIdList(formData, "lookingForSkillId"),
+    offerSkillIds: readIdList(formData, "offerSkillId"),
+    yearOfStudy: readRequiredInteger(formData, "yearOfStudy") ?? 0,
+  };
 
-  if (!fullName || fullName.length < 2 || fullName.length > 120) {
-    return redirectTo(
-      request,
-      profileEditPath("Full name must be 2-120 characters."),
-    );
-  }
+  const result = await saveProfileUpdate(context.supabase, payload);
 
-  if (
-    !facultyId ||
-    !academicProgramId ||
-    !yearOfStudy ||
-    yearOfStudy < 1 ||
-    yearOfStudy > 6
-  ) {
-    return redirectTo(
-      request,
-      profileEditPath("Choose a faculty, program, and year of study."),
-    );
-  }
-
-  if (bio && bio.length > 500) {
-    return redirectTo(request, profileEditPath("Bio is limited to 500 characters."));
-  }
-
-  if (availability && availability.length > 160) {
-    return redirectTo(
-      request,
-      profileEditPath("Availability is limited to 160 characters."),
-    );
-  }
-
-  if (
-    offerSkillIds.length < 1 ||
-    interestIds.length < 1 ||
-    collaborationGoalIds.length < 1
-  ) {
-    return redirectTo(
-      request,
-      profileEditPath("Choose at least one offered skill, interest, and goal."),
-    );
-  }
-
-  const result = await context.supabase.rpc("update_my_profile", {
-    collaboration_goal_ids: collaborationGoalIds,
-    interest_ids: interestIds,
-    looking_for_skill_ids: lookingForSkillIds,
-    offer_skill_ids: offerSkillIds,
-    profile_academic_program_id: academicProgramId,
-    profile_allow_direct_contact: allowDirectContact,
-    profile_availability: availability,
-    profile_bio: bio,
-    profile_faculty_id: facultyId,
-    profile_full_name: fullName,
-    profile_year_of_study: yearOfStudy,
-  });
-
-  if (result.error) {
-    return redirectTo(
-      request,
-      profileEditPath("We could not save your profile. Check your selections."),
-    );
+  if (!result.ok) {
+    return redirectTo(request, profileEditPath(result.error));
   }
 
   return redirectTo(request, "/profile?status=updated");

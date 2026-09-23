@@ -18,7 +18,9 @@ export type ProgramOption = Readonly<{
 export type SkillOption = Readonly<{
   id: number;
   category: string;
+  is_featured: boolean;
   name: string;
+  search_aliases: string[];
 }>;
 
 export type NamedOption = Readonly<{
@@ -275,7 +277,7 @@ export async function loadProfileEditData(
       .order("display_name", { ascending: true }),
     supabase
       .from("skills")
-      .select("id,category,name")
+      .select("id,category,is_featured,name,search_aliases")
       .eq("is_active", true)
       .order("sort_order", { ascending: true })
       .order("name", { ascending: true }),
