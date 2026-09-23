@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres?sslmode=disable
     services:
       postgres:
         image: postgres:17
