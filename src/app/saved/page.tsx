@@ -126,7 +126,7 @@ export default async function SavedPage({ searchParams }: PageProps) {
   if (savedResult.error) {
     return (
       <AppChrome active="saved" currentProfile={currentProfile}>
-        <section className="px-4 py-8 sm:px-6 xl:px-8">
+        <section className="px-4 py-8 sm:px-6 xl:h-full xl:overflow-y-auto xl:px-8">
           <div className="mx-auto max-w-4xl rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
               Saved
@@ -147,8 +147,8 @@ export default async function SavedPage({ searchParams }: PageProps) {
 
   return (
     <AppChrome active="saved" currentProfile={currentProfile}>
-      <div className="grid gap-6 px-4 py-6 sm:px-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:px-8 2xl:gap-8">
-        <section className="min-w-0">
+      <div className="grid gap-6 px-4 py-6 sm:px-6 xl:h-full xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_20rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
+        <section className="min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
           <SavedStatusMessage
             error={firstParam(params.error)}
             status={firstParam(params.status)}
@@ -179,7 +179,7 @@ export default async function SavedPage({ searchParams }: PageProps) {
           )}
         </section>
 
-        <aside className="space-y-4 xl:sticky xl:top-20 xl:self-start">
+        <aside className="space-y-4 xl:h-full xl:min-h-0 xl:overflow-hidden">
           <SavedSummaryCard count={savedProfiles.length} />
           <BrandQuoteCard
             lines={["People", "Ideas", "Community", "Impact"]}

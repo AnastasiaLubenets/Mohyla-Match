@@ -103,8 +103,8 @@ export default async function StudentProfilePage({
       active={source === "saved" ? "saved" : "discover"}
       currentProfile={currentProfile}
     >
-      <div className="grid gap-6 px-4 py-6 sm:px-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:px-8 2xl:gap-8">
-        <div>
+      <div className="grid gap-6 px-4 py-6 sm:px-6 xl:h-full xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_20rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
+        <div className="min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
           <ProfileStatusMessage
             error={firstParam(pageParams.error)}
             status={firstParam(pageParams.status)}
@@ -118,7 +118,7 @@ export default async function StudentProfilePage({
           />
         </div>
 
-        <aside className="space-y-4 xl:sticky xl:top-20 xl:self-start">
+        <aside className="space-y-4 xl:h-full xl:min-h-0 xl:overflow-hidden">
           <BrandQuoteCard
             lines={["People", "Ideas", "Collaboration", "Impact"]}
             text="Great ideas start with real conversations."

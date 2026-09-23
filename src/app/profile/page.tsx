@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { AppChrome, BrandQuoteCard } from "@/components/matching/app-chrome";
+import { AppChrome } from "@/components/matching/app-chrome";
 import { DeleteProfileDangerZone } from "@/components/profile/delete-profile-danger-zone";
 import {
   MyAccountCard,
@@ -27,16 +27,7 @@ function firstParam(value: string | string[] | undefined): string | undefined {
 
 function ProfileStatusMessage({
   error,
-  status,
-}: Readonly<{ error?: string; status?: string }>) {
-  if (status === "updated") {
-    return (
-      <div className="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-900 shadow-sm">
-        Profile saved.
-      </div>
-    );
-  }
-
+}: Readonly<{ error?: string }>) {
   if (error === "delete-failed") {
     return (
       <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900 shadow-sm">
@@ -60,7 +51,7 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
   if (profileResult.error || editDataResult.error) {
     return (
       <AppChrome active="profile" currentProfile={null}>
-        <section className="px-4 py-8 sm:px-6 xl:px-8">
+        <section className="px-4 py-8 sm:px-6 xl:h-full xl:overflow-y-auto xl:px-8">
           <div className="mx-auto max-w-4xl rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
               My profile
@@ -86,8 +77,8 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
 
   return (
     <AppChrome active="profile" currentProfile={profile}>
-      <div className="grid gap-6 px-4 py-6 sm:px-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:px-8 2xl:gap-8">
-        <section className="min-w-0">
+      <div className="grid gap-6 px-4 py-6 sm:px-6 xl:h-full xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_20rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
+        <section className="min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
           <header className="mb-5">
             <h1 className="font-serif text-6xl font-bold leading-none text-blue-950 sm:text-7xl">
               My profile
@@ -100,28 +91,14 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
 
           <ProfileStatusMessage
             error={firstParam(params.error)}
-            status={firstParam(params.status)}
           />
           <MyProfileDashboard editData={editData} profile={profile} />
           <DeleteProfileDangerZone />
         </section>
 
-        <aside className="space-y-4 xl:sticky xl:top-20 xl:self-start">
-          <section className="hidden px-6 py-2 xl:block">
-            <p className="font-serif text-2xl font-semibold italic leading-tight text-blue-950">
-              &quot;Knowledge unites people who create a brighter tomorrow.&quot;
-            </p>
-            <div className="mt-5 h-px w-16 bg-blue-300" />
-            <p className="mt-3 text-xs font-bold uppercase tracking-[0.22em] text-blue-500">
-              NaUKMA
-            </p>
-          </section>
+        <aside className="space-y-4 xl:h-full xl:min-h-0 xl:overflow-hidden">
           <ProfileCompletenessCard profile={profile} />
           <MyAccountCard profile={profile} />
-          <BrandQuoteCard
-            lines={["People", "Ideas", "Community", "Change"]}
-            text="Great connections lead to greater impact."
-          />
         </aside>
       </div>
     </AppChrome>

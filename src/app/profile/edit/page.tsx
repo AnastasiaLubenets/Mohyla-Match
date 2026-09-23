@@ -47,7 +47,7 @@ function EditorTopBar({
   systemAvatarKey: string;
 }>) {
   return (
-    <header className="border-b border-blue-100 bg-white/85 px-4 py-3 backdrop-blur sm:px-6">
+    <header className="z-30 shrink-0 border-b border-blue-100 bg-white/85 px-4 py-3 backdrop-blur sm:px-6">
       <div className="mx-auto flex max-w-[96rem] flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-8">
           <Link
@@ -142,12 +142,12 @@ export default async function EditProfilePage({ searchParams }: PageProps) {
   const error = firstParam(params.error);
 
   return (
-    <main className="min-h-screen bg-[#eef6fb] text-blue-950">
+    <main className="min-h-screen bg-[#eef6fb] text-blue-950 lg:flex lg:h-screen lg:flex-col lg:overflow-hidden">
       <EditorTopBar
         fullName={profileData.data.profile.full_name}
         systemAvatarKey={profileData.data.profile.system_avatar_key}
       />
-      <section className="mx-auto w-full max-w-[96rem] px-4 py-6 sm:px-6 lg:py-8">
+      <section className="mx-auto w-full max-w-[96rem] px-4 py-6 sm:px-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:py-8">
         <ProfileEditForm data={profileData.data} error={error} />
       </section>
     </main>

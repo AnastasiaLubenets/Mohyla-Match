@@ -408,24 +408,24 @@ export function ProfileCompletenessCard({
   const completion = computeCompletion(items);
 
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_55px_rgba(15,94,156,0.08)]">
+    <section className="rounded-lg border border-blue-100 bg-white p-4 shadow-[0_18px_55px_rgba(15,94,156,0.08)] 2xl:p-5">
       <h2 className="font-serif text-2xl font-semibold text-blue-950">
         Profile completeness
       </h2>
-      <div className="mt-5 flex items-center gap-4">
+      <div className="mt-4 flex items-center gap-3 2xl:mt-5 2xl:gap-4">
         <div
           aria-label={`Profile completeness ${completion}%`}
-          className="grid h-24 w-24 shrink-0 place-items-center rounded-full"
+          className="grid h-20 w-20 shrink-0 place-items-center rounded-full 2xl:h-24 2xl:w-24"
           style={{
             background: `conic-gradient(#1d66d2 ${completion}%, #dbeafe ${completion}% 100%)`,
           }}
         >
-          <div className="grid h-16 w-16 place-items-center rounded-full bg-white text-xl font-bold text-blue-800">
+          <div className="grid h-14 w-14 place-items-center rounded-full bg-white text-lg font-bold text-blue-800 2xl:h-16 2xl:w-16 2xl:text-xl">
             {completion}%
           </div>
         </div>
         <div>
-          <p className="text-lg font-bold text-blue-950">
+          <p className="text-base font-bold text-blue-950 2xl:text-lg">
             {completion === 100 ? "Ready to shine" : "Almost there"}
           </p>
           <p className="mt-1 text-sm leading-5 text-blue-700/80">
@@ -433,7 +433,7 @@ export function ProfileCompletenessCard({
           </p>
         </div>
       </div>
-      <ul className="mt-5 space-y-3">
+      <ul className="mt-4 space-y-2 2xl:mt-5 2xl:space-y-3">
         {items.map((item) => (
           <li
             className="flex items-center gap-3 text-sm font-semibold text-blue-800"
@@ -442,8 +442,8 @@ export function ProfileCompletenessCard({
             <span
               className={
                 item.complete
-                  ? "inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white"
-                  : "inline-flex h-6 w-6 items-center justify-center rounded-full text-blue-300 ring-1 ring-blue-200"
+                  ? "inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white 2xl:h-6 2xl:w-6"
+                  : "inline-flex h-5 w-5 items-center justify-center rounded-full text-blue-300 ring-1 ring-blue-200 2xl:h-6 2xl:w-6"
               }
             >
               {item.complete ? <CheckIcon /> : <CircleIcon />}
@@ -462,11 +462,11 @@ export function MyAccountCard({
   profile: SafeProfile;
 }>) {
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_55px_rgba(15,94,156,0.08)]">
+    <section className="rounded-lg border border-blue-100 bg-white p-4 shadow-[0_18px_55px_rgba(15,94,156,0.08)] 2xl:p-5">
       <h2 className="font-serif text-2xl font-semibold text-blue-950">
         My account
       </h2>
-      <ul className="mt-5 space-y-4">
+      <ul className="mt-4 space-y-3 2xl:mt-5 2xl:space-y-4">
         <AccountFact icon={<GraduationIcon />}>
           <strong className="block text-blue-950">Student at NaUKMA</strong>
           {profile.academicProgramName}
@@ -515,7 +515,6 @@ export function MyProfileDashboard({
   const [draftIds, setDraftIds] = useState<number[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   const offeredSkillNames = namesFromIds(skillOptions, state.offeredSkillIds);
   const wantedSkillNames = namesFromIds(skillOptions, state.wantedSkillIds);
@@ -536,7 +535,6 @@ export function MyProfileDashboard({
     }
 
     setError(null);
-    setSuccess(null);
     setEditingSection(section);
 
     if (section === "bio") {
@@ -625,7 +623,6 @@ export function MyProfileDashboard({
       return { ...current, wantedSkillIds: draftIds };
     });
 
-    setSuccess("Profile section saved.");
     setEditingSection(null);
     setDraftText("");
     setDraftIds([]);
@@ -698,15 +695,6 @@ export function MyProfileDashboard({
           {error}
         </div>
       ) : null}
-      {success ? (
-        <div
-          aria-live="polite"
-          className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-950"
-        >
-          {success}
-        </div>
-      ) : null}
-
       <div className="grid gap-4 lg:grid-cols-2">
         <DashboardCard
           activeSection={editingSection}

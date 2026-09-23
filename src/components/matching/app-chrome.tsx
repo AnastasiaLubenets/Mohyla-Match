@@ -109,7 +109,7 @@ function SidebarLink({ active = false, children, href, label }: SidebarLinkProps
 
 function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
   return (
-    <aside className="border-b border-blue-100 bg-white/90 px-4 py-4 backdrop-blur xl:sticky xl:top-0 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r xl:px-5 xl:py-6">
+    <aside className="border-b border-blue-100 bg-white/90 px-4 py-4 backdrop-blur xl:flex xl:h-screen xl:min-h-0 xl:flex-col xl:overflow-hidden xl:border-b-0 xl:border-r xl:px-5 xl:py-5 2xl:py-6">
       <div className="flex items-center gap-3">
         <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-md border border-blue-200 bg-blue-50 font-serif text-3xl font-bold leading-none text-blue-900">
           M
@@ -131,7 +131,7 @@ function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
         </div>
       </div>
 
-      <nav className="mt-5 grid gap-2 sm:grid-cols-3 xl:mt-7 xl:grid-cols-1">
+      <nav className="mt-5 grid gap-2 sm:grid-cols-3 xl:grid-cols-1 2xl:mt-7">
         <SidebarLink active={active === "discover"} href="/app" label="Discover">
           <CompassIcon />
         </SidebarLink>
@@ -143,9 +143,9 @@ function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
         </SidebarLink>
       </nav>
 
-      <div className="mt-8 hidden flex-1 flex-col justify-end xl:flex">
+      <div className="mt-6 hidden min-h-0 flex-1 flex-col justify-end xl:flex">
         <div className="mb-10 px-3 pb-2">
-          <div className="mb-8 border-y border-blue-100 py-8">
+          <div className="mb-6 border-y border-blue-100 py-6 2xl:mb-8 2xl:py-8">
             <p className="font-serif text-6xl font-bold leading-none text-blue-100">
               MM
             </p>
@@ -171,7 +171,7 @@ function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
             що створює майбутнє
           </p>
         </div>
-        <form action="/auth/logout" className="mt-8 px-3" method="post">
+        <form action="/auth/logout" className="mt-5 px-3 2xl:mt-8" method="post">
           <button
             className="text-sm font-semibold text-slate-500 transition hover:text-blue-900"
             type="submit"
@@ -188,7 +188,7 @@ function AppTopBar({
   currentProfile,
 }: Readonly<{ currentProfile: SafeProfile | null }>) {
   return (
-    <header className="border-b border-blue-100 bg-white/80 px-4 py-3 backdrop-blur sm:px-6 xl:px-8">
+    <header className="z-30 shrink-0 border-b border-blue-100 bg-white/80 px-4 py-3 backdrop-blur sm:px-6 xl:px-8">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <form action="/app" className="relative w-full lg:max-w-md">
           <label className="sr-only" htmlFor="global-search">
@@ -239,12 +239,14 @@ function AppTopBar({
 
 export function AppChrome({ active, children, currentProfile }: AppChromeProps) {
   return (
-    <main className="min-h-screen bg-[#eef6fb] text-blue-950">
-      <div className="grid min-h-screen xl:grid-cols-[18rem_minmax(0,1fr)]">
+    <main className="min-h-screen bg-[#eef6fb] text-blue-950 xl:h-screen xl:overflow-hidden">
+      <div className="grid min-h-screen xl:h-screen xl:min-h-0 xl:grid-cols-[18rem_minmax(0,1fr)]">
         <AppSidebar active={active} />
-        <div className="min-w-0">
+        <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">
           <AppTopBar currentProfile={currentProfile} />
-          {children}
+          <div className="min-w-0 flex-1 xl:min-h-0 xl:overflow-hidden">
+            {children}
+          </div>
         </div>
       </div>
     </main>
