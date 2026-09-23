@@ -16,6 +16,8 @@ jobs:
     name: Supabase migrations, seed, pgTAP, and advisors
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      SUPABASE_INTERNAL_IMAGE_REGISTRY: docker.io
 
     steps:
       - name: Checkout
@@ -37,9 +39,6 @@ jobs:
 
       - name: Show Supabase CLI version
         run: supabase --version
-
-      - name: Authenticate GHCR for Supabase images
-        run: echo "${{ github.token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Start local Supabase stack
         run: supabase start --exclude realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
