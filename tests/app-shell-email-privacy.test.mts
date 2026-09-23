@@ -112,8 +112,10 @@ test("own profile reads the current authenticated user's email dynamically", asy
   ]);
 
   assert.match(profilePage, /supabase\.auth\.getUser\(\)/);
+  assert.match(profilePage, /function splitLoginEmail/);
   assert.match(profilePage, /loginEmail={loginEmail}/);
-  assert.match(dashboard, /loginEmail:\s*string \| null/);
+  assert.match(dashboard, /LoginEmailParts/);
+  assert.match(dashboard, /loginEmail:\s*LoginEmailParts \| null/);
   assert.match(dashboard, /Login email/);
   assert.match(dashboard, /break-all/);
   assert.doesNotMatch(profilePage, /anastasiia\.lubenets@ukma\.edu\.ua/);
