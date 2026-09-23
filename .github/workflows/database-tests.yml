@@ -138,7 +138,12 @@ jobs:
           SQL
 
       - name: Apply migrations
-        run: supabase migration up --db-url "$DATABASE_URL" --include-all
+        shell: bash
+        run: |
+          for migration in supabase/migrations/*.sql; do
+            echo "Applying ${migration}"
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$migration"
+          done
 
       - name: Apply seed data
         run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/seed.sql
