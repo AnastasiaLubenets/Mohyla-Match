@@ -7,10 +7,6 @@ import { SaveProfileButton } from "@/components/matching/save-profile-button";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import { TaxonomyChipList } from "@/components/matching/taxonomy-chip-list";
 import type { DiscoveryCandidate } from "@/lib/matching/data";
-import {
-  buildHighlightLabels,
-  compatibilityTone,
-} from "@/lib/matching/view-model";
 
 function StatusMessage({
   error,
@@ -57,7 +53,7 @@ function DiscoveryActionForm({
   targetUserId,
 }: Readonly<{
   action: "skip";
-  children: string;
+  children: ReactNode;
   className?: string;
   pendingLabel: string;
   targetUserId: string;
@@ -86,7 +82,7 @@ function SectionIcon({
   children: ReactNode;
 }>) {
   return (
-    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-800">
+    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center text-blue-800">
       {children}
     </span>
   );
@@ -149,17 +145,37 @@ function TargetIcon() {
   );
 }
 
+function ArrowRightIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <path d="M5 12h14" />
+      <path d="m13 6 6 6-6 6" />
+    </svg>
+  );
+}
+
 export function DiscoveryCard({
   candidate,
   error,
   emptyDescription = "Your previous actions and blocks are already filtered out. Come back after more students complete onboarding.",
   emptyTitle = "No new profiles right now.",
+  saved = false,
   status,
 }: Readonly<{
   candidate: DiscoveryCandidate | null;
   emptyDescription?: string;
   emptyTitle?: string;
   error?: string;
+  saved?: boolean;
   status?: string;
 }>) {
   if (!candidate) {
@@ -187,13 +203,6 @@ export function DiscoveryCard({
     );
   }
 
-  const highlights = buildHighlightLabels({
-    matchedIOfferCount: candidate.matchedIOffer.length,
-    matchedTheyOfferCount: candidate.matchedTheyOffer.length,
-    sharedCollaborationGoalCount: candidate.sharedCollaborationGoals.length,
-    sharedInterestCount: candidate.sharedInterests.length,
-  });
-  const tone = compatibilityTone(candidate.compatibilityScore);
   const lookingForItems =
     candidate.collaborationGoals.length > 0
       ? candidate.collaborationGoals
@@ -203,110 +212,113 @@ export function DiscoveryCard({
   return (
     <>
       <StatusMessage error={error} status={status} />
-      <article className="relative overflow-hidden rounded-lg border border-blue-100 bg-white p-5 text-blue-950 shadow-[0_20px_70px_rgba(15,94,156,0.12)] sm:p-6 lg:p-7">
+      <article className="relative overflow-hidden rounded-lg border border-blue-100 bg-white p-5 text-blue-950 shadow-[0_18px_55px_rgba(15,94,156,0.10)] sm:p-6">
         <div className="absolute right-5 top-5 z-10 sm:right-6 sm:top-6">
           <SaveProfileButton
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-blue-800 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
             returnTo="/app"
-            saved={false}
+            saved={saved}
             targetUserId={candidate.userId}
             variant="icon"
           />
         </div>
 
-        <header className="grid gap-6 pr-12 lg:grid-cols-[13rem_minmax(0,1fr)] lg:pr-14">
-          <div className="overflow-hidden rounded-lg border border-blue-100 bg-blue-50">
+        <header className="grid gap-5 pr-11 md:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)]">
+          <Link
+            aria-label={`Open ${candidate.fullName}'s profile`}
+            className="block overflow-hidden rounded-lg border border-blue-100 bg-blue-50 transition hover:border-blue-300"
+            href={`/profiles/${candidate.userId}`}
+          >
             <SystemAvatar
               availability={candidate.availability}
               facultyName={candidate.facultyName}
               fullName={candidate.fullName}
               programName={candidate.academicProgramName}
-              size="xl"
+              size="discover"
               systemAvatarKey={candidate.systemAvatarKey}
             />
-          </div>
+          </Link>
 
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-blue-700">
-                {tone} match
-              </span>
-              <span className="rounded-full border border-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
-                {candidate.compatibilityScore}% compatibility
-              </span>
-            </div>
-            <h2 className="mt-4 font-serif text-4xl font-semibold leading-tight text-blue-950 sm:text-5xl">
-              {candidate.fullName}
+            <h2 className="font-serif text-4xl font-semibold leading-none text-blue-950">
+              <Link
+                className="transition hover:text-blue-800"
+                href={`/profiles/${candidate.userId}`}
+              >
+                {candidate.fullName}
+              </Link>
             </h2>
-            <p className="mt-3 text-sm font-semibold text-blue-700">
-              {candidate.academicProgramName} · Year {candidate.yearOfStudy}
+            <p className="mt-3 text-base font-medium text-blue-800">
+              {candidate.academicProgramName} <span aria-hidden="true">•</span>{" "}
+              {candidate.yearOfStudy}
+              {candidate.yearOfStudy === 1 ? "st" : candidate.yearOfStudy === 2 ? "nd" : candidate.yearOfStudy === 3 ? "rd" : "th"}{" "}
+              year
             </p>
-            <p className="mt-1 text-sm text-slate-600">{candidate.facultyName}</p>
+            <p className="mt-1 text-sm font-medium text-blue-700/80">
+              {candidate.facultyName}
+            </p>
             {candidate.availability ? (
               <p className="mt-2 text-sm font-medium text-slate-600">
                 {candidate.availability}
               </p>
             ) : null}
-            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600">
+            <p className="mt-4 max-w-3xl text-base leading-6 text-blue-900/80">
               {candidate.bio || "No bio yet."}
             </p>
+            <Link
+              className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-blue-800 transition hover:text-blue-950"
+              href={`/profiles/${candidate.userId}`}
+            >
+              View full profile
+              <ArrowRightIcon />
+            </Link>
           </div>
         </header>
 
-        {highlights.length > 0 ? (
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-            {highlights.map((highlight) => (
-              <li
-                className="rounded-lg border border-blue-100 bg-blue-50/70 px-4 py-3 text-sm font-semibold text-blue-800"
-                key={highlight}
-              >
-                {highlight}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-
-        <div className="mt-7 divide-y divide-blue-100 border-y border-blue-100">
-          <section className="grid gap-4 py-5 sm:grid-cols-[2.25rem_minmax(0,1fr)]">
+        <div className="mt-5 grid gap-5 border-y border-blue-100 py-4 md:grid-cols-3 md:gap-0">
+          <section className="flex gap-3 md:pr-5">
             <SectionIcon>
               <BarsIcon />
             </SectionIcon>
             <div>
-              <h3 className="text-sm font-semibold uppercase tracking-[0.08em] text-blue-900">
+              <h3 className="text-sm font-bold text-blue-950">
                 Skills
               </h3>
               <div className="mt-3">
-                <TaxonomyChipList items={candidate.offeredSkills} showCategory />
+                <TaxonomyChipList items={candidate.offeredSkills} limit={4} />
               </div>
             </div>
           </section>
-          <section className="grid gap-4 py-5 sm:grid-cols-[2.25rem_minmax(0,1fr)]">
+          <section className="flex gap-3 md:border-l md:border-blue-100 md:px-5">
             <SectionIcon>
               <SparkIcon />
             </SectionIcon>
             <div>
-              <h3 className="text-sm font-semibold uppercase tracking-[0.08em] text-blue-900">
+              <h3 className="text-sm font-bold text-blue-950">
                 Academic interests
               </h3>
               <div className="mt-3">
                 <TaxonomyChipList
                   emptyLabel="No interests listed yet."
                   items={candidate.interests}
+                  limit={4}
                 />
               </div>
             </div>
           </section>
-          <section className="grid gap-4 py-5 sm:grid-cols-[2.25rem_minmax(0,1fr)]">
+          <section className="flex gap-3 md:border-l md:border-blue-100 md:pl-5">
             <SectionIcon>
               <TargetIcon />
             </SectionIcon>
             <div>
-              <h3 className="text-sm font-semibold uppercase tracking-[0.08em] text-blue-900">
+              <h3 className="text-sm font-bold text-blue-950">
                 Looking for
               </h3>
               <div className="mt-3">
                 <TaxonomyChipList
                   emptyLabel="No collaboration goals listed yet."
                   items={lookingForItems}
+                  limit={5}
                   showCategory={showLookingForCategory}
                 />
               </div>
@@ -314,28 +326,22 @@ export function DiscoveryCard({
           </section>
         </div>
 
-        <footer className="mt-6">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Link
-              className="inline-flex h-12 items-center justify-center rounded-full border border-blue-200 bg-white px-5 text-sm font-semibold text-blue-900 transition hover:border-blue-400 hover:bg-blue-50"
-              href={`/profiles/${candidate.userId}`}
-            >
-              View profile
-            </Link>
-            <ContactReveal
-              buttonClassName="inline-flex h-12 w-full items-center justify-center rounded-full bg-blue-800 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
-              className="space-y-2"
-              targetUserId={candidate.userId}
-            />
-          </div>
-          <div className="mt-4 flex justify-center sm:justify-end">
+        <footer className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-start">
+          <ContactReveal
+            buttonClassName="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-blue-800 px-8 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70 sm:w-64"
+            className="space-y-2 sm:col-start-2"
+            showIcon
+            targetUserId={candidate.userId}
+          />
+          <div className="flex justify-center sm:col-start-3 sm:justify-end">
             <DiscoveryActionForm
               action="skip"
-              className="inline-flex h-10 items-center justify-center rounded-full px-4 text-sm font-semibold text-slate-500 transition hover:bg-blue-50 hover:text-blue-800 disabled:cursor-not-allowed disabled:opacity-70"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
               pendingLabel="Skipping..."
               targetUserId={candidate.userId}
             >
-              Skip this profile
+              <span>Skip</span>
+              <ArrowRightIcon />
             </DiscoveryActionForm>
           </div>
         </footer>
