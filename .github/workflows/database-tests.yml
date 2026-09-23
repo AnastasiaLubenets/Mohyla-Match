@@ -11,6 +11,10 @@ on:
       - phase-4-onboarding
       - phase-5-profiles
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   database:
     name: Supabase migrations, seed, pgTAP, and advisors
@@ -37,6 +41,9 @@ jobs:
 
       - name: Install PostgreSQL client
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ github.token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Show Supabase CLI version
         run: supabase --version
