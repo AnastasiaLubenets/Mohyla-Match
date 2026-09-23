@@ -148,32 +148,43 @@ jobs:
       - name: Apply seed data
         run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/seed.sql
 
-      - name: Run phase 2 security pgTAP tests
-        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/phase2_security_test.sql
+      - name: Run pgTAP tests
+        shell: bash
+        run: |
+          run_pgtap() {
+            local test_file="$1"
+            local label="$2"
+            local output
+            output="$(mktemp)"
 
-      - name: Run phase 3 auth hook pgTAP tests
-        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/phase3_auth_hook_test.sql
+            echo "::group::${label}"
+            if ! psql "$DATABASE_URL" -X -q -v ON_ERROR_STOP=1 -A -t -f "$test_file" | tee "$output"; then
+              echo "::error file=${test_file}::SQL execution failed for ${label}"
+              echo "::endgroup::"
+              rm -f "$output"
+              return 1
+            fi
 
-      - name: Run phase 4 onboarding pgTAP tests
-        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/phase4_onboarding_test.sql
+            if grep -E '^(not ok|# Looks like you)' "$output"; then
+              echo "::error file=${test_file}::pgTAP failed for ${label}"
+              echo "::endgroup::"
+              rm -f "$output"
+              return 1
+            fi
 
-      - name: Run phase 5 profile pgTAP tests
-        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/phase5_profiles_test.sql
+            echo "::endgroup::"
+            rm -f "$output"
+          }
 
-      - name: Run phase 6 matching pgTAP tests
-        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/phase6_matching_test.sql
-
-      - name: Run phase 6.1 direct contact and saved pgTAP tests
-        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/phase6_1_direct_contact_saved_test.sql
-
-      - name: Run production taxonomy pgTAP tests
-        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/production_taxonomy_test.sql
-
-      - name: Run onboarding reference taxonomy pgTAP tests
-        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/production_onboarding_reference_taxonomy_test.sql
-
-      - name: Run profile deletion pgTAP tests
-        run: supabase test db --db-url "$DATABASE_URL" supabase/tests/profile_deletion_test.sql
+          run_pgtap supabase/tests/phase2_security_test.sql "phase 2 security pgTAP tests"
+          run_pgtap supabase/tests/phase3_auth_hook_test.sql "phase 3 auth hook pgTAP tests"
+          run_pgtap supabase/tests/phase4_onboarding_test.sql "phase 4 onboarding pgTAP tests"
+          run_pgtap supabase/tests/phase5_profiles_test.sql "phase 5 profile pgTAP tests"
+          run_pgtap supabase/tests/phase6_matching_test.sql "phase 6 matching pgTAP tests"
+          run_pgtap supabase/tests/phase6_1_direct_contact_saved_test.sql "phase 6.1 direct contact and saved pgTAP tests"
+          run_pgtap supabase/tests/production_taxonomy_test.sql "production taxonomy pgTAP tests"
+          run_pgtap supabase/tests/production_onboarding_reference_taxonomy_test.sql "onboarding reference taxonomy pgTAP tests"
+          run_pgtap supabase/tests/profile_deletion_test.sql "profile deletion pgTAP tests"
 
       - name: Run Supabase database advisors
         run: supabase db advisors --db-url "$DATABASE_URL" --type all --level warn --fail-on error
