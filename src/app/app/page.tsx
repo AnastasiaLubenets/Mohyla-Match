@@ -1,6 +1,6 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
 
+import { AppSidebar } from "@/components/matching/app-chrome";
 import { DiscoveryCard } from "@/components/matching/discovery-card";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import { requireAccountState } from "@/lib/auth/guards";
@@ -30,68 +30,8 @@ type PageProps = Readonly<{
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }>;
 
-type SidebarLinkProps = Readonly<{
-  active?: boolean;
-  children: ReactNode;
-  href: string;
-  label: string;
-}>;
-
 function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
-}
-
-function CompassIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-5 w-5"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-    >
-      <circle cx="12" cy="12" r="9" />
-      <path d="m15 9-2 5-5 2 2-5 5-2Z" />
-    </svg>
-  );
-}
-
-function BookmarkIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-5 w-5"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-    >
-      <path d="M19 21 12 16 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z" />
-    </svg>
-  );
-}
-
-function UserIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-5 w-5"
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-    >
-      <path d="M20 21a8 8 0 0 0-16 0" />
-      <circle cx="12" cy="8" r="4" />
-    </svg>
-  );
 }
 
 function SearchIcon() {
@@ -109,100 +49,6 @@ function SearchIcon() {
       <circle cx="11" cy="11" r="7" />
       <path d="m20 20-3.5-3.5" />
     </svg>
-  );
-}
-
-function SidebarLink({ active = false, children, href, label }: SidebarLinkProps) {
-  return (
-    <Link
-      aria-current={active ? "page" : undefined}
-      className={
-        active
-          ? "inline-flex items-center gap-4 rounded-md bg-blue-100/90 px-5 py-4 text-sm font-bold text-blue-950 shadow-sm"
-          : "inline-flex items-center gap-4 rounded-md px-5 py-4 text-sm font-bold text-blue-900 transition hover:bg-blue-50"
-      }
-      href={href}
-    >
-      {children}
-      <span>{label}</span>
-    </Link>
-  );
-}
-
-function DiscoverSidebar() {
-  return (
-    <aside className="border-b border-blue-100 bg-white/90 px-4 py-4 backdrop-blur xl:flex xl:h-screen xl:min-h-0 xl:flex-col xl:overflow-hidden xl:border-b-0 xl:border-r xl:px-5 xl:py-5 2xl:py-6">
-      <div className="flex items-center gap-3">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-md border border-blue-200 bg-blue-50 font-serif text-3xl font-bold leading-none text-blue-900">
-          M
-        </div>
-        <div>
-          <Link
-            className="font-serif text-3xl font-bold uppercase leading-[0.82] text-blue-950"
-            href="/app"
-          >
-            Mohyla
-            <br />
-            Match
-          </Link>
-          <p className="mt-2 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-blue-700">
-            Find people
-            <br />
-            Build something together
-          </p>
-        </div>
-      </div>
-
-      <nav className="mt-5 grid gap-2 sm:grid-cols-3 xl:grid-cols-1 2xl:mt-7">
-        <SidebarLink active href="/app" label="Discover">
-          <CompassIcon />
-        </SidebarLink>
-        <SidebarLink href="/saved" label="Saved">
-          <BookmarkIcon />
-        </SidebarLink>
-        <SidebarLink href="/profile" label="My profile">
-          <UserIcon />
-        </SidebarLink>
-      </nav>
-
-      <div className="mt-6 hidden min-h-0 flex-1 flex-col justify-end xl:flex">
-        <div className="mb-10 px-3 pb-2">
-          <div className="mb-6 border-y border-blue-100 py-6 2xl:mb-8 2xl:py-8">
-            <p className="font-serif text-6xl font-bold leading-none text-blue-100">
-              MM
-            </p>
-            <div className="mt-5 grid grid-cols-3 gap-2" aria-hidden="true">
-              <span className="h-px bg-blue-100" />
-              <span className="h-px bg-blue-200" />
-              <span className="h-px bg-blue-100" />
-            </div>
-          </div>
-          <p className="font-serif text-3xl font-semibold uppercase leading-[0.95] text-blue-950">
-            Більше
-            <br />
-            людей
-            <br />
-            Більше
-            <br />
-            можливостей
-          </p>
-          <div className="mt-6 h-px w-16 bg-blue-300" />
-          <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-blue-500">
-            Спільнота
-            <br />
-            що створює майбутнє
-          </p>
-        </div>
-        <form action="/auth/logout" className="mt-5 px-3 2xl:mt-8" method="post">
-          <button
-            className="text-sm font-semibold text-slate-500 transition hover:text-blue-900"
-            type="submit"
-          >
-            Log out
-          </button>
-        </form>
-      </div>
-    </aside>
   );
 }
 
@@ -517,7 +363,7 @@ export default async function AppPage({ searchParams }: PageProps) {
     return (
       <main className="min-h-screen bg-[#eef6fb] text-blue-950 xl:h-screen xl:overflow-hidden">
         <div className="grid min-h-screen xl:h-screen xl:min-h-0 xl:grid-cols-[18rem_minmax(0,1fr)]">
-          <DiscoverSidebar />
+          <AppSidebar active="discover" />
           <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">
             <TopBar currentProfile={currentProfile} filters={filters} />
             <section className="scrollbar-hidden px-4 py-8 sm:px-6 xl:min-h-0 xl:flex-1 xl:overflow-y-auto xl:px-8">
@@ -547,7 +393,7 @@ export default async function AppPage({ searchParams }: PageProps) {
   return (
     <main className="min-h-screen bg-[#eef6fb] text-blue-950 xl:h-screen xl:overflow-hidden">
       <div className="grid min-h-screen xl:h-screen xl:min-h-0 xl:grid-cols-[18rem_minmax(0,1fr)]">
-        <DiscoverSidebar />
+        <AppSidebar active="discover" />
         <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">
           <TopBar currentProfile={currentProfile} filters={filters} />
           <div className="grid gap-6 px-4 py-6 sm:px-6 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1fr)_22rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
