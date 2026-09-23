@@ -249,6 +249,26 @@ function formatMonthYear(value: string) {
   }).format(date);
 }
 
+function LoginEmailText({ email }: Readonly<{ email: string | null }>) {
+  if (!email) {
+    return <>Unavailable for this session</>;
+  }
+
+  const atIndex = email.indexOf("@");
+
+  if (atIndex === -1) {
+    return <>{email}</>;
+  }
+
+  return (
+    <>
+      <span>{email.slice(0, atIndex)}</span>
+      <span>@</span>
+      <span>{email.slice(atIndex + 1)}</span>
+    </>
+  );
+}
+
 function buildCompletionItems(profile: SafeProfile): CompletionItem[] {
   return [
     { complete: Boolean(profile.bio?.trim()), label: "Add bio" },
@@ -476,7 +496,7 @@ export function MyAccountCard({
         <AccountFact icon={<EnvelopeIcon />}>
           <strong className="block text-blue-950">Login email</strong>
           <span className="break-all">
-            {loginEmail ?? "Unavailable for this session"}
+            <LoginEmailText email={loginEmail} />
           </span>
         </AccountFact>
         <AccountFact icon={<LinkIcon />}>
