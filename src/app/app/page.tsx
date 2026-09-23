@@ -520,7 +520,7 @@ export default async function AppPage({ searchParams }: PageProps) {
           <DiscoverSidebar />
           <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">
             <TopBar currentProfile={currentProfile} filters={filters} />
-            <section className="px-4 py-8 sm:px-6 xl:min-h-0 xl:flex-1 xl:overflow-y-auto xl:px-8">
+            <section className="scrollbar-hidden px-4 py-8 sm:px-6 xl:min-h-0 xl:flex-1 xl:overflow-y-auto xl:px-8">
               <div className="mx-auto max-w-4xl rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
                 <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
                   Discover
@@ -551,7 +551,7 @@ export default async function AppPage({ searchParams }: PageProps) {
         <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">
           <TopBar currentProfile={currentProfile} filters={filters} />
           <div className="grid gap-6 px-4 py-6 sm:px-6 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1fr)_22rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
-            <section className="min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
+            <section className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
               <Hero />
               <DiscoveryFeed
                 candidates={filteredCandidates}

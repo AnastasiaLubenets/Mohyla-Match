@@ -33,6 +33,11 @@ type EditableState = Readonly<{
   wantedSkillIds: number[];
 }>;
 
+export type LoginEmailParts = Readonly<{
+  domain: string | null;
+  localPart: string;
+}>;
+
 function UserIcon() {
   return (
     <svg
@@ -249,6 +254,24 @@ function formatMonthYear(value: string) {
   }).format(date);
 }
 
+function LoginEmailText({ email }: Readonly<{ email: LoginEmailParts | null }>) {
+  if (!email) {
+    return <>Unavailable for this session</>;
+  }
+
+  if (!email.domain) {
+    return <>{email.localPart}</>;
+  }
+
+  return (
+    <>
+      <span>{email.localPart}</span>
+      <span>@</span>
+      <span>{email.domain}</span>
+    </>
+  );
+}
+
 function buildCompletionItems(profile: SafeProfile): CompletionItem[] {
   return [
     { complete: Boolean(profile.bio?.trim()), label: "Add bio" },
@@ -457,8 +480,10 @@ export function ProfileCompletenessCard({
 }
 
 export function MyAccountCard({
+  loginEmail,
   profile,
 }: Readonly<{
+  loginEmail: LoginEmailParts | null;
   profile: SafeProfile;
 }>) {
   return (
@@ -473,7 +498,9 @@ export function MyAccountCard({
         </AccountFact>
         <AccountFact icon={<EnvelopeIcon />}>
           <strong className="block text-blue-950">Login email</strong>
-          Kept private in Supabase Auth
+          <span className="break-all">
+            <LoginEmailText email={loginEmail} />
+          </span>
         </AccountFact>
         <AccountFact icon={<LinkIcon />}>
           <strong className="block text-blue-950">Direct email contact</strong>

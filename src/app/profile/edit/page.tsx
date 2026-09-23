@@ -147,7 +147,7 @@ export default async function EditProfilePage({ searchParams }: PageProps) {
         fullName={profileData.data.profile.full_name}
         systemAvatarKey={profileData.data.profile.system_avatar_key}
       />
-      <section className="mx-auto w-full max-w-[96rem] px-4 py-6 sm:px-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:py-8">
+      <section className="scrollbar-hidden mx-auto w-full max-w-[96rem] px-4 py-6 sm:px-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:py-8">
         <ProfileEditForm data={profileData.data} error={error} />
       </section>
     </main>
