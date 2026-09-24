@@ -2,6 +2,8 @@ import Image from "next/image";
 
 import {
   getProgramAvatarSrc,
+  programAvatarContainerClasses,
+  programAvatarImageClasses,
   systemAvatarSizeClasses,
   type SystemAvatarSize,
 } from "@/lib/profile/program-avatar";
@@ -58,12 +60,12 @@ export function SystemAvatar({
     return (
       <div
         aria-label={`${fullName} system avatar`}
-        className={`relative isolate shrink-0 overflow-hidden rounded-lg border border-border bg-blue-50 ${systemAvatarSizeClasses[size]}`}
+        className={`${programAvatarContainerClasses} ${systemAvatarSizeClasses[size]}`}
       >
         <Image
           alt=""
           aria-hidden="true"
-          className="object-cover"
+          className={programAvatarImageClasses}
           fill
           sizes={
             size === "sm"

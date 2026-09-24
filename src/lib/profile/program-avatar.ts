@@ -8,6 +8,11 @@ export const systemAvatarSizeClasses = {
 
 export type SystemAvatarSize = keyof typeof systemAvatarSizeClasses;
 
+export const programAvatarContainerClasses =
+  "relative isolate shrink-0 overflow-hidden rounded-[1.25rem] p-0";
+
+export const programAvatarImageClasses = "h-full w-full object-cover";
+
 export const mappedProgramAvatarKeys = [
   "program-economics",
   "program-marketing",

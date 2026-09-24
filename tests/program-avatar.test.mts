@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
@@ -7,6 +7,8 @@ import {
   getMappedProgramAvatarKey,
   getProgramAvatarSrc,
   mappedProgramAvatarKeys,
+  programAvatarContainerClasses,
+  programAvatarImageClasses,
   systemAvatarSizeClasses,
 } from "../src/lib/profile/program-avatar.ts";
 
@@ -80,6 +82,43 @@ test("all current SystemAvatar sizes remain defined", () => {
   for (const className of Object.values(systemAvatarSizeClasses)) {
     assert.match(className, /\bh-/);
     assert.match(className, /\bw-/);
+  }
+});
+
+test("mapped program avatars render as clean edge-to-edge image tiles", () => {
+  assert.match(programAvatarContainerClasses, /\boverflow-hidden\b/);
+  assert.ok(
+    programAvatarContainerClasses.split(/\s+/).includes("rounded-[1.25rem]"),
+  );
+  assert.match(programAvatarContainerClasses, /\bp-0\b/);
+  assert.doesNotMatch(programAvatarContainerClasses, /\bbg-\S+/);
+  assert.doesNotMatch(programAvatarContainerClasses, /\bborder(?:-\S+)?\b/);
+
+  assert.match(programAvatarImageClasses, /\bh-full\b/);
+  assert.match(programAvatarImageClasses, /\bw-full\b/);
+  assert.match(programAvatarImageClasses, /\bobject-cover\b/);
+});
+
+test("program avatar placements do not add blue frame wrappers", () => {
+  const profileSources = [
+    "src/components/profile/profile-edit-form.tsx",
+    "src/components/profile/my-profile-dashboard.tsx",
+    "src/components/profile/full-student-profile.tsx",
+  ];
+
+  for (const sourcePath of profileSources) {
+    const source = readFileSync(join(repoRoot, sourcePath), "utf8");
+
+    assert.doesNotMatch(
+      source,
+      /overflow-hidden rounded-lg border border-blue-100 bg-blue-50/,
+      `${sourcePath} should not wrap program artwork in the old blue frame`,
+    );
+    assert.doesNotMatch(
+      source,
+      /w-fit overflow-hidden rounded-\[1\.25rem\] border border-blue-100 bg-white/,
+      `${sourcePath} should let SystemAvatar own the visible crop`,
+    );
   }
 });
 

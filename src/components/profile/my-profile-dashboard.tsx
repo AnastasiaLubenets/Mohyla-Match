@@ -661,16 +661,14 @@ export function MyProfileDashboard({
     <div className="space-y-4">
       <section className="rounded-[1.375rem] border border-blue-100 bg-white p-5 sm:p-6">
         <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)_14rem] lg:items-start">
-          <div className="w-fit overflow-hidden rounded-[1.25rem] border border-blue-100 bg-white">
-            <SystemAvatar
-              availability={state.availability}
-              facultyName={profile.facultyName}
-              fullName={profile.fullName}
-              programName={profile.academicProgramName}
-              size="xl"
-              systemAvatarKey={profile.systemAvatarKey}
-            />
-          </div>
+          <SystemAvatar
+            availability={state.availability}
+            facultyName={profile.facultyName}
+            fullName={profile.fullName}
+            programName={profile.academicProgramName}
+            size="xl"
+            systemAvatarKey={profile.systemAvatarKey}
+          />
 
           <div className="min-w-0">
             <h2 className="font-serif text-5xl font-semibold leading-none text-blue-950">
