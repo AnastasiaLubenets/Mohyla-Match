@@ -95,7 +95,7 @@ export function SystemAvatar({
   return (
     <div
       aria-label={`${fullName} system avatar`}
-      className={`relative isolate flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border font-semibold shadow-sm ${systemAvatarSizeClasses[size]}`}
+      className={`relative isolate flex aspect-square shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border font-semibold shadow-sm ${systemAvatarSizeClasses[size]}`}
       style={{
         background: palette.background,
         color: palette.foreground,
