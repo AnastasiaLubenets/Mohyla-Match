@@ -451,7 +451,7 @@ select lives_ok(
   'zero looking-for skills accepted'
 );
 
-select throws_ok(
+select lives_ok(
   $$ select public.update_my_profile(
        'Zero Interest',
        (select id from public.faculties where slug = 'phase5-faculty-a'),
@@ -464,12 +464,10 @@ select throws_ok(
        '{}'::bigint[],
        array[(select id from public.collaboration_goals where slug = 'phase5-goal')]
      ) $$,
-  'P0001',
-  null,
-  'zero interests rejected'
+  'zero interests accepted'
 );
 
-select throws_ok(
+select lives_ok(
   $$ select public.update_my_profile(
        'Zero Goal',
        (select id from public.faculties where slug = 'phase5-faculty-a'),
@@ -482,9 +480,7 @@ select throws_ok(
        array[(select id from public.interests where slug = 'phase5-interest')],
        '{}'::bigint[]
      ) $$,
-  'P0001',
-  null,
-  'zero collaboration goals rejected'
+  'zero collaboration goals accepted'
 );
 
 do $$

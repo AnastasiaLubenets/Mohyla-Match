@@ -804,12 +804,11 @@ export function MyProfileDashboard({
             <div>
               <TaxonomyMultiSelect
                 disabled={isSaving}
-                emptyLabel="Choose at least one academic interest."
+                emptyLabel="No academic interests selected."
                 label="Academic interests"
                 onChange={setDraftIds}
                 options={interestOptions}
                 placeholder="Search academic interests..."
-                required
                 selectedIds={draftIds}
               />
               <InlineActionButtons
@@ -837,12 +836,11 @@ export function MyProfileDashboard({
             <div>
               <TaxonomyMultiSelect
                 disabled={isSaving}
-                emptyLabel="Choose at least one collaboration goal."
+                emptyLabel="No collaboration goals selected."
                 label="Collaboration goals"
                 onChange={setDraftIds}
                 options={collaborationGoalOptions}
                 placeholder="Search collaboration goals..."
-                required
                 selectedIds={draftIds}
               />
               <InlineActionButtons

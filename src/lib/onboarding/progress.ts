@@ -21,10 +21,6 @@ export function getFirstIncompleteOnboardingStep(
     return 2;
   }
 
-  if (progress.interestCount < 1 || progress.collaborationGoalCount < 1) {
-    return 4;
-  }
-
   return null;
 }
 

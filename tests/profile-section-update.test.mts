@@ -85,7 +85,7 @@ test("section update rejects zero offered skills because offered skills are requ
   });
 
   assert.deepEqual(result, {
-    error: "Choose at least one offered skill, interest, and goal.",
+    error: "Choose at least one offered skill.",
     ok: false,
   });
 });
@@ -104,6 +104,38 @@ test("section update allows zero looking-for skills", () => {
 
   assert.deepEqual(result.payload.lookingForSkillIds, []);
   assert.deepEqual(result.payload.offerSkillIds, [101]);
+});
+
+test("section update allows zero academic interests", () => {
+  const result = mergeProfileSectionUpdate(editData, {
+    ids: [],
+    section: "interests",
+  });
+
+  assert.equal(result.ok, true);
+
+  if (!result.ok) {
+    return;
+  }
+
+  assert.deepEqual(result.payload.interestIds, []);
+  assert.deepEqual(result.payload.collaborationGoalIds, [301]);
+});
+
+test("section update allows zero collaboration goals", () => {
+  const result = mergeProfileSectionUpdate(editData, {
+    ids: [],
+    section: "collaborationGoals",
+  });
+
+  assert.equal(result.ok, true);
+
+  if (!result.ok) {
+    return;
+  }
+
+  assert.deepEqual(result.payload.collaborationGoalIds, []);
+  assert.deepEqual(result.payload.interestIds, [201]);
 });
 
 test("section update rejects non-canonical ids", () => {
