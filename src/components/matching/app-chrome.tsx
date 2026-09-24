@@ -143,13 +143,13 @@ function SidebarBrandLogo() {
 
 function SidebarBuildingArt() {
   return (
-    <div className="mb-5 flex min-h-0 justify-center 2xl:mb-7">
+    <div className="mb-5 -ml-8 -mr-8 flex min-h-0 justify-start 2xl:mb-7">
       <Image
         alt=""
         aria-hidden="true"
-        className="max-h-[26vh] w-full max-w-[15rem] object-contain object-bottom 2xl:max-h-[34vh]"
+        className="h-auto w-full max-w-none object-contain object-left-bottom"
         height={sidebarBuilding.height}
-        sizes="15rem"
+        sizes="18rem"
         src={sidebarBuilding.src}
         width={sidebarBuilding.width}
       />
