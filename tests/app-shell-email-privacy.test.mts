@@ -57,8 +57,8 @@ test("authenticated app center scroll containers keep overflow-y auto with hidde
   );
   assertHasClassLine(
     discoverPage,
-    ["scrollbar-hidden", "xl:overflow-y-auto", "xl:pr-2"],
-    "/app feed center container should hide the visual scrollbar.",
+    ["scrollbar-hidden", "xl:overflow-y-auto", "xl:-mx-4", "xl:px-4", "xl:pb-16"],
+    "/app feed center container should hide the visual scrollbar while preserving room for card shadows.",
   );
   assertHasClassLine(
     savedPage,
