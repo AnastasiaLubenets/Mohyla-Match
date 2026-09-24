@@ -10,6 +10,7 @@ export type FacultyOption = Readonly<{
 }>;
 
 export type ProgramOption = Readonly<{
+  avatar_variant_key: string;
   id: number;
   faculty_id: number;
   display_name: string;
@@ -271,7 +272,7 @@ export async function loadProfileEditData(
       .order("display_name", { ascending: true }),
     supabase
       .from("academic_programs")
-      .select("id,faculty_id,display_name")
+      .select("id,faculty_id,display_name,avatar_variant_key")
       .eq("is_active", true)
       .order("sort_order", { ascending: true })
       .order("display_name", { ascending: true }),

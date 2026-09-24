@@ -30,7 +30,14 @@ const editData: EditProfileData = {
     system_avatar_key: "stable-avatar",
     year_of_study: 2,
   },
-  programs: [{ display_name: "Computer Science", faculty_id: 1, id: 11 }],
+  programs: [
+    {
+      avatar_variant_key: "program-computer-science",
+      display_name: "Computer Science",
+      faculty_id: 1,
+      id: 11,
+    },
+  ],
   skills: [
     {
       category: "Software & Web",

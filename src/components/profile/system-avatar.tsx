@@ -1,9 +1,18 @@
+import Image from "next/image";
+
+import {
+  getProgramAvatarSrc,
+  systemAvatarSizeClasses,
+  type SystemAvatarSize,
+} from "@/lib/profile/program-avatar";
+
 type SystemAvatarProps = Readonly<{
   availability?: string | null;
+  avatarVariantKey?: string | null;
   facultyName?: string | null;
   fullName: string;
   programName?: string | null;
-  size?: "sm" | "md" | "lg" | "xl" | "discover";
+  size?: SystemAvatarSize;
   systemAvatarKey: string;
 }>;
 
@@ -15,14 +24,6 @@ const palettes = [
   { background: "#e9e6f2", foreground: "#42366e", accent: "#d7a928" },
   { background: "#e8edf0", foreground: "#283f4d", accent: "#7f5a12" },
 ];
-
-const sizeClasses = {
-  sm: "h-14 w-14 text-lg",
-  md: "h-24 w-24 text-3xl",
-  lg: "h-32 w-32 text-4xl",
-  xl: "h-52 w-full text-5xl sm:w-52",
-  discover: "h-48 w-full text-5xl sm:h-56",
-};
 
 function hashIdentity(value: string): number {
   return [...value].reduce(
@@ -44,12 +45,43 @@ function initialsFromName(fullName: string): string {
 
 export function SystemAvatar({
   availability,
+  avatarVariantKey,
   facultyName,
   fullName,
   programName,
   size = "md",
   systemAvatarKey,
 }: SystemAvatarProps) {
+  const programAvatarSrc = getProgramAvatarSrc(systemAvatarKey, avatarVariantKey);
+
+  if (programAvatarSrc) {
+    return (
+      <div
+        aria-label={`${fullName} system avatar`}
+        className={`relative isolate shrink-0 overflow-hidden rounded-lg border border-border bg-blue-50 ${systemAvatarSizeClasses[size]}`}
+      >
+        <Image
+          alt=""
+          aria-hidden="true"
+          className="object-cover"
+          fill
+          sizes={
+            size === "sm"
+              ? "3.5rem"
+              : size === "md"
+                ? "6rem"
+                : size === "lg"
+                  ? "8rem"
+                  : size === "xl"
+                    ? "(min-width: 640px) 13rem, 100vw"
+                    : "(min-width: 640px) 14rem, 100vw"
+          }
+          src={programAvatarSrc}
+        />
+      </div>
+    );
+  }
+
   const hash = hashIdentity(
     [systemAvatarKey, fullName, facultyName, programName, availability]
       .filter(Boolean)
@@ -61,7 +93,7 @@ export function SystemAvatar({
   return (
     <div
       aria-label={`${fullName} system avatar`}
-      className={`relative isolate flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border font-semibold shadow-sm ${sizeClasses[size]}`}
+      className={`relative isolate flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border font-semibold shadow-sm ${systemAvatarSizeClasses[size]}`}
       style={{
         background: palette.background,
         color: palette.foreground,
