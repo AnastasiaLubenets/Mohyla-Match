@@ -63,13 +63,9 @@ export function validateProfileUpdatePayload(
     return { error: "Availability is limited to 160 characters.", ok: false };
   }
 
-  if (
-    payload.offerSkillIds.length < 1 ||
-    payload.interestIds.length < 1 ||
-    payload.collaborationGoalIds.length < 1
-  ) {
+  if (payload.offerSkillIds.length < 1) {
     return {
-      error: "Choose at least one offered skill, interest, and goal.",
+      error: "Choose at least one offered skill.",
       ok: false,
     };
   }

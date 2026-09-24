@@ -166,18 +166,6 @@ export function ProfileEditForm({
       return;
     }
 
-    if (interestIds.length < 1) {
-      event.preventDefault();
-      setClientError("Choose at least one academic interest.");
-      return;
-    }
-
-    if (collaborationGoalIds.length < 1) {
-      event.preventDefault();
-      setClientError("Choose at least one collaboration goal.");
-      return;
-    }
-
     setClientError(null);
   }
 
@@ -375,26 +363,24 @@ export function ProfileEditForm({
 
         <PickerCard icon={<SparkIcon />} title="Academic interests">
           <TaxonomyMultiSelect
-            emptyLabel="Choose at least one academic interest."
+            emptyLabel="No academic interests selected."
             fieldName="interestId"
             label="Academic interests"
             onChange={setInterestIds}
             options={namedOptions(data.interests)}
             placeholder="Search academic interests..."
-            required
             selectedIds={interestIds}
           />
         </PickerCard>
 
         <PickerCard icon={<TargetIcon />} title="Collaboration goals">
           <TaxonomyMultiSelect
-            emptyLabel="Choose at least one collaboration goal."
+            emptyLabel="No collaboration goals selected."
             fieldName="collaborationGoalId"
             label="Collaboration goals"
             onChange={setCollaborationGoalIds}
             options={namedOptions(data.collaborationGoals)}
             placeholder="Search collaboration goals..."
-            required
             selectedIds={collaborationGoalIds}
           />
         </PickerCard>

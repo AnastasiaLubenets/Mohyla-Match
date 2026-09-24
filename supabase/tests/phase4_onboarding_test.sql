@@ -226,13 +226,6 @@ values (
 );
 
 select throws_ok(
-  $$ select public.complete_onboarding() $$,
-  'P0001',
-  null,
-  'Step 4 blocks completion after offer skills even with zero looking-for skills'
-);
-
-select throws_ok(
   $$ insert into public.profile_skills (user_id, skill_id, direction)
      values (
        '00000000-0000-4000-8000-000000000402',
@@ -244,29 +237,10 @@ select throws_ok(
   'another user''s onboarding data cannot be changed'
 );
 
-insert into public.profile_interests (user_id, interest_id)
-values (
-  '00000000-0000-4000-8000-000000000401',
-  (select id from public.interests where slug = 'phase4-interest')
-);
-
-select throws_ok(
-  $$ select public.complete_onboarding() $$,
-  'P0001',
-  null,
-  'Step 4 still requires a collaboration goal after interest selection'
-);
-
-insert into public.profile_collaboration_goals (user_id, collaboration_goal_id)
-values (
-  '00000000-0000-4000-8000-000000000401',
-  (select id from public.collaboration_goals where slug = 'phase4-goal')
-);
-
 select isnt(
   (select public.complete_onboarding()),
   null,
-  'successful 4-step flow sets onboarding completion'
+  'successful onboarding can complete with zero optional looking-for skills, interests, and collaboration goals'
 );
 
 select isnt(
@@ -352,6 +326,26 @@ select is(
   'successful onboarding can have zero looking-for skills'
 );
 
+select is(
+  (
+    select count(*)::integer
+    from public.profile_interests
+    where user_id = '00000000-0000-4000-8000-000000000401'
+  ),
+  0,
+  'successful onboarding can have zero interests'
+);
+
+select is(
+  (
+    select count(*)::integer
+    from public.profile_collaboration_goals
+    where user_id = '00000000-0000-4000-8000-000000000401'
+  ),
+  0,
+  'successful onboarding can have zero collaboration goals'
+);
+
 insert into public.profile_skills (user_id, skill_id, direction)
 values (
   '00000000-0000-4000-8000-000000000401',
@@ -374,15 +368,6 @@ select ok(
   'removing optional looking-for skills keeps effective onboarded eligibility'
 );
 
-delete from public.profile_interests
-where user_id = '00000000-0000-4000-8000-000000000401'
-  and interest_id = (select id from public.interests where slug = 'phase4-interest');
-
-select ok(
-  not private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
-  'deleting the last interest removes effective onboarded eligibility'
-);
-
 insert into public.profile_interests (user_id, interest_id)
 values (
   '00000000-0000-4000-8000-000000000401',
@@ -391,16 +376,16 @@ values (
 
 select ok(
   private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
-  'restoring an interest restores effective onboarded eligibility'
+  'adding an optional interest keeps effective onboarded eligibility'
 );
 
-delete from public.profile_collaboration_goals
+delete from public.profile_interests
 where user_id = '00000000-0000-4000-8000-000000000401'
-  and collaboration_goal_id = (select id from public.collaboration_goals where slug = 'phase4-goal');
+  and interest_id = (select id from public.interests where slug = 'phase4-interest');
 
 select ok(
-  not private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
-  'deleting the last collaboration goal removes effective onboarded eligibility'
+  private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
+  'removing optional interests keeps effective onboarded eligibility'
 );
 
 insert into public.profile_collaboration_goals (user_id, collaboration_goal_id)
@@ -411,7 +396,16 @@ values (
 
 select ok(
   private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
-  'restoring a collaboration goal restores effective onboarded eligibility'
+  'adding an optional collaboration goal keeps effective onboarded eligibility'
+);
+
+delete from public.profile_collaboration_goals
+where user_id = '00000000-0000-4000-8000-000000000401'
+  and collaboration_goal_id = (select id from public.collaboration_goals where slug = 'phase4-goal');
+
+select ok(
+  private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
+  'removing optional collaboration goals keeps effective onboarded eligibility'
 );
 
 select is(

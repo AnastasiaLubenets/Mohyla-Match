@@ -731,39 +731,55 @@ async function runOnboardingEligibilityRegression(
     "deleting an optional looking-for skill keeps /app eligibility",
   );
 
-  await verifyOnboardingEligibilityToggle({
-    cookieJar,
-    deleteTable: "profile_interests",
-    deleteFilters: [
-      ["user_id", userId],
-      ["interest_id", taxonomy.interest.id],
-    ],
-    restoreTable: "profile_interests",
-    restoreRow: {
+  await insertOnboardingRow(
+    "profile_interests",
+    {
       user_id: userId,
       interest_id: taxonomy.interest.id,
     },
-    missingLabel: "deleting the last interest removes /app eligibility",
-    restoredLabel: "restoring an interest restores /app eligibility",
-  });
-
-  await verifyOnboardingEligibilityToggle({
+    "adding an optional interest succeeds",
+  );
+  await assertAppAccessible(
     cookieJar,
-    deleteTable: "profile_collaboration_goals",
-    deleteFilters: [
+    "adding an optional interest keeps /app eligibility",
+  );
+  await deleteOnboardingRows(
+    "profile_interests",
+    [
       ["user_id", userId],
-      ["collaboration_goal_id", taxonomy.goal.id],
+      ["interest_id", taxonomy.interest.id],
     ],
-    restoreTable: "profile_collaboration_goals",
-    restoreRow: {
+    "deleting an optional interest succeeds",
+  );
+  await assertAppAccessible(
+    cookieJar,
+    "deleting an optional interest keeps /app eligibility",
+  );
+
+  await insertOnboardingRow(
+    "profile_collaboration_goals",
+    {
       user_id: userId,
       collaboration_goal_id: taxonomy.goal.id,
     },
-    missingLabel:
-      "deleting the last collaboration goal removes /app eligibility",
-    restoredLabel:
-      "restoring a collaboration goal restores /app eligibility",
-  });
+    "adding an optional collaboration goal succeeds",
+  );
+  await assertAppAccessible(
+    cookieJar,
+    "adding an optional collaboration goal keeps /app eligibility",
+  );
+  await deleteOnboardingRows(
+    "profile_collaboration_goals",
+    [
+      ["user_id", userId],
+      ["collaboration_goal_id", taxonomy.goal.id],
+    ],
+    "deleting an optional collaboration goal succeeds",
+  );
+  await assertAppAccessible(
+    cookieJar,
+    "deleting an optional collaboration goal keeps /app eligibility",
+  );
 
   const restoredProfile = await expectNoSupabaseError(
     await service
@@ -776,7 +792,7 @@ async function runOnboardingEligibilityRegression(
   assert.equal(
     restoredProfile.onboarding_completed_at,
     completedAt,
-    "transient onboarding incompleteness preserves original completion timestamp",
+    "optional taxonomy changes preserve original completion timestamp",
   );
   assert.equal(
     await countOnboardingCompletedEvents(userId),
@@ -904,35 +920,10 @@ async function runOnboardingFlow(cookieJar, userId) {
     "refresh resumes at Step 4 after skills",
   );
 
-  assertRedirectWithParams(
-    await postForm("/account/setup/build", {}, cookieJar),
-    "/account/setup",
-    { step: "4" },
-    "Step 4 requires interest and collaboration goal",
-  );
-
-  assertRedirectWithParams(
-    await postForm(
-      "/account/setup/build",
-      { interestId: taxonomy.interest.id },
-      cookieJar,
-    ),
-    "/account/setup",
-    { step: "4" },
-    "Step 4 requires collaboration goal after interest",
-  );
-
   assertRedirect(
-    await postForm(
-      "/account/setup/build",
-      {
-        interestId: taxonomy.interest.id,
-        collaborationGoalId: taxonomy.goal.id,
-      },
-      cookieJar,
-    ),
+    await postForm("/account/setup/build", { skip: "true" }, cookieJar),
     "/app",
-    "successful 4-step flow reaches app",
+    "Step 4 can be skipped with zero interests and goals",
   );
 
   await assertAppAccessible(cookieJar, "completed active user can access app");
@@ -959,6 +950,33 @@ async function runOnboardingFlow(cookieJar, userId) {
     false,
     "corporate email never enters profiles",
   );
+
+  const skippedInterests = await expectNoSupabaseError(
+    await service
+      .from("profile_interests")
+      .select("interest_id")
+      .eq("user_id", userId),
+    "load skipped interests",
+  );
+  assert.equal(
+    skippedInterests.length,
+    0,
+    "Step 4 skip stores zero interests",
+  );
+
+  const skippedGoals = await expectNoSupabaseError(
+    await service
+      .from("profile_collaboration_goals")
+      .select("collaboration_goal_id")
+      .eq("user_id", userId),
+    "load skipped collaboration goals",
+  );
+  assert.equal(
+    skippedGoals.length,
+    0,
+    "Step 4 skip stores zero collaboration goals",
+  );
+
   await runOnboardingEligibilityRegression(
     cookieJar,
     userId,

@@ -49,8 +49,21 @@ test("onboarding treats looking-for skills as optional", () => {
     collaborationGoalCount: 0,
   };
 
-  assert.equal(getFirstIncompleteOnboardingStep(progress), 4);
-  assert.equal(getCompletedOnboardingStepCount(progress), 3);
+  assert.equal(getFirstIncompleteOnboardingStep(progress), null);
+  assert.equal(getCompletedOnboardingStepCount(progress), 4);
+});
+
+test("onboarding treats interests and collaboration goals as optional", () => {
+  const progress = {
+    hasBasicProfile: true,
+    offerSkillCount: 1,
+    lookingForSkillCount: 2,
+    interestCount: 0,
+    collaborationGoalCount: 0,
+  };
+
+  assert.equal(getFirstIncompleteOnboardingStep(progress), null);
+  assert.equal(getCompletedOnboardingStepCount(progress), 4);
 });
 
 test("onboarding accepts revisiting completed steps", () => {

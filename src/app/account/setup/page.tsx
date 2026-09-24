@@ -210,12 +210,13 @@ function BuildStep({
       <div>
         <h1 className="text-3xl font-semibold">What do you want to build?</h1>
         <p className="mt-3 leading-7 text-muted">
-          Choose at least one interest and one collaboration goal.
+          Choose interests and collaboration goals if you already know what you
+          want to explore, or skip this for now.
         </p>
       </div>
 
       <fieldset className="space-y-3">
-        <legend className="text-sm font-semibold">Interests · Required</legend>
+        <legend className="text-sm font-semibold">Interests · Optional</legend>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {interests.map((interest) => (
             <ChoiceCard
@@ -231,7 +232,7 @@ function BuildStep({
 
       <fieldset className="space-y-3">
         <legend className="text-sm font-semibold">
-          Collaboration goals · Required
+          Collaboration goals · Optional
         </legend>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {collaborationGoals.map((goal) => (
@@ -252,6 +253,16 @@ function BuildStep({
       >
         Finish onboarding
       </FormNavigation>
+      <div className="flex justify-end">
+        <button
+          className="text-sm font-semibold text-muted transition hover:text-foreground"
+          name="skip"
+          type="submit"
+          value="true"
+        >
+          Skip for now
+        </button>
+      </div>
     </form>
   );
 }

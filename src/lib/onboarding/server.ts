@@ -307,29 +307,31 @@ export async function saveBuildStep(request: NextRequest) {
     return context.response;
   }
 
-  const interestIds = readIdList(formData, "interestId");
-  const collaborationGoalIds = readIdList(formData, "collaborationGoalId");
+  const isSkipped = typeof formData.get("skip") === "string";
+  const interestIds = isSkipped ? [] : readIdList(formData, "interestId");
+  const collaborationGoalIds = isSkipped
+    ? []
+    : readIdList(formData, "collaborationGoalId");
 
-  if (interestIds.length < 1 || collaborationGoalIds.length < 1) {
-    return redirectTo(
-      request,
-      onboardingStepPath(4, "Choose at least one interest and one goal."),
-    );
-  }
-
-  const [{ data: activeInterests, error: interestsError }, { data: activeGoals, error: goalsError }] =
-    await Promise.all([
-      context.supabase
-        .from("interests")
-        .select("id")
-        .in("id", interestIds)
-        .eq("is_active", true),
-      context.supabase
-        .from("collaboration_goals")
-        .select("id")
-        .in("id", collaborationGoalIds)
-        .eq("is_active", true),
-    ]);
+  const [
+    { data: activeInterests, error: interestsError },
+    { data: activeGoals, error: goalsError },
+  ] = await Promise.all([
+    interestIds.length > 0
+      ? context.supabase
+          .from("interests")
+          .select("id")
+          .in("id", interestIds)
+          .eq("is_active", true)
+      : Promise.resolve({ data: [], error: null }),
+    collaborationGoalIds.length > 0
+      ? context.supabase
+          .from("collaboration_goals")
+          .select("id")
+          .in("id", collaborationGoalIds)
+          .eq("is_active", true)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
 
   if (
     interestsError ||
@@ -362,18 +364,22 @@ export async function saveBuildStep(request: NextRequest) {
   }
 
   const [insertInterests, insertGoals] = await Promise.all([
-    context.supabase.from("profile_interests").insert(
-      interestIds.map((interestId) => ({
-        user_id: context.userId,
-        interest_id: interestId,
-      })),
-    ),
-    context.supabase.from("profile_collaboration_goals").insert(
-      collaborationGoalIds.map((collaborationGoalId) => ({
-        user_id: context.userId,
-        collaboration_goal_id: collaborationGoalId,
-      })),
-    ),
+    interestIds.length > 0
+      ? context.supabase.from("profile_interests").insert(
+          interestIds.map((interestId) => ({
+            user_id: context.userId,
+            interest_id: interestId,
+          })),
+        )
+      : Promise.resolve({ error: null }),
+    collaborationGoalIds.length > 0
+      ? context.supabase.from("profile_collaboration_goals").insert(
+          collaborationGoalIds.map((collaborationGoalId) => ({
+            user_id: context.userId,
+            collaboration_goal_id: collaborationGoalId,
+          })),
+        )
+      : Promise.resolve({ error: null }),
   ]);
 
   if (insertInterests.error || insertGoals.error) {
