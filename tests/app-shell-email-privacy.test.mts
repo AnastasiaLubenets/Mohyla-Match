@@ -57,9 +57,10 @@ test("authenticated app center scroll containers keep overflow-y auto with hidde
   );
   assertHasClassLine(
     discoverPage,
-    ["scrollbar-hidden", "xl:overflow-y-auto", "xl:-mx-14", "xl:px-14", "xl:pb-28"],
-    "/app feed center container should hide the visual scrollbar while preserving the full Discover card shadow gutter.",
+    ["scrollbar-hidden", "min-w-0", "xl:min-h-0", "xl:overflow-y-auto"],
+    "/app feed center container should hide the visual scrollbar without a shadow compensation gutter.",
   );
+  assert.doesNotMatch(discoverPage, /xl:-(?:mx-14)|xl:px-14|xl:pb-28/);
   assertHasClassLine(
     savedPage,
     ["scrollbar-hidden", "xl:overflow-y-auto", "xl:h-full"],
@@ -128,6 +129,31 @@ test("sidebar building artwork is full bleed outside padded branding text", asyn
     /<div className="mb-5 px-3 pb-2[^"]*">\s*<SidebarBuildingArt \/>/,
     "Sidebar building artwork should not live inside the padded branding wrapper.",
   );
+});
+
+test("authenticated app content cards do not use large decorative shadows", async () => {
+  const cardSurfaceFiles = [
+    "src/app/app/page.tsx",
+    "src/app/saved/page.tsx",
+    "src/components/matching/app-chrome.tsx",
+    "src/components/matching/discovery-card.tsx",
+    "src/components/matching/saved-profile-card.tsx",
+    "src/components/profile/full-student-profile.tsx",
+    "src/components/profile/my-profile-dashboard.tsx",
+    "src/components/profile/profile-edit-form.tsx",
+  ];
+
+  const largeDecorativeShadow = /shadow-\[0_\d+px_\d+px_rgba\(/;
+
+  for (const path of cardSurfaceFiles) {
+    const source = await readRepoFile(path);
+
+    assert.doesNotMatch(
+      source,
+      largeDecorativeShadow,
+      `${path} should keep authenticated app content cards flat.`,
+    );
+  }
 });
 
 test("own profile reads the current authenticated user's email dynamically", async () => {

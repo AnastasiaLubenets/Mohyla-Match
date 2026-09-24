@@ -354,7 +354,7 @@ function DashboardCard({
   const otherSectionActive = Boolean(activeSection && activeSection !== section);
 
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_55px_rgba(15,94,156,0.08)] sm:p-6">
+    <section className="rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
           <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
@@ -431,7 +431,7 @@ export function ProfileCompletenessCard({
   const completion = computeCompletion(items);
 
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-4 shadow-[0_18px_55px_rgba(15,94,156,0.08)] 2xl:p-5">
+    <section className="rounded-lg border border-blue-100 bg-white p-4 2xl:p-5">
       <h2 className="font-serif text-2xl font-semibold text-blue-950">
         Profile completeness
       </h2>
@@ -487,7 +487,7 @@ export function MyAccountCard({
   profile: SafeProfile;
 }>) {
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-4 shadow-[0_18px_55px_rgba(15,94,156,0.08)] 2xl:p-5">
+    <section className="rounded-lg border border-blue-100 bg-white p-4 2xl:p-5">
       <h2 className="font-serif text-2xl font-semibold text-blue-950">
         My account
       </h2>
@@ -659,7 +659,7 @@ export function MyProfileDashboard({
 
   return (
     <div className="space-y-4">
-      <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_55px_rgba(15,94,156,0.09)] sm:p-6">
+      <section className="rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
         <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)_14rem] lg:items-start">
           <div className="overflow-hidden rounded-lg border border-blue-100 bg-blue-50">
             <SystemAvatar

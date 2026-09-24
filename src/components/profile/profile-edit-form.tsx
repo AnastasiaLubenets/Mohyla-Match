@@ -102,7 +102,7 @@ function fieldClassName() {
 
 function PickerCard({ children, icon, title }: PickerCardProps) {
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_55px_rgba(15,94,156,0.08)]">
+    <section className="rounded-lg border border-blue-100 bg-white p-5">
       <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
         <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
           {icon}
@@ -212,7 +212,7 @@ export function ProfileEditForm({
         </div>
       ) : null}
 
-      <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_55px_rgba(15,94,156,0.08)] sm:p-6">
+      <section className="rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
         <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)]">
           <div className="overflow-hidden rounded-lg border border-blue-100 bg-blue-50">
             <SystemAvatar

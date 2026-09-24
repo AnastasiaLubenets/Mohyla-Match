@@ -182,7 +182,7 @@ export function DiscoveryCard({
     return (
       <>
         <StatusMessage error={error} status={status} />
-        <section className="rounded-lg border border-blue-100 bg-white p-6 shadow-[0_18px_50px_rgba(15,94,156,0.10)] sm:p-8">
+        <section className="rounded-lg border border-blue-100 bg-white p-6 sm:p-8">
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
             Discover
           </p>
@@ -212,7 +212,7 @@ export function DiscoveryCard({
   return (
     <>
       <StatusMessage error={error} status={status} />
-      <article className="relative rounded-lg border border-blue-100 bg-white p-5 text-blue-950 shadow-[0_18px_55px_rgba(15,94,156,0.10)] sm:p-6">
+      <article className="relative rounded-lg border border-blue-100 bg-white p-5 text-blue-950 sm:p-6">
         <div className="absolute right-5 top-5 z-10 sm:right-6 sm:top-6">
           <SaveProfileButton
             className="inline-flex h-9 w-9 items-center justify-center rounded-md text-blue-800 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"

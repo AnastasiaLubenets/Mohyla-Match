@@ -285,7 +285,7 @@ export function BrandQuoteCard({
   text: string;
 }>) {
   return (
-    <section className="rounded-lg border border-blue-50 bg-[#fffaf0] p-7 shadow-[0_18px_50px_rgba(15,94,156,0.06)]">
+    <section className="rounded-lg border border-blue-50 bg-[#fffaf0] p-7">
       <p className="font-serif text-6xl font-bold leading-none text-blue-800">
         &quot;
       </p>

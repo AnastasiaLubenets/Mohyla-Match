@@ -174,7 +174,7 @@ function ProfileInfoCard({
   title: string;
 }>) {
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_55px_rgba(15,94,156,0.08)] sm:p-6">
+    <section className="rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
       <div className="flex gap-3">
         <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center text-blue-800">
           {icon}
@@ -225,7 +225,7 @@ export function FullStudentProfile({
         </p>
       </header>
 
-      <article className="relative rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_55px_rgba(15,94,156,0.10)] sm:p-6">
+      <article className="relative rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
         <div className="absolute right-5 top-5 z-10 sm:right-6 sm:top-6">
           <SaveProfileButton
             className={
