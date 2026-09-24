@@ -186,7 +186,7 @@ function DiscoveryFilterRail({
 }>) {
   return (
     <aside className="space-y-4 xl:h-full xl:min-h-0 xl:overflow-hidden">
-      <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_50px_rgba(15,94,156,0.09)]">
+      <section className="rounded-lg border border-blue-100 bg-white p-5">
         <div className="flex items-center justify-between gap-4">
           <h2 className="font-serif text-3xl font-bold leading-none text-blue-950">
             Filters
@@ -252,7 +252,7 @@ function DiscoveryFilterRail({
         </form>
       </section>
 
-      <section className="rounded-lg border border-blue-50 bg-[#fffaf0] p-7 shadow-[0_18px_50px_rgba(15,94,156,0.06)]">
+      <section className="rounded-lg border border-blue-50 bg-[#fffaf0] p-7">
         <p className="font-serif text-6xl font-bold leading-none text-blue-800">“</p>
         <p className="mt-1 font-serif text-3xl font-semibold italic leading-[1.02] text-blue-950">
           Great things happen when Mohylians find each other.
@@ -397,7 +397,7 @@ export default async function AppPage({ searchParams }: PageProps) {
         <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">
           <TopBar currentProfile={currentProfile} filters={filters} />
           <div className="grid gap-6 px-4 py-6 sm:px-6 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1fr)_22rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
-            <section className="scrollbar-hidden min-w-0 xl:-mx-14 xl:min-h-0 xl:overflow-y-auto xl:px-14 xl:pb-28">
+            <section className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto">
               <Hero />
               <DiscoveryFeed
                 candidates={filteredCandidates}

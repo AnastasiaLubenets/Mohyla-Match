@@ -72,7 +72,7 @@ function SavedStatusMessage({
 
 function SavedSummaryCard({ count }: Readonly<{ count: number }>) {
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-[0_18px_55px_rgba(15,94,156,0.08)]">
+    <section className="rounded-lg border border-blue-100 bg-white p-5">
       <div className="inline-flex h-14 w-14 items-center justify-center rounded-lg bg-blue-100 text-blue-800">
         <BookmarkIcon />
       </div>
@@ -92,7 +92,7 @@ function SavedSummaryCard({ count }: Readonly<{ count: number }>) {
 
 function EmptySavedState() {
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-8 shadow-[0_18px_55px_rgba(15,94,156,0.08)]">
+    <section className="rounded-lg border border-blue-100 bg-white p-8">
       <h2 className="font-serif text-4xl font-semibold text-blue-950">
         No saved profiles yet
       </h2>
