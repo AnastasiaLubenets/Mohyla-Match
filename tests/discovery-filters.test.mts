@@ -121,6 +121,52 @@ test("discover filters by program, year, skill, interest, and goal", () => {
   );
 });
 
+test("discover filters work for recommended and all-students candidate sets", () => {
+  const recommendedCandidates = [
+    candidate({
+      fullName: "Recommended Python Student",
+      offeredSkills: [
+        {
+          category: "Software & Web",
+          id: 5,
+          name: "Python",
+          slug: "python",
+        },
+      ],
+    }),
+  ];
+  const allStudentsCandidates = [
+    ...recommendedCandidates,
+    candidate({
+      fullName: "All Students Design Peer",
+      interests: [{ id: 7, name: "Design", slug: "design" }],
+      offeredSkills: [
+        {
+          category: "Design",
+          id: 6,
+          name: "Figma",
+          slug: "figma",
+        },
+      ],
+      userId: "00000000-0000-4000-8000-000000000006",
+    }),
+  ];
+  const filters = createDiscoveryFilters({ searchQuery: "python" });
+
+  assert.deepEqual(
+    filterDiscoveryCandidates(recommendedCandidates, filters).map(
+      (result) => result.fullName,
+    ),
+    ["Recommended Python Student"],
+  );
+  assert.deepEqual(
+    filterDiscoveryCandidates(allStudentsCandidates, filters).map(
+      (result) => result.fullName,
+    ),
+    ["Recommended Python Student"],
+  );
+});
+
 test("discover filter options are deduplicated and sorted", () => {
   const options = buildDiscoveryFilterOptions([
     candidate({ fullName: "Maria K." }),

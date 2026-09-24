@@ -522,6 +522,31 @@ export type Database = {
           year_of_study: number;
         }[];
       };
+      get_all_discovery_profiles: {
+        Args: {
+          profile_limit?: number;
+        };
+        Returns: {
+          academic_program_name: string;
+          availability: string | null;
+          bio: string | null;
+          collaboration_goals: Json;
+          compatibility_score: number;
+          faculty_name: string;
+          full_name: string;
+          interests: Json;
+          looking_for_skills: Json;
+          matched_i_offer: Json;
+          matched_they_offer: Json;
+          score_breakdown: Json;
+          shared_collaboration_goals: Json;
+          shared_interests: Json;
+          offered_skills: Json;
+          system_avatar_key: string;
+          user_id: string;
+          year_of_study: number;
+        }[];
+      };
       get_current_account_state: {
         Args: Record<PropertyKey, never>;
         Returns: "onboarding_incomplete" | "active" | "suspended" | "deleted";

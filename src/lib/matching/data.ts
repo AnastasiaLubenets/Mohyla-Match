@@ -160,28 +160,55 @@ export async function loadDiscoveryCandidates(
   }
 
   return {
-    data: (result.data ?? []).map((candidate) => ({
-      academicProgramName: candidate.academic_program_name,
-      availability: candidate.availability,
-      bio: candidate.bio,
-      collaborationGoals: parseNamedItems(candidate.collaboration_goals),
-      compatibilityScore: candidate.compatibility_score,
-      facultyName: candidate.faculty_name,
-      fullName: candidate.full_name,
-      interests: parseNamedItems(candidate.interests),
-      lookingForSkills: parseSkillItems(candidate.looking_for_skills),
-      matchedIOffer: parseSkillItems(candidate.matched_i_offer),
-      matchedTheyOffer: parseSkillItems(candidate.matched_they_offer),
-      offeredSkills: parseSkillItems(candidate.offered_skills),
-      scoreBreakdown: candidate.score_breakdown,
-      sharedCollaborationGoals: parseNamedItems(
-        candidate.shared_collaboration_goals,
-      ),
-      sharedInterests: parseNamedItems(candidate.shared_interests),
-      systemAvatarKey: candidate.system_avatar_key,
-      userId: candidate.user_id,
-      yearOfStudy: candidate.year_of_study,
-    })),
+    data: (result.data ?? []).map(mapDiscoveryCandidate),
+    error: false,
+  };
+}
+
+type DiscoveryCandidateRow =
+  Database["public"]["Functions"]["get_discovery_candidates"]["Returns"][number];
+
+function mapDiscoveryCandidate(
+  candidate: DiscoveryCandidateRow,
+): DiscoveryCandidate {
+  return {
+    academicProgramName: candidate.academic_program_name,
+    availability: candidate.availability,
+    bio: candidate.bio,
+    collaborationGoals: parseNamedItems(candidate.collaboration_goals),
+    compatibilityScore: candidate.compatibility_score,
+    facultyName: candidate.faculty_name,
+    fullName: candidate.full_name,
+    interests: parseNamedItems(candidate.interests),
+    lookingForSkills: parseSkillItems(candidate.looking_for_skills),
+    matchedIOffer: parseSkillItems(candidate.matched_i_offer),
+    matchedTheyOffer: parseSkillItems(candidate.matched_they_offer),
+    offeredSkills: parseSkillItems(candidate.offered_skills),
+    scoreBreakdown: candidate.score_breakdown,
+    sharedCollaborationGoals: parseNamedItems(
+      candidate.shared_collaboration_goals,
+    ),
+    sharedInterests: parseNamedItems(candidate.shared_interests),
+    systemAvatarKey: candidate.system_avatar_key,
+    userId: candidate.user_id,
+    yearOfStudy: candidate.year_of_study,
+  };
+}
+
+export async function loadAllDiscoveryProfiles(
+  supabase: SupabaseServerClient,
+  limit?: number,
+): Promise<LoadResult<DiscoveryCandidate[]>> {
+  const args =
+    typeof limit === "number" ? { profile_limit: limit } : {};
+  const result = await supabase.rpc("get_all_discovery_profiles", args);
+
+  if (result.error) {
+    return { data: null, error: true };
+  }
+
+  return {
+    data: (result.data ?? []).map(mapDiscoveryCandidate),
     error: false,
   };
 }

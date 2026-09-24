@@ -50,19 +50,21 @@ function DiscoveryActionForm({
   children,
   className,
   pendingLabel,
+  returnTo,
   targetUserId,
 }: Readonly<{
   action: "skip";
   children: ReactNode;
   className?: string;
   pendingLabel: string;
+  returnTo: string;
   targetUserId: string;
 }>) {
   return (
     <form action="/app/action" method="post">
       <input name="targetUserId" type="hidden" value={targetUserId} />
       <input name="action" type="hidden" value={action} />
-      <input name="returnTo" type="hidden" value="/app" />
+      <input name="returnTo" type="hidden" value={returnTo} />
       <AuthSubmitButton
         className={
           className ??
@@ -165,17 +167,25 @@ function ArrowRightIcon() {
 
 export function DiscoveryCard({
   candidate,
+  emptyAction,
   error,
   emptyDescription = "Your previous actions and blocks are already filtered out. Come back after more students complete onboarding.",
   emptyTitle = "No new profiles right now.",
+  returnTo = "/app?view=recommended",
   saved = false,
+  showProfileAction = true,
+  showSkip = true,
   status,
 }: Readonly<{
   candidate: DiscoveryCandidate | null;
+  emptyAction?: ReactNode;
   emptyDescription?: string;
   emptyTitle?: string;
   error?: string;
+  returnTo?: string;
   saved?: boolean;
+  showProfileAction?: boolean;
+  showSkip?: boolean;
   status?: string;
 }>) {
   if (!candidate) {
@@ -190,14 +200,19 @@ export function DiscoveryCard({
             {emptyTitle}
           </h1>
           <p className="mt-4 max-w-2xl leading-7 text-slate-600">{emptyDescription}</p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link
-              className="inline-flex h-12 items-center justify-center rounded-full border border-blue-200 px-5 text-sm font-semibold text-blue-900 transition hover:border-blue-400 hover:bg-blue-50"
-              href="/profile"
-            >
-              Update my profile
-            </Link>
-          </div>
+          {emptyAction || showProfileAction ? (
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              {emptyAction}
+              {showProfileAction ? (
+                <Link
+                  className="inline-flex h-12 items-center justify-center rounded-full border border-blue-200 px-5 text-sm font-semibold text-blue-900 transition hover:border-blue-400 hover:bg-blue-50"
+                  href="/profile"
+                >
+                  Update my profile
+                </Link>
+              ) : null}
+            </div>
+          ) : null}
         </section>
       </>
     );
@@ -216,7 +231,7 @@ export function DiscoveryCard({
         <div className="absolute right-5 top-5 z-10 sm:right-6 sm:top-6">
           <SaveProfileButton
             className="inline-flex h-9 w-9 items-center justify-center rounded-md text-blue-800 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
-            returnTo="/app"
+            returnTo={returnTo}
             saved={saved}
             targetUserId={candidate.userId}
             variant="icon"
@@ -333,17 +348,20 @@ export function DiscoveryCard({
             showIcon
             targetUserId={candidate.userId}
           />
-          <div className="flex justify-center sm:col-start-3 sm:justify-end">
-            <DiscoveryActionForm
-              action="skip"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
-              pendingLabel="Skipping..."
-              targetUserId={candidate.userId}
-            >
-              <span>Skip</span>
-              <ArrowRightIcon />
-            </DiscoveryActionForm>
-          </div>
+          {showSkip ? (
+            <div className="flex justify-center sm:col-start-3 sm:justify-end">
+              <DiscoveryActionForm
+                action="skip"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
+                pendingLabel="Skipping..."
+                returnTo={returnTo}
+                targetUserId={candidate.userId}
+              >
+                <span>Skip</span>
+                <ArrowRightIcon />
+              </DiscoveryActionForm>
+            </div>
+          ) : null}
         </footer>
       </article>
     </>
