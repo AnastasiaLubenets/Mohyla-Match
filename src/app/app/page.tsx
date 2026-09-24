@@ -1,10 +1,12 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { AppSidebar } from "@/components/matching/app-chrome";
 import { DiscoveryCard } from "@/components/matching/discovery-card";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import { requireAccountState } from "@/lib/auth/guards";
 import {
+  loadAllDiscoveryProfiles,
   loadDiscoveryCandidates,
   loadSavedProfiles,
   type DiscoveryCandidate,
@@ -17,6 +19,11 @@ import {
   type DiscoveryFilterOptions,
   type DiscoveryFilters,
 } from "@/lib/matching/discovery-filters";
+import {
+  createDiscoveryView,
+  discoveryViewHref,
+  type DiscoveryView,
+} from "@/lib/matching/discovery-view";
 import { loadSafeProfile, type SafeProfile } from "@/lib/profile/data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -55,12 +62,15 @@ function SearchIcon() {
 function HiddenFilterInputs({
   filters,
   omit,
+  view,
 }: Readonly<{
   filters: DiscoveryFilters;
   omit: keyof DiscoveryFilters;
+  view: DiscoveryView;
 }>) {
   return (
     <>
+      <input name="view" type="hidden" value={view} />
       {omit !== "programName" && filters.programName ? (
         <input name="program" type="hidden" value={filters.programName} />
       ) : null}
@@ -83,9 +93,11 @@ function HiddenFilterInputs({
 function TopBar({
   currentProfile,
   filters,
+  view,
 }: Readonly<{
   currentProfile: SafeProfile | null;
   filters: DiscoveryFilters;
+  view: DiscoveryView;
 }>) {
   return (
     <header className="z-30 shrink-0 border-b border-blue-100 bg-white/80 px-4 py-3 backdrop-blur sm:px-6 xl:px-8">
@@ -105,7 +117,11 @@ function TopBar({
             placeholder="Search students, skills or interests..."
             type="search"
           />
-          <HiddenFilterInputs filters={filters} omit="searchQuery" />
+          <HiddenFilterInputs
+            filters={filters}
+            omit="searchQuery"
+            view={view}
+          />
           <button className="sr-only" type="submit">
             Search
           </button>
@@ -177,12 +193,14 @@ function DiscoveryFilterRail({
   options,
   resultCount,
   totalCount,
+  view,
 }: Readonly<{
   filters: DiscoveryFilters;
   hasActiveFilters: boolean;
   options: DiscoveryFilterOptions;
   resultCount: number;
   totalCount: number;
+  view: DiscoveryView;
 }>) {
   return (
     <aside className="space-y-4 xl:h-full xl:min-h-0 xl:overflow-hidden">
@@ -197,7 +215,7 @@ function DiscoveryFilterRail({
                 ? "text-sm font-bold text-blue-700 transition hover:text-blue-950"
                 : "text-sm font-bold text-blue-300"
             }
-            href="/app"
+            href={discoveryViewHref({}, view)}
           >
             Reset
           </Link>
@@ -208,6 +226,7 @@ function DiscoveryFilterRail({
         </p>
 
         <form action="/app" className="mt-4 space-y-3">
+          <input name="view" type="hidden" value={view} />
           {filters.searchQuery ? (
             <input name="q" type="hidden" value={filters.searchQuery} />
           ) : null}
@@ -288,28 +307,79 @@ function Hero() {
   );
 }
 
+function DiscoveryViewTabs({
+  currentView,
+  params,
+}: Readonly<{
+  currentView: DiscoveryView;
+  params: Record<string, string | string[] | undefined>;
+}>) {
+  const tabs: { label: string; view: DiscoveryView }[] = [
+    { label: "Recommended", view: "recommended" },
+    { label: "All students", view: "all" },
+  ];
+
+  return (
+    <nav
+      aria-label="Discovery views"
+      className="mb-5 flex justify-center"
+    >
+      <div className="inline-flex rounded-lg border border-blue-100 bg-white p-1">
+        {tabs.map((tab) => {
+          const active = currentView === tab.view;
+
+          return (
+            <Link
+              aria-current={active ? "page" : undefined}
+              className={
+                active
+                  ? "inline-flex h-9 items-center justify-center rounded-md bg-blue-800 px-4 text-sm font-bold text-white"
+                  : "inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-bold text-blue-700 transition hover:bg-blue-50 hover:text-blue-950"
+              }
+              href={discoveryViewHref(params, tab.view)}
+              key={tab.view}
+            >
+              {tab.label}
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
 function DiscoveryFeed({
   candidates,
+  emptyAction,
   emptyDescription,
   emptyTitle,
   error,
+  returnTo,
   savedProfileIds,
+  showProfileAction,
+  showSkip,
   status,
 }: Readonly<{
   candidates: readonly DiscoveryCandidate[];
+  emptyAction?: ReactNode;
   emptyDescription?: string;
   emptyTitle?: string;
   error?: string;
+  returnTo: string;
   savedProfileIds: ReadonlySet<string>;
+  showProfileAction?: boolean;
+  showSkip?: boolean;
   status?: string;
 }>) {
   if (candidates.length === 0) {
     return (
       <DiscoveryCard
         candidate={null}
+        emptyAction={emptyAction}
         emptyDescription={emptyDescription}
         emptyTitle={emptyTitle}
         error={error}
+        showProfileAction={showProfileAction}
         status={status}
       />
     );
@@ -322,7 +392,9 @@ function DiscoveryFeed({
           candidate={candidate}
           error={index === 0 ? error : undefined}
           key={candidate.userId}
+          returnTo={returnTo}
           saved={savedProfileIds.has(candidate.userId)}
+          showSkip={showSkip}
           status={index === 0 ? status : undefined}
         />
       ))}
@@ -333,6 +405,7 @@ function DiscoveryFeed({
 export default async function AppPage({ searchParams }: PageProps) {
   const accountState = await requireAccountState("/app", ["active"]);
   const params = await searchParams;
+  const view = createDiscoveryView(params.view);
   const filters = createDiscoveryFilters({
     collaborationGoalSlug: firstParam(params.goal),
     interestSlug: firstParam(params.interest),
@@ -344,11 +417,13 @@ export default async function AppPage({ searchParams }: PageProps) {
   const supabase = await createSupabaseServerClient();
   const [candidatesResult, currentProfileResult, savedProfilesResult] =
     await Promise.all([
-      loadDiscoveryCandidates(supabase, 50),
+      view === "all"
+        ? loadAllDiscoveryProfiles(supabase)
+        : loadDiscoveryCandidates(supabase, 50),
       accountState.userId
         ? loadSafeProfile(supabase, accountState.userId)
         : Promise.resolve({ data: null, error: false }),
-      loadSavedProfiles(supabase, 50),
+      loadSavedProfiles(supabase, 100),
     ]);
   const currentProfile = currentProfileResult.error
     ? null
@@ -365,7 +440,11 @@ export default async function AppPage({ searchParams }: PageProps) {
         <div className="grid min-h-screen xl:h-screen xl:min-h-0 xl:grid-cols-[18rem_minmax(0,1fr)]">
           <AppSidebar active="discover" />
           <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">
-            <TopBar currentProfile={currentProfile} filters={filters} />
+            <TopBar
+              currentProfile={currentProfile}
+              filters={filters}
+              view={view}
+            />
             <section className="scrollbar-hidden px-4 py-8 sm:px-6 xl:min-h-0 xl:flex-1 xl:overflow-y-auto xl:px-8">
               <div className="mx-auto max-w-4xl rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
                 <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
@@ -375,7 +454,7 @@ export default async function AppPage({ searchParams }: PageProps) {
                   Discovery unavailable
                 </h1>
                 <p className="mt-3 leading-7 text-slate-600">
-                  We could not load matching candidates. Try again in a moment.
+                  We could not load discovery profiles. Try again in a moment.
                 </p>
               </div>
             </section>
@@ -389,28 +468,46 @@ export default async function AppPage({ searchParams }: PageProps) {
   const filteredCandidates = filterDiscoveryCandidates(allCandidates, filters);
   const activeFilters = hasActiveDiscoveryFilters(filters);
   const options = buildDiscoveryFilterOptions(allCandidates);
+  const returnTo = discoveryViewHref(params, view);
+  const recommendedEmptyAction = (
+    <Link
+      className="inline-flex h-12 items-center justify-center rounded-md bg-blue-800 px-5 text-sm font-bold text-white transition hover:bg-blue-900"
+      href={discoveryViewHref(params, "all")}
+    >
+      Browse all students
+    </Link>
+  );
 
   return (
     <main className="min-h-screen bg-[#eef6fb] text-blue-950 xl:h-screen xl:overflow-hidden">
       <div className="grid min-h-screen xl:h-screen xl:min-h-0 xl:grid-cols-[18rem_minmax(0,1fr)]">
         <AppSidebar active="discover" />
         <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">
-          <TopBar currentProfile={currentProfile} filters={filters} />
+          <TopBar currentProfile={currentProfile} filters={filters} view={view} />
           <div className="grid gap-6 px-4 py-6 sm:px-6 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1fr)_22rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
             <section className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto">
               <Hero />
+              <DiscoveryViewTabs currentView={view} params={params} />
               <DiscoveryFeed
                 candidates={filteredCandidates}
+                emptyAction={
+                  view === "recommended" ? recommendedEmptyAction : undefined
+                }
                 emptyDescription={
-                  activeFilters
-                    ? "Try clearing filters or broadening your search to see more Mohyla students."
-                    : undefined
+                  view === "recommended"
+                    ? "No more recommendations right now. You can still browse all students."
+                    : "Try clearing filters or changing your search."
                 }
                 emptyTitle={
-                  activeFilters ? "No profiles match these filters." : undefined
+                  view === "recommended"
+                    ? "No more recommendations right now."
+                    : "No students match these filters."
                 }
                 error={firstParam(params.error)}
+                returnTo={returnTo}
                 savedProfileIds={savedProfileIds}
+                showProfileAction={false}
+                showSkip={view === "recommended"}
                 status={firstParam(params.status)}
               />
             </section>
@@ -421,6 +518,7 @@ export default async function AppPage({ searchParams }: PageProps) {
               options={options}
               resultCount={filteredCandidates.length}
               totalCount={allCandidates.length}
+              view={view}
             />
           </div>
         </div>

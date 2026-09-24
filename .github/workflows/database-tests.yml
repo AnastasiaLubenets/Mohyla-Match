@@ -107,6 +107,7 @@ jobs:
           run_pgtap supabase/tests/phase5_profiles_test.sql "phase 5 profile pgTAP tests"
           run_pgtap supabase/tests/phase6_matching_test.sql "phase 6 matching pgTAP tests"
           run_pgtap supabase/tests/phase6_1_direct_contact_saved_test.sql "phase 6.1 direct contact and saved pgTAP tests"
+          run_pgtap supabase/tests/phase7_discovery_views_test.sql "phase 7 discovery views pgTAP tests"
           run_pgtap supabase/tests/production_taxonomy_test.sql "production taxonomy pgTAP tests"
           run_pgtap supabase/tests/production_onboarding_reference_taxonomy_test.sql "onboarding reference taxonomy pgTAP tests"
           run_pgtap supabase/tests/profile_deletion_test.sql "profile deletion pgTAP tests"

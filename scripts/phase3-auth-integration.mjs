@@ -1376,6 +1376,16 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
   assertTextContains(discoverBody, "Discover", "app route renders discovery");
   assertTextContains(
     discoverBody,
+    "Recommended",
+    "discover page renders recommended tab",
+  );
+  assertTextContains(
+    discoverBody,
+    "All students",
+    "discover page renders all students tab",
+  );
+  assertTextContains(
+    discoverBody,
     "Phase Six Match Peer",
     "discover page renders a compatible candidate",
   );
@@ -1409,6 +1419,73 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
     discoverBody,
     "mailto:",
     "discover page does not render mailto links",
+  );
+
+  const recommendedSearchBody = await readPageText(
+    await getPath("/app?view=recommended&q=Phase%20Six%20Match", cookieJar),
+    "recommended discovery search",
+  );
+  assertTextContains(
+    recommendedSearchBody,
+    "Phase Six Match Peer",
+    "recommended search finds a compatible candidate",
+  );
+  const recommendedSkillBody = await readPageText(
+    await getPath("/app?view=recommended&skill=ui-ux", cookieJar),
+    "recommended discovery skill filter",
+  );
+  assertTextContains(
+    recommendedSkillBody,
+    "Phase Six Match Peer",
+    "recommended skill filter finds a compatible candidate",
+  );
+  const allStudentsBody = await readPageText(
+    await getPath("/app?view=all&q=Phase%20Six%20Match", cookieJar),
+    "all students discovery search",
+  );
+  assertTextContains(
+    allStudentsBody,
+    "All students",
+    "all students tab renders",
+  );
+  assertTextContains(
+    allStudentsBody,
+    "Phase Six Match Peer",
+    "all students search finds the same compatible candidate",
+  );
+  assertTextContains(
+    allStudentsBody,
+    "Save profile",
+    "all students renders the private save action",
+  );
+  assertTextContains(
+    allStudentsBody,
+    "Get email",
+    "all students renders direct email copy action",
+  );
+  assertTextContains(
+    allStudentsBody,
+    "View full profile",
+    "all students renders full profile navigation",
+  );
+  assertTextExcludes(
+    allStudentsBody,
+    "Skip",
+    "all students does not render skip action",
+  );
+  assertTextExcludes(
+    allStudentsBody,
+    peer.email,
+    "all students never renders candidate email",
+  );
+  const allStudentsSkillBody = await readPageText(
+    await getPath("/app?view=all&skill=ui-ux", cookieJar),
+    "all students discovery skill filter",
+  );
+  assertTextContains(
+    allStudentsSkillBody,
+    "Phase Six Match Peer",
+    "all students skill filter finds the same compatible candidate",
   );
 
   const peerProfileBody = await readPageText(
@@ -1527,6 +1604,25 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
     "Phase Six Match Peer",
     "saved profile is removed from normal discovery",
   );
+  const allAfterSaveBody = await readPageText(
+    await getPath("/app?view=all&q=Phase%20Six%20Match", cookieJar),
+    "all students after save",
+  );
+  assertTextContains(
+    allAfterSaveBody,
+    "Phase Six Match Peer",
+    "saved profile remains visible in all students",
+  );
+  assertTextContains(
+    allAfterSaveBody,
+    "Remove from saved",
+    "saved all students card renders private unsave action",
+  );
+  assertTextExcludes(
+    allAfterSaveBody,
+    "Skip",
+    "saved all students card still omits skip action",
+  );
   const peerCookies = new Map();
   assertRedirect(
     await postForm(
@@ -1641,6 +1737,25 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
     "Phase Six Match Peer",
     "skipped profile is removed from discovery",
   );
+  const allAfterSkipBody = await readPageText(
+    await getPath("/app?view=all&q=Phase%20Six%20Match", cookieJar),
+    "all students after skip",
+  );
+  assertTextContains(
+    allAfterSkipBody,
+    "Phase Six Match Peer",
+    "skipped profile remains visible in all students",
+  );
+  assertTextExcludes(
+    allAfterSkipBody,
+    "Skip",
+    "all students still omits skip after the profile is skipped",
+  );
+  assertTextExcludes(
+    allAfterSkipBody,
+    peer.email,
+    "all students still does not expose email after skip",
+  );
 
   assertRedirectWithParams(
     await postForm(
@@ -1688,6 +1803,14 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
     cookieJar,
     peer.id,
     "blocked profile becomes unavailable",
+  );
+  assertTextExcludes(
+    await readPageText(
+      await getPath("/app?view=all&q=Phase%20Six%20Match", cookieJar),
+      "all students after block",
+    ),
+    "Phase Six Match Peer",
+    "blocked profile is removed from all students",
   );
   const blockedContactResponse = await postJson(
     "/profiles/contact",
