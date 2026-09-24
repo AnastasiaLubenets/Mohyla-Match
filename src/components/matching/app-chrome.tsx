@@ -143,13 +143,13 @@ function SidebarBrandLogo() {
 
 function SidebarBuildingArt() {
   return (
-    <div className="mb-5 flex min-h-0 justify-center 2xl:mb-7">
+    <div className="mb-5 -mx-5 min-h-0 2xl:mb-7">
       <Image
         alt=""
         aria-hidden="true"
-        className="max-h-[26vh] w-full max-w-[15rem] object-contain object-bottom 2xl:max-h-[34vh]"
+        className="h-auto w-full max-w-none object-contain object-left-bottom"
         height={sidebarBuilding.height}
-        sizes="15rem"
+        sizes="18rem"
         src={sidebarBuilding.src}
         width={sidebarBuilding.width}
       />
@@ -175,23 +175,25 @@ export function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
       </nav>
 
       <div className="mt-6 hidden min-h-0 flex-1 flex-col justify-end xl:flex">
-        <div className="mb-5 px-3 pb-2 2xl:mb-8">
+        <div className="mb-5 pb-2 2xl:mb-8">
           <SidebarBuildingArt />
-          <p className="font-serif text-2xl font-semibold uppercase leading-[0.95] text-blue-950 2xl:text-3xl">
-            Більше
-            <br />
-            людей
-            <br />
-            Більше
-            <br />
-            можливостей
-          </p>
-          <div className="mt-4 h-px w-16 bg-blue-300 2xl:mt-6" />
-          <p className="mt-4 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-blue-500 2xl:mt-6 2xl:text-xs">
-            Спільнота
-            <br />
-            що створює майбутнє
-          </p>
+          <div className="px-3">
+            <p className="font-serif text-2xl font-semibold uppercase leading-[0.95] text-blue-950 2xl:text-3xl">
+              Більше
+              <br />
+              людей
+              <br />
+              Більше
+              <br />
+              можливостей
+            </p>
+            <div className="mt-4 h-px w-16 bg-blue-300 2xl:mt-6" />
+            <p className="mt-4 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-blue-500 2xl:mt-6 2xl:text-xs">
+              Спільнота
+              <br />
+              що створює майбутнє
+            </p>
+          </div>
         </div>
         <form action="/auth/logout" className="px-3" method="post">
           <button
