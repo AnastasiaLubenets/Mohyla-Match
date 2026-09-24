@@ -8,8 +8,24 @@ export const systemAvatarSizeClasses = {
 
 export type SystemAvatarSize = keyof typeof systemAvatarSizeClasses;
 
+export const systemAvatarRadiusClasses = {
+  default: "rounded-[1.25rem]",
+  topbar: "rounded-xl",
+} as const;
+
+export type SystemAvatarRadius = keyof typeof systemAvatarRadiusClasses;
+
+const programAvatarBaseContainerClasses =
+  "relative isolate aspect-square shrink-0 overflow-hidden p-0";
+
 export const programAvatarContainerClasses =
-  "relative isolate aspect-square shrink-0 overflow-hidden rounded-[1.25rem] p-0";
+  `${programAvatarBaseContainerClasses} ${systemAvatarRadiusClasses.default}`;
+
+export function getProgramAvatarContainerClasses(
+  radius: SystemAvatarRadius = "default",
+) {
+  return `${programAvatarBaseContainerClasses} ${systemAvatarRadiusClasses[radius]}`;
+}
 
 export const programAvatarImageClasses = "h-full w-full object-cover";
 

@@ -244,6 +244,7 @@ function AppTopBar({
                 facultyName={currentProfile.facultyName}
                 fullName={currentProfile.fullName}
                 programName={currentProfile.academicProgramName}
+                radius="topbar"
                 size="sm"
                 systemAvatarKey={currentProfile.systemAvatarKey}
               />
