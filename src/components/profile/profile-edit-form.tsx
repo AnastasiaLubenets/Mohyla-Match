@@ -148,6 +148,9 @@ export function ProfileEditForm({
       ),
     [data.programs, selectedFacultyId],
   );
+  const selectedProgram = data.programs.find(
+    (program) => program.id === selectedProgramId,
+  );
 
   function handleFacultyChange(value: string) {
     const nextFacultyId = Number(value);
@@ -217,6 +220,7 @@ export function ProfileEditForm({
           <div className="overflow-hidden rounded-lg border border-blue-100 bg-blue-50">
             <SystemAvatar
               availability={data.profile.availability}
+              avatarVariantKey={selectedProgram?.avatar_variant_key}
               fullName={data.profile.full_name}
               size="xl"
               systemAvatarKey={data.profile.system_avatar_key}
