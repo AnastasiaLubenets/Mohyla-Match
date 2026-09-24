@@ -14,6 +14,19 @@ import {
 
 const repoRoot = process.cwd();
 
+const systemAvatarPlacementSources = [
+  "src/app/app/page.tsx",
+  "src/app/profile/edit/page.tsx",
+  "src/components/matching/app-chrome.tsx",
+  "src/components/matching/discovery-card.tsx",
+  "src/components/matching/match-card.tsx",
+  "src/components/matching/saved-profile-card.tsx",
+  "src/components/profile/profile-details.tsx",
+  "src/components/profile/my-profile-dashboard.tsx",
+  "src/components/profile/full-student-profile.tsx",
+  "src/components/profile/profile-edit-form.tsx",
+];
+
 test("mapped academic program renders its stable image source", () => {
   assert.equal(
     getProgramAvatarSrc("faculty-economics--program-economics"),
@@ -100,13 +113,7 @@ test("mapped program avatars render as clean edge-to-edge image tiles", () => {
 });
 
 test("program avatar placements do not add blue frame wrappers", () => {
-  const profileSources = [
-    "src/components/profile/profile-edit-form.tsx",
-    "src/components/profile/my-profile-dashboard.tsx",
-    "src/components/profile/full-student-profile.tsx",
-  ];
-
-  for (const sourcePath of profileSources) {
+  for (const sourcePath of systemAvatarPlacementSources) {
     const source = readFileSync(join(repoRoot, sourcePath), "utf8");
 
     assert.doesNotMatch(
@@ -118,6 +125,29 @@ test("program avatar placements do not add blue frame wrappers", () => {
       source,
       /w-fit overflow-hidden rounded-\[1\.25rem\] border border-blue-100 bg-white/,
       `${sourcePath} should let SystemAvatar own the visible crop`,
+    );
+    assert.doesNotMatch(
+      source,
+      /className="[^"]*border-blue-100[^"]*bg-blue-50[^"]*"[\s\S]{0,300}<SystemAvatar/,
+      `${sourcePath} should not add a visible blue bordered avatar wrapper`,
+    );
+  }
+});
+
+test("Discover and Saved avatar links stay visually neutral", () => {
+  const framedLinkPattern =
+    /className="[^"]*(?:overflow-hidden|border-blue-100|bg-blue-50)[^"]*"[\s\S]{0,300}<SystemAvatar/;
+
+  for (const sourcePath of [
+    "src/components/matching/discovery-card.tsx",
+    "src/components/matching/saved-profile-card.tsx",
+  ]) {
+    const source = readFileSync(join(repoRoot, sourcePath), "utf8");
+
+    assert.doesNotMatch(
+      source,
+      framedLinkPattern,
+      `${sourcePath} should keep clickable avatar wrappers visually neutral`,
     );
   }
 });

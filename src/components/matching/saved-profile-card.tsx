@@ -135,7 +135,7 @@ export function SavedProfileCard({
       <header className="grid gap-5 pr-11 md:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13rem_minmax(0,1fr)]">
         <Link
           aria-label={`Open ${profile.fullName}'s profile`}
-          className="block overflow-hidden rounded-lg border border-blue-100 bg-blue-50 transition hover:border-blue-300"
+          className="block rounded-[1.25rem] outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           href={`/profiles/${profile.userId}?from=saved`}
         >
           <SystemAvatar
