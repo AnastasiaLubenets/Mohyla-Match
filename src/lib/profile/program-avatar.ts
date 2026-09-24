@@ -1,15 +1,15 @@
 export const systemAvatarSizeClasses = {
-  sm: "h-14 w-14 text-lg",
-  md: "h-24 w-24 text-3xl",
-  lg: "h-32 w-32 text-4xl",
-  xl: "h-52 w-full text-5xl sm:w-52",
-  discover: "h-48 w-full text-5xl sm:h-56",
+  sm: "w-14 text-lg",
+  md: "w-24 text-3xl",
+  lg: "w-32 text-4xl",
+  xl: "w-full text-5xl sm:w-52",
+  discover: "w-full text-5xl",
 } as const;
 
 export type SystemAvatarSize = keyof typeof systemAvatarSizeClasses;
 
 export const programAvatarContainerClasses =
-  "relative isolate shrink-0 overflow-hidden rounded-[1.25rem] p-0";
+  "relative isolate aspect-square shrink-0 overflow-hidden rounded-[1.25rem] p-0";
 
 export const programAvatarImageClasses = "h-full w-full object-cover";
 

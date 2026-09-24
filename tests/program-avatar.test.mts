@@ -93,12 +93,51 @@ test("all current SystemAvatar sizes remain defined", () => {
   ]);
 
   for (const className of Object.values(systemAvatarSizeClasses)) {
-    assert.match(className, /\bh-/);
     assert.match(className, /\bw-/);
+    assert.doesNotMatch(className, /\b(?:h|min-h|max-h)-/);
   }
 });
 
+test("every SystemAvatar size variant preserves a 1:1 aspect ratio", () => {
+  assert.match(programAvatarContainerClasses, /\baspect-square\b/);
+
+  for (const [size, className] of Object.entries(systemAvatarSizeClasses)) {
+    assert.match(
+      className,
+      /\bw-/,
+      `${size} should define the avatar scale through width`,
+    );
+    assert.doesNotMatch(
+      className,
+      /\b(?:h|min-h|max-h)-/,
+      `${size} should not define an independent height`,
+    );
+    assert.doesNotMatch(
+      className,
+      /\b(?:aspect-\S+)/,
+      `${size} should inherit the shared aspect-square rule`,
+    );
+  }
+
+  const systemAvatarSource = readFileSync(
+    join(repoRoot, "src/components/profile/system-avatar.tsx"),
+    "utf8",
+  );
+
+  assert.match(
+    systemAvatarSource,
+    /programAvatarContainerClasses/,
+    "mapped artwork should use the shared square avatar container",
+  );
+  assert.match(
+    systemAvatarSource,
+    /flex aspect-square shrink-0/,
+    "fallback initials avatar should also stay square",
+  );
+});
+
 test("mapped program avatars render as clean edge-to-edge image tiles", () => {
+  assert.match(programAvatarContainerClasses, /\baspect-square\b/);
   assert.match(programAvatarContainerClasses, /\boverflow-hidden\b/);
   assert.ok(
     programAvatarContainerClasses.split(/\s+/).includes("rounded-[1.25rem]"),
