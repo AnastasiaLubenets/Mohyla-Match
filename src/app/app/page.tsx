@@ -397,7 +397,7 @@ export default async function AppPage({ searchParams }: PageProps) {
         <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">
           <TopBar currentProfile={currentProfile} filters={filters} />
           <div className="grid gap-6 px-4 py-6 sm:px-6 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1fr)_22rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
-            <section className="scrollbar-hidden min-w-0 xl:-mx-4 xl:min-h-0 xl:overflow-y-auto xl:px-4 xl:pb-16">
+            <section className="scrollbar-hidden min-w-0 xl:-mx-14 xl:min-h-0 xl:overflow-y-auto xl:px-14 xl:pb-28">
               <Hero />
               <DiscoveryFeed
                 candidates={filteredCandidates}
