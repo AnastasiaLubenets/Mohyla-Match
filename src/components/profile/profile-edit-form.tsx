@@ -217,15 +217,13 @@ export function ProfileEditForm({
 
       <section className="rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
         <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)]">
-          <div className="overflow-hidden rounded-lg border border-blue-100 bg-blue-50">
-            <SystemAvatar
-              availability={data.profile.availability}
-              avatarVariantKey={selectedProgram?.avatar_variant_key}
-              fullName={data.profile.full_name}
-              size="xl"
-              systemAvatarKey={data.profile.system_avatar_key}
-            />
-          </div>
+          <SystemAvatar
+            availability={data.profile.availability}
+            avatarVariantKey={selectedProgram?.avatar_variant_key}
+            fullName={data.profile.full_name}
+            size="xl"
+            systemAvatarKey={data.profile.system_avatar_key}
+          />
 
           <div className="grid gap-4 lg:grid-cols-3">
             <label className="block">

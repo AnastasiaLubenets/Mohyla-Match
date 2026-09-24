@@ -242,16 +242,14 @@ export function FullStudentProfile({
         </div>
 
         <div className="grid gap-6 pr-0 md:grid-cols-[14rem_minmax(0,1fr)] md:pr-24 xl:grid-cols-[15rem_minmax(0,1fr)]">
-          <div className="overflow-hidden rounded-lg border border-blue-100 bg-blue-50">
-            <SystemAvatar
-              availability={profile.availability}
-              facultyName={profile.facultyName}
-              fullName={profile.fullName}
-              programName={profile.academicProgramName}
-              size="discover"
-              systemAvatarKey={profile.systemAvatarKey}
-            />
-          </div>
+          <SystemAvatar
+            availability={profile.availability}
+            facultyName={profile.facultyName}
+            fullName={profile.fullName}
+            programName={profile.academicProgramName}
+            size="discover"
+            systemAvatarKey={profile.systemAvatarKey}
+          />
 
           <div className="min-w-0">
             <h2 className="font-serif text-5xl font-semibold leading-none text-blue-950">
