@@ -105,6 +105,31 @@ test("fixed app shell keeps fixed rails and top bar behavior", async () => {
   assert.match(discoverPage, /xl:h-screen xl:overflow-hidden/);
 });
 
+test("sidebar building artwork is full bleed outside padded branding text", async () => {
+  const chrome = await readRepoFile("src/components/matching/app-chrome.tsx");
+
+  assertHasClassLine(
+    chrome,
+    ["mb-5", "-mx-5", "min-h-0", "2xl:mb-7"],
+    "Sidebar building artwork should compensate for desktop sidebar padding.",
+  );
+  assertHasClassLine(
+    chrome,
+    ["h-auto", "w-full", "max-w-none", "object-contain", "object-left-bottom"],
+    "Sidebar building artwork should use full available width without a poster max-width.",
+  );
+  assert.match(
+    chrome,
+    /<SidebarBuildingArt \/>\s*<div className="px-3">/,
+    "Sidebar building artwork should be separated from the padded branding text wrapper.",
+  );
+  assert.doesNotMatch(
+    chrome,
+    /<div className="mb-5 px-3 pb-2[^"]*">\s*<SidebarBuildingArt \/>/,
+    "Sidebar building artwork should not live inside the padded branding wrapper.",
+  );
+});
+
 test("own profile reads the current authenticated user's email dynamically", async () => {
   const [profilePage, dashboard] = await Promise.all([
     readRepoFile("src/app/profile/page.tsx"),
