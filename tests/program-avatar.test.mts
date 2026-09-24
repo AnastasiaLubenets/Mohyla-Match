@@ -4,11 +4,13 @@ import { join } from "node:path";
 import test from "node:test";
 
 import {
+  getProgramAvatarContainerClasses,
   getMappedProgramAvatarKey,
   getProgramAvatarSrc,
   mappedProgramAvatarKeys,
   programAvatarContainerClasses,
   programAvatarImageClasses,
+  systemAvatarRadiusClasses,
   systemAvatarSizeClasses,
 } from "../src/lib/profile/program-avatar.ts";
 
@@ -126,7 +128,7 @@ test("every SystemAvatar size variant preserves a 1:1 aspect ratio", () => {
 
   assert.match(
     systemAvatarSource,
-    /programAvatarContainerClasses/,
+    /getProgramAvatarContainerClasses/,
     "mapped artwork should use the shared square avatar container",
   );
   assert.match(
@@ -149,6 +151,51 @@ test("mapped program avatars render as clean edge-to-edge image tiles", () => {
   assert.match(programAvatarImageClasses, /\bh-full\b/);
   assert.match(programAvatarImageClasses, /\bw-full\b/);
   assert.match(programAvatarImageClasses, /\bobject-cover\b/);
+});
+
+test("top-right account avatar can use a smaller radius without changing defaults", () => {
+  assert.equal(systemAvatarRadiusClasses.default, "rounded-[1.25rem]");
+  assert.equal(systemAvatarRadiusClasses.topbar, "rounded-xl");
+  assert.ok(
+    getProgramAvatarContainerClasses()
+      .split(/\s+/)
+      .includes("rounded-[1.25rem]"),
+  );
+  assert.ok(
+    !getProgramAvatarContainerClasses().split(/\s+/).includes("rounded-xl"),
+  );
+  assert.ok(
+    getProgramAvatarContainerClasses("topbar")
+      .split(/\s+/)
+      .includes("rounded-xl"),
+  );
+  assert.ok(
+    !getProgramAvatarContainerClasses("topbar")
+      .split(/\s+/)
+      .includes("rounded-[1.25rem]"),
+  );
+
+  const appChromeSource = readFileSync(
+    join(repoRoot, "src/components/matching/app-chrome.tsx"),
+    "utf8",
+  );
+  assert.match(
+    appChromeSource,
+    /<SystemAvatar[\s\S]*?radius="topbar"[\s\S]*?size="sm"/,
+    "AppTopBar should be the compact account avatar placement",
+  );
+
+  for (const sourcePath of systemAvatarPlacementSources.filter(
+    (sourcePath) => sourcePath !== "src/components/matching/app-chrome.tsx",
+  )) {
+    const source = readFileSync(join(repoRoot, sourcePath), "utf8");
+
+    assert.doesNotMatch(
+      source,
+      /radius="topbar"/,
+      `${sourcePath} should keep the default SystemAvatar radius`,
+    );
+  }
 });
 
 test("program avatar placements do not add blue frame wrappers", () => {

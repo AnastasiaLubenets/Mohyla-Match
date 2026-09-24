@@ -1,10 +1,12 @@
 import Image from "next/image";
 
 import {
+  getProgramAvatarContainerClasses,
   getProgramAvatarSrc,
-  programAvatarContainerClasses,
   programAvatarImageClasses,
+  systemAvatarRadiusClasses,
   systemAvatarSizeClasses,
+  type SystemAvatarRadius,
   type SystemAvatarSize,
 } from "@/lib/profile/program-avatar";
 
@@ -14,6 +16,7 @@ type SystemAvatarProps = Readonly<{
   facultyName?: string | null;
   fullName: string;
   programName?: string | null;
+  radius?: SystemAvatarRadius;
   size?: SystemAvatarSize;
   systemAvatarKey: string;
 }>;
@@ -51,6 +54,7 @@ export function SystemAvatar({
   facultyName,
   fullName,
   programName,
+  radius = "default",
   size = "md",
   systemAvatarKey,
 }: SystemAvatarProps) {
@@ -60,7 +64,7 @@ export function SystemAvatar({
     return (
       <div
         aria-label={`${fullName} system avatar`}
-        className={`${programAvatarContainerClasses} ${systemAvatarSizeClasses[size]}`}
+        className={`${getProgramAvatarContainerClasses(radius)} ${systemAvatarSizeClasses[size]}`}
       >
         <Image
           alt=""
@@ -91,11 +95,13 @@ export function SystemAvatar({
   );
   const palette = palettes[hash % palettes.length];
   const rotation = (hash % 32) - 16;
+  const fallbackRadiusClass =
+    radius === "topbar" ? systemAvatarRadiusClasses.topbar : "rounded-lg";
 
   return (
     <div
       aria-label={`${fullName} system avatar`}
-      className={`relative isolate flex aspect-square shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border font-semibold shadow-sm ${systemAvatarSizeClasses[size]}`}
+      className={`relative isolate flex aspect-square shrink-0 items-center justify-center overflow-hidden ${fallbackRadiusClass} border border-border font-semibold shadow-sm ${systemAvatarSizeClasses[size]}`}
       style={{
         background: palette.background,
         color: palette.foreground,
