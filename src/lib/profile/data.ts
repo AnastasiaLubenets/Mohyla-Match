@@ -45,6 +45,17 @@ export type SafeProfile = Readonly<{
   yearOfStudy: number;
 }>;
 
+export type ProfileChromeSummary = Readonly<
+  Pick<
+    SafeProfile,
+    | "academicProgramName"
+    | "availability"
+    | "facultyName"
+    | "fullName"
+    | "systemAvatarKey"
+  >
+>;
+
 export type EditProfileData = Readonly<{
   collaborationGoals: NamedOption[];
   faculties: FacultyOption[];
@@ -243,6 +254,65 @@ export async function loadSafeProfile(
         skillNames.namesById,
       ),
       yearOfStudy: profile.year_of_study,
+    },
+    error: false,
+  };
+}
+
+export async function loadProfileChromeSummary(
+  supabase: SupabaseServerClient,
+  userId: string,
+): Promise<LoadResult<ProfileChromeSummary>> {
+  const profileResult = await supabase
+    .from("profiles")
+    .select(
+      "full_name,faculty_id,academic_program_id,availability,system_avatar_key",
+    )
+    .eq("user_id", userId)
+    .eq("profile_status", "active")
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (profileResult.error) {
+    return { data: null, error: true };
+  }
+
+  const profile = profileResult.data;
+  if (!profile) {
+    return { data: null, error: false };
+  }
+
+  const [facultyResult, programResult] = await Promise.all([
+    supabase
+      .from("faculties")
+      .select("display_name")
+      .eq("id", profile.faculty_id)
+      .eq("is_active", true)
+      .maybeSingle(),
+    supabase
+      .from("academic_programs")
+      .select("display_name")
+      .eq("id", profile.academic_program_id)
+      .eq("faculty_id", profile.faculty_id)
+      .eq("is_active", true)
+      .maybeSingle(),
+  ]);
+
+  if (facultyResult.error || programResult.error) {
+    return { data: null, error: true };
+  }
+
+  if (!facultyResult.data || !programResult.data) {
+    return { data: null, error: false };
+  }
+
+  return {
+    data: {
+      academicProgramName: programResult.data.display_name,
+      availability: profile.availability,
+      facultyName: facultyResult.data.display_name,
+      fullName: profile.full_name,
+      systemAvatarKey: profile.system_avatar_key,
     },
     error: false,
   };

@@ -4,7 +4,7 @@ import { AppChrome, BrandQuoteCard } from "@/components/matching/app-chrome";
 import { SavedProfileCard } from "@/components/matching/saved-profile-card";
 import { requireAccountState } from "@/lib/auth/guards";
 import { loadSavedProfiles } from "@/lib/matching/data";
-import { loadSafeProfile } from "@/lib/profile/data";
+import { loadProfileChromeSummary } from "@/lib/profile/data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -116,7 +116,7 @@ export default async function SavedPage({ searchParams }: PageProps) {
   const [savedResult, currentProfileResult] = await Promise.all([
     loadSavedProfiles(supabase, 50),
     accountState.userId
-      ? loadSafeProfile(supabase, accountState.userId)
+      ? loadProfileChromeSummary(supabase, accountState.userId)
       : Promise.resolve({ data: null, error: false }),
   ]);
   const currentProfile = currentProfileResult.error

@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { NextRequest, NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 import { readRequiredFormString, redirectTo } from "@/lib/auth/http";
 import {
@@ -26,6 +26,14 @@ type MatchingActionContext =
       supabase: SupabaseClient<Database>;
     };
 
+function wantsJson(request: NextRequest) {
+  return request.headers.get("accept")?.includes("application/json") ?? false;
+}
+
+function actionError(message: string, status = 400) {
+  return NextResponse.json({ error: message, ok: false }, { status });
+}
+
 async function requireActiveMatchingAction(
   request: NextRequest,
   requestedPath: string,
@@ -34,6 +42,22 @@ async function requireActiveMatchingAction(
   const accountState = await getCurrentAccountState(supabase);
 
   if (accountState.state !== "active") {
+    if (wantsJson(request)) {
+      return {
+        response: NextResponse.json(
+          {
+            error: "Sign in with an active profile to continue.",
+            ok: false,
+            redirectTo: destinationForAccountState(
+              accountState.state,
+              requestedPath,
+            ),
+          },
+          { status: 401 },
+        ),
+      };
+    }
+
     return {
       response: redirectTo(
         request,
@@ -78,6 +102,10 @@ export async function performDiscoveryAction(
   const requestedAction = readRequiredFormString(formData, "action");
 
   if (!targetUserId || !isDiscoveryAction(requestedAction)) {
+    if (wantsJson(request)) {
+      return actionError("We could not save that discovery action. Try again.");
+    }
+
     return redirectTo(request, errorPath(returnPath, "action-failed"));
   }
 
@@ -87,11 +115,24 @@ export async function performDiscoveryAction(
   });
 
   if (result.error) {
+    if (wantsJson(request)) {
+      return actionError("We could not save that discovery action. Try again.", 500);
+    }
+
     return redirectTo(request, errorPath(returnPath, "action-failed"));
   }
 
   const actionResult = result.data?.[0];
   const status = actionStatus(requestedAction, Boolean(actionResult?.matched));
+
+  if (wantsJson(request)) {
+    return NextResponse.json({
+      action: requestedAction,
+      matched: Boolean(actionResult?.matched),
+      ok: true,
+      status,
+    });
+  }
 
   return redirectTo(request, statusPath(returnPath, status));
 }
@@ -128,6 +169,10 @@ export async function performSavedProfileAction(
   const intent = readRequiredFormString(formData, "intent");
 
   if (!targetUserId || (intent !== "save" && intent !== "remove")) {
+    if (wantsJson(request)) {
+      return actionError("We could not update Saved. Try again.");
+    }
+
     return redirectTo(request, errorPath(returnPath, "save-failed"));
   }
 
@@ -137,7 +182,19 @@ export async function performSavedProfileAction(
   });
 
   if (result.error) {
+    if (wantsJson(request)) {
+      return actionError("We could not update Saved. Try again.", 500);
+    }
+
     return redirectTo(request, errorPath(returnPath, "save-failed"));
+  }
+
+  if (wantsJson(request)) {
+    return NextResponse.json({
+      ok: true,
+      saved: intent === "save",
+      status: intent === "save" ? "saved" : "unsaved",
+    });
   }
 
   return redirectTo(

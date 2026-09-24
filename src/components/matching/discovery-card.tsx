@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { AuthSubmitButton } from "@/components/auth-submit-button";
 import { ContactReveal } from "@/components/matching/contact-reveal";
+import { DiscoveryActionButton } from "@/components/matching/discovery-action-button";
 import { SaveProfileButton } from "@/components/matching/save-profile-button";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import { TaxonomyChipList } from "@/components/matching/taxonomy-chip-list";
@@ -43,37 +43,6 @@ function StatusMessage({
   }
 
   return null;
-}
-
-function DiscoveryActionForm({
-  action,
-  children,
-  className,
-  pendingLabel,
-  targetUserId,
-}: Readonly<{
-  action: "skip";
-  children: ReactNode;
-  className?: string;
-  pendingLabel: string;
-  targetUserId: string;
-}>) {
-  return (
-    <form action="/app/action" method="post">
-      <input name="targetUserId" type="hidden" value={targetUserId} />
-      <input name="action" type="hidden" value={action} />
-      <input name="returnTo" type="hidden" value="/app" />
-      <AuthSubmitButton
-        className={
-          className ??
-          "inline-flex h-12 w-full items-center justify-center rounded-full border border-border px-5 text-sm font-semibold text-foreground transition hover:border-primary disabled:cursor-not-allowed disabled:opacity-70"
-        }
-        pendingLabel={pendingLabel}
-      >
-        {children}
-      </AuthSubmitButton>
-    </form>
-  );
 }
 
 function SectionIcon({
@@ -334,7 +303,7 @@ export function DiscoveryCard({
             targetUserId={candidate.userId}
           />
           <div className="flex justify-center sm:col-start-3 sm:justify-end">
-            <DiscoveryActionForm
+            <DiscoveryActionButton
               action="skip"
               className="inline-flex h-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
               pendingLabel="Skipping..."
@@ -342,7 +311,7 @@ export function DiscoveryCard({
             >
               <span>Skip</span>
               <ArrowRightIcon />
-            </DiscoveryActionForm>
+            </DiscoveryActionButton>
           </div>
         </footer>
       </article>

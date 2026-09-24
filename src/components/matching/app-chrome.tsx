@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { SystemAvatar } from "@/components/profile/system-avatar";
-import type { SafeProfile } from "@/lib/profile/data";
+import type { ProfileChromeSummary } from "@/lib/profile/data";
 
 export type NavKey = "discover" | "profile" | "saved";
 
@@ -23,7 +23,7 @@ const sidebarBuilding = {
 type AppChromeProps = Readonly<{
   active: NavKey;
   children: ReactNode;
-  currentProfile: SafeProfile | null;
+  currentProfile: ProfileChromeSummary | null;
 }>;
 
 type SidebarLinkProps = Readonly<{
@@ -208,7 +208,7 @@ export function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
 
 function AppTopBar({
   currentProfile,
-}: Readonly<{ currentProfile: SafeProfile | null }>) {
+}: Readonly<{ currentProfile: ProfileChromeSummary | null }>) {
   return (
     <header className="z-30 shrink-0 border-b border-blue-100 bg-white/80 px-4 py-3 backdrop-blur sm:px-6 xl:px-8">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
