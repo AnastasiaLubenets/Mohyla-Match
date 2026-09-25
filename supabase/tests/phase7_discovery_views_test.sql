@@ -1,6 +1,6 @@
 begin;
 
-select plan(12);
+select plan(17);
 
 insert into public.faculties (slug, display_name, avatar_theme_key, sort_order)
 values ('phase7-discovery-faculty', 'Phase 7 Discovery Faculty', 'phase7', 997)
@@ -147,17 +147,50 @@ set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000001201', true);
 
 select results_eq(
-  $$ select action::text
-     from public.set_discovery_action('00000000-0000-4000-8000-000000001202', 'skip') $$,
-  $$ values ('skip'::text) $$,
-  'viewer can skip a recommended profile'
+  $$ select user_id
+     from public.get_discovery_candidates(20)
+     where user_id = '00000000-0000-4000-8000-000000001202' $$,
+  $$ values ('00000000-0000-4000-8000-000000001202'::uuid) $$,
+  'recommended candidate appears in recommended discovery before actions'
+);
+
+select results_eq(
+  $$ select user_id
+     from public.get_all_discovery_profiles(500)
+     where user_id = '00000000-0000-4000-8000-000000001202' $$,
+  $$ values ('00000000-0000-4000-8000-000000001202'::uuid) $$,
+  'recommended candidate also appears in all students before actions'
+);
+
+select is_empty(
+  $$ select user_id
+     from public.get_discovery_candidates(20)
+     except
+     select user_id
+     from public.get_all_discovery_profiles(500) $$,
+  'recommended discovery ids are a subset of all students ids'
+);
+
+select results_eq(
+  $$ select saved, action::text
+     from public.set_saved_profile('00000000-0000-4000-8000-000000001202', true) $$,
+  $$ values (true, 'save'::text) $$,
+  'viewer can save a recommended profile'
+);
+
+select results_eq(
+  $$ select user_id
+     from public.get_all_discovery_profiles(500)
+     where user_id = '00000000-0000-4000-8000-000000001202' $$,
+  $$ values ('00000000-0000-4000-8000-000000001202'::uuid) $$,
+  'saved recommended profile remains visible in all students'
 );
 
 select results_eq(
   $$ select action::text
-     from public.set_discovery_action('00000000-0000-4000-8000-000000001205', 'save') $$,
-  $$ values ('save'::text) $$,
-  'viewer can save a directory profile'
+     from public.set_discovery_action('00000000-0000-4000-8000-000000001202', 'skip') $$,
+  $$ values ('skip'::text) $$,
+  'viewer can skip the same recommended profile'
 );
 
 select is_empty(
@@ -169,23 +202,28 @@ select is_empty(
 
 select results_eq(
   $$ select user_id
-     from public.get_all_discovery_profiles(20)
+     from public.get_all_discovery_profiles(500)
      where user_id = '00000000-0000-4000-8000-000000001202' $$,
   $$ values ('00000000-0000-4000-8000-000000001202'::uuid) $$,
   'skipped profile remains visible in all students'
 );
 
 select results_eq(
-  $$ select user_id
-     from public.get_all_discovery_profiles(20)
-     where user_id = '00000000-0000-4000-8000-000000001205' $$,
-  $$ values ('00000000-0000-4000-8000-000000001205'::uuid) $$,
-  'saved profile remains visible in all students'
+  $$ select public.block_user('00000000-0000-4000-8000-000000001202') $$,
+  $$ values (true) $$,
+  'viewer can block the same skipped profile'
 );
 
 select is_empty(
   $$ select user_id
-     from public.get_all_discovery_profiles(20)
+     from public.get_all_discovery_profiles(500)
+     where user_id = '00000000-0000-4000-8000-000000001202' $$,
+  'blocked profile disappears from all students'
+);
+
+select is_empty(
+  $$ select user_id
+     from public.get_all_discovery_profiles(500)
      where user_id in (
        '00000000-0000-4000-8000-000000001203',
        '00000000-0000-4000-8000-000000001204'
@@ -205,7 +243,7 @@ select is_empty(
 
 select is_empty(
   $$ select user_id
-     from public.get_all_discovery_profiles(20)
+     from public.get_all_discovery_profiles(500)
      where user_id = '00000000-0000-4000-8000-000000001201' $$,
   'current user never appears in all students'
 );
@@ -213,7 +251,7 @@ select is_empty(
 select is(
   (
     select coalesce(bool_or(row_to_json(profile_row)::text like '%@example.test%'), false)
-    from public.get_all_discovery_profiles(20) profile_row
+    from public.get_all_discovery_profiles(500) profile_row
   ),
   false,
   'all students RPC does not leak auth email'
