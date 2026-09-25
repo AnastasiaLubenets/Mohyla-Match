@@ -89,3 +89,63 @@ test("all students uses the compact directory list instead of discovery cards", 
     "the compact directory should not expose raw email links",
   );
 });
+
+test("tab feed load failures stay inside the results block", () => {
+  const appPageSource = readFileSync(
+    join(repoRoot, "src/app/app/page.tsx"),
+    "utf8",
+  );
+  const allStudentsListSource = readFileSync(
+    join(repoRoot, "src/components/matching/all-students-list.tsx"),
+    "utf8",
+  );
+
+  assert.doesNotMatch(
+    appPageSource,
+    /Discovery unavailable/,
+    "a feed load failure must not replace the full Discover shell",
+  );
+  assert.doesNotMatch(
+    appPageSource,
+    /if\s*\(\s*candidatesResult\.error\s*\)\s*{\s*return\s*\(/,
+    "candidate loader errors should not use a page-level early return",
+  );
+  assert.match(
+    appPageSource,
+    /<AllStudentsList[\s\S]*?loadError=\{candidatesResult\.error\}/,
+    "all-students loader errors should be passed to the result block",
+  );
+  assert.match(
+    appPageSource,
+    /<DiscoveryFeed[\s\S]*?loadError=\{candidatesResult\.error\}/,
+    "recommended loader errors should be passed to the result block",
+  );
+  assert.match(
+    allStudentsListSource,
+    /Could not load students\. Try again\./,
+    "all-students failures should show the requested inline error",
+  );
+});
+
+test("all students loader calls the production RPC with an explicit limit", () => {
+  const matchingDataSource = readFileSync(
+    join(repoRoot, "src/lib/matching/data.ts"),
+    "utf8",
+  );
+
+  assert.match(
+    matchingDataSource,
+    /loadAllDiscoveryProfiles\([\s\S]*?limit = 500/,
+    "the all-students loader should default to the RPC's production-safe cap",
+  );
+  assert.match(
+    matchingDataSource,
+    /rpc\("get_all_discovery_profiles",\s*{\s*profile_limit: limit,\s*}\)/,
+    "the all-students RPC should not depend on a no-argument call path",
+  );
+  assert.doesNotMatch(
+    matchingDataSource,
+    /get_all_discovery_profiles",\s*{}\)/,
+    "the all-students RPC should never be called with an empty args object",
+  );
+});

@@ -339,6 +339,7 @@ function DiscoveryViewTabs({
               }
               href={discoveryViewHref(params, tab.view)}
               key={tab.view}
+              scroll={false}
             >
               {tab.label}
             </Link>
@@ -355,6 +356,7 @@ function DiscoveryFeed({
   emptyDescription,
   emptyTitle,
   error,
+  loadError,
   returnTo,
   savedProfileIds,
   showProfileAction,
@@ -366,12 +368,26 @@ function DiscoveryFeed({
   emptyDescription?: string;
   emptyTitle?: string;
   error?: string;
+  loadError?: boolean;
   returnTo: string;
   savedProfileIds: ReadonlySet<string>;
   showProfileAction?: boolean;
   showSkip?: boolean;
   status?: string;
 }>) {
+  if (loadError) {
+    return (
+      <DiscoveryCard
+        candidate={null}
+        emptyDescription="Try again in a moment."
+        emptyTitle="Could not load recommendations."
+        error={error}
+        showProfileAction={false}
+        status={status}
+      />
+    );
+  }
+
   if (candidates.length === 0) {
     return (
       <DiscoveryCard
@@ -435,37 +451,9 @@ export default async function AppPage({ searchParams }: PageProps) {
       : (savedProfilesResult.data ?? []).map((profile) => profile.userId),
   );
 
-  if (candidatesResult.error) {
-    return (
-      <main className="min-h-screen bg-[#eef6fb] text-blue-950 xl:h-screen xl:overflow-hidden">
-        <div className="grid min-h-screen xl:h-screen xl:min-h-0 xl:grid-cols-[18rem_minmax(0,1fr)]">
-          <AppSidebar active="discover" />
-          <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">
-            <TopBar
-              currentProfile={currentProfile}
-              filters={filters}
-              view={view}
-            />
-            <section className="scrollbar-hidden px-4 py-8 sm:px-6 xl:min-h-0 xl:flex-1 xl:overflow-y-auto xl:px-8">
-              <div className="mx-auto max-w-4xl rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
-                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
-                  Discover
-                </p>
-                <h1 className="mt-4 font-serif text-4xl font-semibold text-blue-950">
-                  Discovery unavailable
-                </h1>
-                <p className="mt-3 leading-7 text-slate-600">
-                  We could not load discovery profiles. Try again in a moment.
-                </p>
-              </div>
-            </section>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  const allCandidates = candidatesResult.data ?? [];
+  const allCandidates = candidatesResult.error
+    ? []
+    : (candidatesResult.data ?? []);
   const filteredCandidates = filterDiscoveryCandidates(allCandidates, filters);
   const activeFilters = hasActiveDiscoveryFilters(filters);
   const options = buildDiscoveryFilterOptions(allCandidates);
@@ -474,6 +462,7 @@ export default async function AppPage({ searchParams }: PageProps) {
     <Link
       className="inline-flex h-12 items-center justify-center rounded-md bg-blue-800 px-5 text-sm font-bold text-white transition hover:bg-blue-900"
       href={discoveryViewHref(params, "all")}
+      scroll={false}
     >
       Browse all students
     </Link>
@@ -494,6 +483,7 @@ export default async function AppPage({ searchParams }: PageProps) {
                   candidates={filteredCandidates}
                   error={firstParam(params.error)}
                   hasActiveFilters={activeFilters}
+                  loadError={candidatesResult.error}
                   returnTo={returnTo}
                   savedProfileIds={savedProfileIds}
                   status={firstParam(params.status)}
@@ -506,6 +496,7 @@ export default async function AppPage({ searchParams }: PageProps) {
                   emptyDescription="No more recommendations right now. You can still browse all students."
                   emptyTitle="No more recommendations right now."
                   error={firstParam(params.error)}
+                  loadError={candidatesResult.error}
                   returnTo={returnTo}
                   savedProfileIds={savedProfileIds}
                   showProfileAction={false}

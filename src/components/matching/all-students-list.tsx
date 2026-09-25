@@ -88,6 +88,19 @@ function AllStudentsEmptyState({
   );
 }
 
+function AllStudentsLoadError() {
+  return (
+    <section className="rounded-lg border border-red-200 bg-red-50 p-6 sm:p-8">
+      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-red-700">
+        All students
+      </p>
+      <h2 className="mt-4 font-serif text-4xl font-semibold leading-tight text-red-950">
+        Could not load students. Try again.
+      </h2>
+    </section>
+  );
+}
+
 function AllStudentRow({
   candidate,
   returnTo,
@@ -175,6 +188,7 @@ export function AllStudentsList({
   candidates,
   error,
   hasActiveFilters,
+  loadError,
   returnTo,
   savedProfileIds,
   status,
@@ -183,6 +197,7 @@ export function AllStudentsList({
   candidates: readonly DiscoveryCandidate[];
   error?: string;
   hasActiveFilters: boolean;
+  loadError?: boolean;
   returnTo: string;
   savedProfileIds: ReadonlySet<string>;
   status?: string;
@@ -194,7 +209,9 @@ export function AllStudentsList({
         All students directory
       </h2>
       <AllStudentsStatusMessage error={error} status={status} />
-      {candidates.length === 0 ? (
+      {loadError ? (
+        <AllStudentsLoadError />
+      ) : candidates.length === 0 ? (
         <AllStudentsEmptyState
           hasActiveFilters={hasActiveFilters}
           totalCount={totalCount}
