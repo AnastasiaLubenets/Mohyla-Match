@@ -197,11 +197,11 @@ function mapDiscoveryCandidate(
 
 export async function loadAllDiscoveryProfiles(
   supabase: SupabaseServerClient,
-  limit?: number,
+  limit = 500,
 ): Promise<LoadResult<DiscoveryCandidate[]>> {
-  const args =
-    typeof limit === "number" ? { profile_limit: limit } : {};
-  const result = await supabase.rpc("get_all_discovery_profiles", args);
+  const result = await supabase.rpc("get_all_discovery_profiles", {
+    profile_limit: limit,
+  });
 
   if (result.error) {
     return { data: null, error: true };

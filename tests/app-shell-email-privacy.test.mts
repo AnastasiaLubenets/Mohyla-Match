@@ -52,13 +52,13 @@ test("authenticated app center scroll containers keep overflow-y auto with hidde
 
   assertHasClassLine(
     discoverPage,
-    ["scrollbar-hidden", "xl:overflow-y-auto", "xl:flex-1"],
-    "/app error state center container should remain scrollable.",
-  );
-  assertHasClassLine(
-    discoverPage,
     ["scrollbar-hidden", "min-w-0", "xl:min-h-0", "xl:overflow-y-auto"],
     "/app feed center container should hide the visual scrollbar without a shadow compensation gutter.",
+  );
+  assert.doesNotMatch(
+    discoverPage,
+    /Discovery unavailable/,
+    "/app should not replace the Discover shell with a page-level data error state.",
   );
   assert.doesNotMatch(discoverPage, /xl:-(?:mx-14)|xl:px-14|xl:pb-28/);
   assertHasClassLine(
