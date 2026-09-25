@@ -1,6 +1,17 @@
 import Link from "next/link";
 
+import { AuthField, AuthMessage } from "@/components/auth/auth-field";
+import { AuthPageShell } from "@/components/auth/auth-page-shell";
 import { AuthSubmitButton } from "@/components/auth-submit-button";
+import { PasswordField } from "@/components/auth/password-field";
+import {
+  ArrowRightIcon,
+  BarChartIcon,
+  BoltIcon,
+  LockIcon,
+  MailIcon,
+  UsersIcon,
+} from "@/components/public/public-icons";
 import { sanitizeNextPath } from "@/lib/auth/routing";
 
 export const metadata = {
@@ -19,7 +30,15 @@ function readParam(
   return typeof value === "string" ? value : null;
 }
 
-function loginMessage(error: string | null, status: string | null) {
+type AuthPageMessage = {
+  tone: "error" | "success";
+  text: string;
+};
+
+function loginMessage(
+  error: string | null,
+  status: string | null,
+): AuthPageMessage | null {
   if (status === "signed-out") {
     return {
       tone: "success",
@@ -57,54 +76,76 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const message = loginMessage(readParam(params, "error"), readParam(params, "status"));
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-5 py-10">
-      <section className="w-full max-w-md rounded-lg border border-border bg-surface p-6 shadow-sm">
-        <Link href="/" className="text-sm font-semibold text-primary">
-          Mohyla Match
-        </Link>
-        <h1 className="mt-8 text-3xl font-semibold">Login</h1>
-        <p className="mt-3 leading-7 text-muted">
-          Corporate email access for verified Mohyla students.
-        </p>
-        {message ? (
-          <p
-            className={`mt-6 rounded-md border px-4 py-3 text-sm ${
-              message.tone === "success"
-                ? "border-primary/30 bg-primary/5 text-primary"
-                : "border-red-200 bg-red-50 text-red-700"
-            }`}
-          >
-            {message.text}
-          </p>
-        ) : null}
-        <form action="/auth/login" className="mt-8 space-y-4" method="post">
+    <AuthPageShell
+      active="login"
+      badgeIcon={<LockIcon className="h-4 w-4" />}
+      benefits={[
+        {
+          description: "Find collaborators",
+          icon: <UsersIcon className="h-5 w-5" />,
+          title: "",
+        },
+        {
+          description: "Return to saved profiles",
+          icon: <BoltIcon className="h-5 w-5" />,
+          title: "",
+        },
+        {
+          description: "Keep building",
+          icon: <BarChartIcon className="h-5 w-5" />,
+          title: "",
+        },
+      ]}
+      subtitle="Log in to reconnect with the Mohyla student network. Find people and keep building together."
+      title="Welcome back"
+    >
+      <section className="mt-7 rounded-[1.35rem] border border-[#dce7f7] bg-white/92 p-5 shadow-[0_18px_50px_rgba(37,76,139,0.11)] backdrop-blur sm:p-7">
+        <form action="/auth/login" className="space-y-5" method="post">
           <input name="next" type="hidden" value={nextPath} />
-          <input
-            autoComplete="email"
-            className="h-12 w-full rounded-md border border-border bg-background px-4 text-base outline-none transition focus:border-primary"
+          <AuthMessage message={message} />
+          <AuthField
+            addon={
+              <span className="hidden rounded-full bg-[#edf4ff] px-3 py-1 text-sm font-bold text-[#174ca7] sm:inline-block">
+                @ukma.edu.ua
+              </span>
+            }
+            helper="Use your NaUKMA student email"
+            icon={<MailIcon className="h-5 w-5" />}
+            inputProps={{
+              autoComplete: "email",
+              name: "email",
+              placeholder: "Student email",
+              required: true,
+            }}
+            label="Student email"
             name="email"
-            required
             type="email"
-            placeholder="student@domain"
           />
-          <input
+          <PasswordField
             autoComplete="current-password"
-            className="h-12 w-full rounded-md border border-border bg-background px-4 text-base outline-none transition focus:border-primary"
-            minLength={6}
+            helper="Enter your password"
+            label="Password"
             name="password"
-            placeholder="Password"
-            required
-            type="password"
           />
-          <AuthSubmitButton pendingLabel="Logging in...">Login</AuthSubmitButton>
+          <AuthSubmitButton
+            className="inline-flex h-16 w-full items-center justify-center gap-4 rounded-full bg-[#3154b8] px-8 text-lg font-bold text-white transition hover:bg-[#27469f] disabled:cursor-not-allowed disabled:opacity-70"
+            pendingLabel="Logging in..."
+          >
+            Login
+            <ArrowRightIcon className="h-6 w-6" />
+          </AuthSubmitButton>
         </form>
-        <p className="mt-6 text-sm text-muted">
-          Need an account?{" "}
-          <Link className="font-semibold text-primary" href="/signup">
-            Join Mohyla Match
-          </Link>
-        </p>
+        <div className="mt-5 flex items-center gap-5 text-sm font-semibold text-[#344268]">
+          <span className="h-px flex-1 bg-[#dce7f7]" />
+          <p>
+            New here?{" "}
+            <Link className="text-[#174ca7] transition hover:text-[#101b55]" href="/signup">
+              Join Mohyla Match
+            </Link>
+          </p>
+          <span className="h-px flex-1 bg-[#dce7f7]" />
+        </div>
       </section>
-    </main>
+    </AuthPageShell>
   );
 }

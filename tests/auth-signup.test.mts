@@ -4,6 +4,9 @@ import test from "node:test";
 import {
   destinationForSignupError,
   destinationForSignupResult,
+  normalizeSignupFullName,
+  signupFullNameMaxLength,
+  signupMetadataForFullName,
 } from "../src/lib/auth/signup.ts";
 
 test("email confirmation disabled redirects signed-in signup sessions to onboarding", () => {
@@ -51,4 +54,13 @@ test("signup error classification keeps existing non-duplicate destinations", ()
     "/signup?error=password",
   );
   assert.equal(destinationForSignupError("Unexpected auth error"), "/signup?error=signup");
+});
+
+test("signup full name metadata is trimmed and bounded", () => {
+  assert.equal(normalizeSignupFullName("  Anastasiia   L.  "), "Anastasiia L.");
+  assert.equal(normalizeSignupFullName("   "), null);
+  assert.equal(normalizeSignupFullName("A".repeat(signupFullNameMaxLength + 1)), null);
+  assert.deepEqual(signupMetadataForFullName("Anastasiia L."), {
+    full_name: "Anastasiia L.",
+  });
 });

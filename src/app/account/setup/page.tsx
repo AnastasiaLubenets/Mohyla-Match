@@ -6,6 +6,7 @@ import { AuthSubmitButton } from "@/components/auth-submit-button";
 import { OnboardingSkillPicker } from "@/components/onboarding-skill-picker";
 import { OnboardingBasicForm } from "@/components/onboarding-basic-form";
 import { destinationForAccountState } from "@/lib/auth/routing";
+import { normalizeSignupFullName } from "@/lib/auth/signup";
 import { getCurrentAccountState } from "@/lib/auth/state";
 import {
   canVisitOnboardingStep,
@@ -286,6 +287,7 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
     profileSkillsResult,
     profileInterestsResult,
     profileGoalsResult,
+    userResult,
   ] = await Promise.all([
     supabase
       .from("faculties")
@@ -336,6 +338,7 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
       .from("profile_collaboration_goals")
       .select("collaboration_goal_id")
       .eq("user_id", accountState.userId),
+    supabase.auth.getUser(),
   ]);
 
   const loadError = [
@@ -367,6 +370,9 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
   }
 
   const profile = (profileResult.data ?? null) as ProfileValue | null;
+  const suggestedFullName = profile
+    ? null
+    : normalizeSignupFullName(userResult.data.user?.user_metadata?.full_name);
   const profileSkills = profileSkillsResult.data ?? [];
   const offerSkillIds = new Set(
     profileSkills
@@ -421,6 +427,7 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
           faculties={(facultiesResult.data ?? []) as FacultyOption[]}
           programs={(programsResult.data ?? []) as ProgramOption[]}
           profile={profile}
+          suggestedFullName={suggestedFullName}
         />
       </>
     );

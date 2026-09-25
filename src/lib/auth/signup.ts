@@ -1,10 +1,32 @@
 import { onboardingPath } from "./routing.ts";
 
+export const signupFullNameMaxLength = 120;
+
 type SignUpResultWithSession = {
   data: {
     session: unknown | null;
   };
 };
+
+export function normalizeSignupFullName(value: unknown): string | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const normalized = value.trim().replace(/\s+/g, " ");
+
+  if (!normalized || normalized.length > signupFullNameMaxLength) {
+    return null;
+  }
+
+  return normalized;
+}
+
+export function signupMetadataForFullName(fullName: string) {
+  return {
+    full_name: fullName,
+  };
+}
 
 export function destinationForSignupResult(
   signUpResult: SignUpResultWithSession,

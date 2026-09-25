@@ -9,17 +9,27 @@ import { getAppUrl } from "@/lib/auth/origin";
 import {
   destinationForSignupError,
   destinationForSignupResult,
+  normalizeSignupFullName,
+  signupMetadataForFullName,
 } from "@/lib/auth/signup";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const email = readRequiredFormString(formData, "email");
+  const fullName = normalizeSignupFullName(formData.get("full_name"));
   const password = readRequiredFormString(formData, "password");
   const passwordConfirmation = readRequiredFormString(
     formData,
     "password_confirmation",
   );
+
+  if (!fullName) {
+    return redirectTo(
+      request,
+      pathWithParams("/signup", { error: "full-name" }),
+    );
+  }
 
   if (!email || !password || !passwordConfirmation) {
     return redirectTo(request, pathWithParams("/signup", { error: "missing" }));
@@ -35,6 +45,7 @@ export async function POST(request: NextRequest) {
     email,
     password,
     options: {
+      data: signupMetadataForFullName(fullName),
       emailRedirectTo: confirmUrl.toString(),
     },
   });
