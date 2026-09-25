@@ -146,31 +146,6 @@ export async function performSavedProfileAction(
   );
 }
 
-export async function blockProfile(request: NextRequest) {
-  const formData = await request.formData();
-  const context = await requireActiveMatchingAction(request, "/app");
-
-  if (context.response) {
-    return context.response;
-  }
-
-  const targetUserId = readRequiredFormString(formData, "targetUserId");
-
-  if (!targetUserId) {
-    return redirectTo(request, errorPath("/app", "block-failed"));
-  }
-
-  const result = await context.supabase.rpc("block_user", {
-    target_user_id: targetUserId,
-  });
-
-  if (result.error || result.data !== true) {
-    return redirectTo(request, errorPath("/app", "block-failed"));
-  }
-
-  return redirectTo(request, statusPath("/app", "blocked"));
-}
-
 export async function reportProfile(request: NextRequest) {
   const formData = await request.formData();
   const returnPath = safeReturnPath(formData.get("returnTo"), "/app");

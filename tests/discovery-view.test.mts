@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
@@ -55,7 +55,7 @@ test("all students uses the compact directory list instead of discovery cards", 
   );
   assert.match(
     appPageSource,
-    /:\s*\([\s\S]*?<DiscoveryFeed/,
+    /:\s*\([\s\S]*?<RecommendedFeed/,
     "the recommended tab should keep the existing discovery feed",
   );
   assert.doesNotMatch(
@@ -90,6 +90,79 @@ test("all students uses the compact directory list instead of discovery cards", 
   );
 });
 
+test("recommended skip is local-only and never posts to the legacy route", () => {
+  const discoveryCardSource = readFileSync(
+    join(repoRoot, "src/components/matching/discovery-card.tsx"),
+    "utf8",
+  );
+  const recommendedFeedSource = readFileSync(
+    join(repoRoot, "src/components/matching/recommended-feed.tsx"),
+    "utf8",
+  );
+
+  assert.doesNotMatch(
+    discoveryCardSource,
+    /action="\/app\/action"/,
+    "the visible Skip control should not post to /app/action",
+  );
+  assert.match(
+    discoveryCardSource,
+    /type="button"[\s\S]*?<span>Skip<\/span>/,
+    "Skip should be a client-side button",
+  );
+  assert.match(
+    discoveryCardSource,
+    /onSkip\?\.\(candidate\.userId\)/,
+    "Skip should call the local dismissal callback",
+  );
+  assert.match(
+    recommendedFeedSource,
+    /useState<ReadonlySet<string>>/,
+    "recommended feed should keep dismissed ids in memory",
+  );
+  assert.match(
+    recommendedFeedSource,
+    /setDismissedIds/,
+    "recommended feed should dismiss skipped cards locally",
+  );
+  assert.doesNotMatch(
+    recommendedFeedSource,
+    /localStorage|sessionStorage|fetch\(|\/app\/action/,
+    "local skip state must not be persisted or sent over the network",
+  );
+});
+
+test("block controls and routes are not user-facing", () => {
+  const matchingActionsSource = readFileSync(
+    join(repoRoot, "src/lib/matching/actions.ts"),
+    "utf8",
+  );
+  const profileActionPanelSource = readFileSync(
+    join(repoRoot, "src/components/matching/profile-action-panel.tsx"),
+    "utf8",
+  );
+  const profileSafetyMenuSource = readFileSync(
+    join(repoRoot, "src/components/profile/profile-safety-menu.tsx"),
+    "utf8",
+  );
+
+  assert.equal(
+    existsSync(join(repoRoot, "src/app/profiles/block/route.ts")),
+    false,
+    "the profile block route should be removed",
+  );
+  assert.doesNotMatch(
+    matchingActionsSource,
+    /blockProfile|block_user|block-failed/,
+    "matching actions should not expose a block action",
+  );
+  assert.doesNotMatch(
+    profileActionPanelSource + profileSafetyMenuSource,
+    /\/profiles\/block|Block profile|Block user|Block this profile/,
+    "profile surfaces should not render block controls",
+  );
+});
+
 test("tab feed load failures stay inside the results block", () => {
   const appPageSource = readFileSync(
     join(repoRoot, "src/app/app/page.tsx"),
@@ -117,7 +190,7 @@ test("tab feed load failures stay inside the results block", () => {
   );
   assert.match(
     appPageSource,
-    /<DiscoveryFeed[\s\S]*?loadError=\{candidatesResult\.error\}/,
+    /<RecommendedFeed[\s\S]*?loadError=\{candidatesResult\.error\}/,
     "recommended loader errors should be passed to the result block",
   );
   assert.match(

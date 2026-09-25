@@ -1312,23 +1312,27 @@ async function runProfileFlow(
     "deleted target profile is unavailable",
   );
 
-  const blockedTarget = await createConfirmedUser(
+  const legacyBlockedTarget = await createConfirmedUser(
     `profile-blocked-${suffix}@${allowedDomain}`,
   );
-  await seedCompletedProfile(blockedTarget.id, taxonomy, {
-    fullName: "Phase Five Blocked Target",
+  await seedCompletedProfile(legacyBlockedTarget.id, taxonomy, {
+    fullName: "Phase Five Legacy Block Target",
   });
   await expectNoSupabaseError(
     await service.from("blocks").insert({
       blocker_user_id: userId,
-      blocked_user_id: blockedTarget.id,
+      blocked_user_id: legacyBlockedTarget.id,
     }),
-    "seed profile block",
+    "seed legacy profile block",
   );
-  await assertProfileUnavailable(
-    cookieJar,
-    blockedTarget.id,
-    "blocked target profile is unavailable",
+  const legacyBlockedProfileBody = await readPageText(
+    await getPath(`/profiles/${legacyBlockedTarget.id}`, cookieJar),
+    "legacy blocked target profile",
+  );
+  assertTextContains(
+    legacyBlockedProfileBody,
+    "Phase Five Legacy Block Target",
+    "legacy block row does not hide target profile",
   );
 
   await assertProfileUnavailable(
@@ -1405,6 +1409,11 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
     "discover page renders direct email copy action",
   );
   assertTextContains(discoverBody, "Skip", "discover page renders skip action");
+  assertTextExcludes(
+    discoverBody,
+    'action="/app/action"',
+    "discover skip action is not posted to the legacy server route",
+  );
   assertTextExcludes(
     discoverBody,
     "Connect",
@@ -1504,13 +1513,13 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
   );
   assertTextContains(
     peerProfileBody,
-    "Block",
-    "other profile keeps block action",
-  );
-  assertTextContains(
-    peerProfileBody,
     "Report",
     "other profile keeps report action",
+  );
+  assertTextExcludes(
+    peerProfileBody,
+    "Block",
+    "other profile removes block action",
   );
   assertTextExcludes(
     peerProfileBody,
@@ -1710,12 +1719,26 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
     ),
     "/app",
     { status: "passed" },
-    "discover skip records the simplified dismissal action",
+    "legacy discover skip route returns harmless success",
   );
   assert.equal(
     await countActiveMatches(userId, peer.id),
     0,
     "simplified discovery flow does not create a match",
+  );
+  const legacySkipInteractions = await expectNoSupabaseError(
+    await service
+      .from("interactions")
+      .select("action")
+      .eq("source_user_id", userId)
+      .eq("target_user_id", peer.id)
+      .eq("action", "skip"),
+    "load legacy skip interactions",
+  );
+  assert.equal(
+    legacySkipInteractions.length,
+    0,
+    "legacy skip route does not persist a skip interaction",
   );
   const discoveryEvents = await expectNoSupabaseError(
     await service
@@ -1729,13 +1752,13 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
   );
   assert.deepEqual(
     discoveryEvents.map((event) => event.event_name),
-    ["discover_action_skip"],
-    "simplified discovery product UI emits skip but no connect event",
+    [],
+    "legacy skip route emits no discovery skip or connect event",
   );
-  assertTextExcludes(
+  assertTextContains(
     await readPageText(await getPath("/app", cookieJar), "discover after skip"),
     "Phase Six Match Peer",
-    "skipped profile is removed from discovery",
+    "legacy skipped profile remains eligible after reload",
   );
   const allAfterSkipBody = await readPageText(
     await getPath("/app?view=all&q=Phase%20Six%20Match", cookieJar),
@@ -1787,51 +1810,53 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
     "profile report records a product event",
   );
 
-  assertRedirectWithParams(
-    await postForm(
-      "/profiles/block",
-      {
-        targetUserId: peer.id,
-      },
-      cookieJar,
-    ),
-    "/app",
-    { status: "blocked" },
-    "profile block route succeeds",
-  );
-  await assertProfileUnavailable(
+  const blockRouteResponse = await postForm(
+    "/profiles/block",
+    {
+      targetUserId: peer.id,
+    },
     cookieJar,
-    peer.id,
-    "blocked profile becomes unavailable",
   );
-  assertTextExcludes(
+  assert.equal(
+    blockRouteResponse.status,
+    404,
+    "profile block route is removed",
+  );
+  const profileAfterRemovedBlockRouteBody = await readPageText(
+    await getPath(`/profiles/${peer.id}`, cookieJar),
+    "profile after removed block route",
+  );
+  assertTextContains(
+    profileAfterRemovedBlockRouteBody,
+    "Phase Six Match Peer",
+    "removed block route leaves profile visible",
+  );
+  assertTextContains(
     await readPageText(
       await getPath("/app?view=all&q=Phase%20Six%20Match", cookieJar),
-      "all students after block",
+      "all students after removed block route",
     ),
     "Phase Six Match Peer",
-    "blocked profile is removed from all students",
+    "removed block route leaves profile visible in all students",
   );
-  const blockedContactResponse = await postJson(
+  const contactAfterRemovedBlockResponse = await postJson(
     "/profiles/contact",
     { targetUserId: peer.id },
     cookieJar,
   );
-  assert.equal(
-    blockedContactResponse.status,
-    404,
-    "blocked profile email contact request is rejected",
+  const contactAfterRemovedBlockPayload = await readJson(
+    contactAfterRemovedBlockResponse,
+    "profile direct email contact endpoint after removed block route",
   );
-  const blockedContactPayload = await blockedContactResponse.json();
-  assert.deepEqual(
-    blockedContactPayload,
-    { error: "Direct email contact is not available for this profile." },
-    "blocked profile email contact returns a safe error",
+  assert.equal(
+    contactAfterRemovedBlockPayload.email,
+    peer.email,
+    "removed block route leaves direct email contact available",
   );
   assert.equal(
     await countActiveMatches(userId, peer.id),
     0,
-    "blocking leaves no active integration match",
+    "removed block route creates no active integration match",
   );
 }
 

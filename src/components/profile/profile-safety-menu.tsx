@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import { AuthSubmitButton } from "@/components/auth-submit-button";
 import { reportReasons } from "@/lib/matching/view-model";
 
@@ -31,8 +29,6 @@ export function ProfileSafetyMenu({
   returnTo: string;
   targetUserId: string;
 }>) {
-  const [showBlockConfirm, setShowBlockConfirm] = useState(false);
-
   return (
     <div className="relative">
       <details className="group">
@@ -41,15 +37,7 @@ export function ProfileSafetyMenu({
           More
         </summary>
         <div className="absolute right-0 z-20 mt-2 w-[min(22rem,86vw)] rounded-lg border border-blue-100 bg-white p-4 shadow-xl">
-          <button
-            className="inline-flex h-10 w-full items-center justify-center rounded-md border border-red-200 px-4 text-sm font-bold text-red-700 transition hover:bg-red-50"
-            onClick={() => setShowBlockConfirm(true)}
-            type="button"
-          >
-            Block user
-          </button>
-
-          <details className="mt-3">
+          <details>
             <summary className="inline-flex h-10 w-full cursor-pointer list-none items-center justify-center rounded-md border border-blue-100 px-4 text-sm font-bold text-blue-800 transition hover:bg-blue-50">
               Report user
             </summary>
@@ -92,42 +80,6 @@ export function ProfileSafetyMenu({
           </details>
         </div>
       </details>
-
-      {showBlockConfirm ? (
-        <div
-          aria-modal="true"
-          className="fixed inset-0 z-30 flex items-center justify-center bg-black/30 px-5"
-          role="dialog"
-        >
-          <div className="w-full max-w-md rounded-lg border border-blue-100 bg-white p-5 shadow-xl">
-            <h3 className="font-serif text-3xl font-semibold text-blue-950">
-              Block this profile?
-            </h3>
-            <p className="mt-3 leading-7 text-blue-900/75">
-              They will disappear from discovery and any active match between you
-              will be closed.
-            </p>
-            <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <button
-                className="inline-flex h-11 items-center justify-center rounded-md border border-blue-200 px-4 text-sm font-bold text-blue-800 transition hover:bg-blue-50"
-                onClick={() => setShowBlockConfirm(false)}
-                type="button"
-              >
-                Cancel
-              </button>
-              <form action="/profiles/block" method="post">
-                <input name="targetUserId" type="hidden" value={targetUserId} />
-                <AuthSubmitButton
-                  className="inline-flex h-11 items-center justify-center rounded-md bg-red-700 px-4 text-sm font-bold text-white transition hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-70"
-                  pendingLabel="Blocking..."
-                >
-                  Block user
-                </AuthSubmitButton>
-              </form>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

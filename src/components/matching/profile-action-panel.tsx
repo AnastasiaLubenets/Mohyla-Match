@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import { AuthSubmitButton } from "@/components/auth-submit-button";
 import { ContactReveal } from "@/components/matching/contact-reveal";
 import { SaveProfileButton } from "@/components/matching/save-profile-button";
@@ -15,11 +13,9 @@ export function ProfileActionPanel({
   status: ProfileConnectionStatus | null;
   targetUserId: string;
 }>) {
-  const [showBlockConfirm, setShowBlockConfirm] = useState(false);
   const alreadyConnected = status?.outgoingAction === "connect";
-  const passed = status?.outgoingAction === "skip";
   const saved = status?.outgoingAction === "save";
-  const canToggleSave = !status?.isMatched && !alreadyConnected && !passed;
+  const canToggleSave = !status?.isMatched && !alreadyConnected;
 
   return (
     <aside className="mt-6 rounded-lg border border-border bg-surface p-5 shadow-sm">
@@ -39,14 +35,6 @@ export function ProfileActionPanel({
             <ContactReveal targetUserId={targetUserId} />
           </div>
         ) : null}
-
-        <button
-          className="inline-flex h-11 items-center justify-center rounded-full border border-red-300 px-4 text-sm font-semibold text-red-700 transition hover:bg-red-50"
-          onClick={() => setShowBlockConfirm(true)}
-          type="button"
-        >
-          Block
-        </button>
 
         <details className="group">
           <summary className="inline-flex h-11 w-full cursor-pointer list-none items-center justify-center rounded-full border border-border px-4 text-sm font-semibold transition hover:border-primary">
@@ -91,40 +79,6 @@ export function ProfileActionPanel({
           </form>
         </details>
       </div>
-
-      {showBlockConfirm ? (
-        <div
-          aria-modal="true"
-          className="fixed inset-0 z-20 flex items-center justify-center bg-black/30 px-5"
-          role="dialog"
-        >
-          <div className="w-full max-w-md rounded-lg border border-border bg-surface p-5 shadow-xl">
-            <h3 className="text-xl font-semibold">Block this profile?</h3>
-            <p className="mt-3 leading-7 text-muted">
-              They will disappear from discovery and any active match between
-              you will be closed.
-            </p>
-            <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <button
-                className="inline-flex h-11 items-center justify-center rounded-full border border-border px-4 text-sm font-semibold transition hover:border-primary"
-                onClick={() => setShowBlockConfirm(false)}
-                type="button"
-              >
-                Cancel
-              </button>
-              <form action="/profiles/block" method="post">
-                <input name="targetUserId" type="hidden" value={targetUserId} />
-                <AuthSubmitButton
-                  className="inline-flex h-11 items-center justify-center rounded-full bg-red-600 px-4 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-70"
-                  pendingLabel="Blocking..."
-                >
-                  Block profile
-                </AuthSubmitButton>
-              </form>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </aside>
   );
 }

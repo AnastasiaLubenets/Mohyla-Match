@@ -293,15 +293,20 @@ select is_empty(
   'deleted target cannot be viewed'
 );
 
+reset role;
 insert into public.blocks (blocker_user_id, blocked_user_id)
 values (
   '00000000-0000-4000-8000-000000000501',
   '00000000-0000-4000-8000-000000000506'
 );
 
-select is_empty(
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000501', true);
+
+select results_eq(
   $$ select user_id from public.profiles where user_id = '00000000-0000-4000-8000-000000000506' $$,
-  'blocked target cannot be viewed'
+  $$ values ('00000000-0000-4000-8000-000000000506'::uuid) $$,
+  'legacy block row no longer hides an eligible profile'
 );
 
 select is_empty(

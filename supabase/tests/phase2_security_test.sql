@@ -506,46 +506,52 @@ select throws_ok(
   'users cannot create interactions for another source user'
 );
 
-insert into public.blocks (blocker_user_id, blocked_user_id)
-values (
-  '00000000-0000-4000-8000-000000000001',
-  '00000000-0000-4000-8000-000000000002'
+select throws_ok(
+  $$ insert into public.blocks (blocker_user_id, blocked_user_id)
+     values (
+       '00000000-0000-4000-8000-000000000001',
+       '00000000-0000-4000-8000-000000000002'
+     ) $$,
+  '42501',
+  null,
+  'authenticated users cannot create block rows'
 );
 
-select is_empty(
-  $$ select corporate_email
-     from public.get_matched_contact_email('00000000-0000-4000-8000-000000000002') $$,
-  'block removes matched contact visibility'
+select throws_ok(
+  $$ select public.block_user('00000000-0000-4000-8000-000000000002') $$,
+  '42501',
+  null,
+  'authenticated users cannot execute deprecated block RPC'
 );
 
 reset role;
-select is(
-  (
-    select status::text
-    from public.matches
-    where user_low = '00000000-0000-4000-8000-000000000001'
-      and user_high = '00000000-0000-4000-8000-000000000002'
-  ),
-  'blocked',
-  'block closes existing match as blocked'
+insert into public.blocks (blocker_user_id, blocked_user_id)
+values (
+  '00000000-0000-4000-8000-000000000001',
+  '00000000-0000-4000-8000-000000000003'
 );
 
 set local role authenticated;
-select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000002', true);
+select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000001', true);
 
-select is_empty(
-  $$ select blocker_user_id
-     from public.blocks
-     where blocker_user_id = '00000000-0000-4000-8000-000000000001'
-       and blocked_user_id = '00000000-0000-4000-8000-000000000002' $$,
-  'incoming block row is not directly visible to the blocked user'
+select results_eq(
+  $$ select user_id
+     from public.profiles
+     where user_id = '00000000-0000-4000-8000-000000000003' $$,
+  $$ values ('00000000-0000-4000-8000-000000000003'::uuid) $$,
+  'legacy block row does not hide profile from blocker'
 );
 
-select is_empty(
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000003', true);
+
+select results_eq(
   $$ select user_id
      from public.profiles
      where user_id = '00000000-0000-4000-8000-000000000001' $$,
-  'block removes profile visibility in both directions'
+  $$ values ('00000000-0000-4000-8000-000000000001'::uuid) $$,
+  'legacy block row does not hide profile from target'
 );
 
 reset role;
