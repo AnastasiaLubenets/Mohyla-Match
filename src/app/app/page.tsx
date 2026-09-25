@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { AllStudentsList } from "@/components/matching/all-students-list";
 import { AppSidebar } from "@/components/matching/app-chrome";
 import { DiscoveryCard } from "@/components/matching/discovery-card";
 import { SystemAvatar } from "@/components/profile/system-avatar";
@@ -488,28 +489,30 @@ export default async function AppPage({ searchParams }: PageProps) {
             <section className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto">
               <Hero />
               <DiscoveryViewTabs currentView={view} params={params} />
-              <DiscoveryFeed
-                candidates={filteredCandidates}
-                emptyAction={
-                  view === "recommended" ? recommendedEmptyAction : undefined
-                }
-                emptyDescription={
-                  view === "recommended"
-                    ? "No more recommendations right now. You can still browse all students."
-                    : "Try clearing filters or changing your search."
-                }
-                emptyTitle={
-                  view === "recommended"
-                    ? "No more recommendations right now."
-                    : "No students match these filters."
-                }
-                error={firstParam(params.error)}
-                returnTo={returnTo}
-                savedProfileIds={savedProfileIds}
-                showProfileAction={false}
-                showSkip={view === "recommended"}
-                status={firstParam(params.status)}
-              />
+              {view === "all" ? (
+                <AllStudentsList
+                  candidates={filteredCandidates}
+                  error={firstParam(params.error)}
+                  hasActiveFilters={activeFilters}
+                  returnTo={returnTo}
+                  savedProfileIds={savedProfileIds}
+                  status={firstParam(params.status)}
+                  totalCount={allCandidates.length}
+                />
+              ) : (
+                <DiscoveryFeed
+                  candidates={filteredCandidates}
+                  emptyAction={recommendedEmptyAction}
+                  emptyDescription="No more recommendations right now. You can still browse all students."
+                  emptyTitle="No more recommendations right now."
+                  error={firstParam(params.error)}
+                  returnTo={returnTo}
+                  savedProfileIds={savedProfileIds}
+                  showProfileAction={false}
+                  showSkip
+                  status={firstParam(params.status)}
+                />
+              )}
             </section>
 
             <DiscoveryFilterRail
