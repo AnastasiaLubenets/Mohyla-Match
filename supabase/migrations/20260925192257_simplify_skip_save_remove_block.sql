@@ -149,6 +149,7 @@ set search_path = ''
 as $$
 declare
   caller_id uuid := auth.uid();
+  requested_target_user_id uuid := target_user_id;
   current_match_id uuid;
 begin
   if caller_id is null then
@@ -165,7 +166,7 @@ begin
       using errcode = 'P0001';
   end if;
 
-  if target_user_id is null or target_user_id = caller_id then
+  if requested_target_user_id is null or requested_target_user_id = caller_id then
     raise exception 'Choose another active profile.'
       using errcode = 'P0001';
   end if;
@@ -173,7 +174,7 @@ begin
   if requested_action = 'skip'::public.interaction_action then
     delete from public.interactions i
     where i.source_user_id = caller_id
-      and i.target_user_id = target_user_id
+      and i.target_user_id = requested_target_user_id
       and i.action = 'skip'::public.interaction_action;
 
     return query
@@ -182,24 +183,24 @@ begin
     return;
   end if;
 
-  if not private.can_interact(target_user_id) then
+  if not private.can_interact(requested_target_user_id) then
     raise exception 'This profile is not available for discovery.'
       using errcode = '42501';
   end if;
 
   insert into public.interactions (source_user_id, target_user_id, action)
-  values (caller_id, target_user_id, requested_action)
+  values (caller_id, requested_target_user_id, requested_action)
   on conflict on constraint interactions_pkey do update
   set action = excluded.action,
       updated_at = now();
 
-  current_match_id := private.active_match_id(caller_id, target_user_id);
+  current_match_id := private.active_match_id(caller_id, requested_target_user_id);
 
   if requested_action = 'connect'::public.interaction_action then
     insert into public.product_events (user_id, subject_user_id, match_id, event_name, metadata)
     values (
       caller_id,
-      target_user_id,
+      requested_target_user_id,
       current_match_id,
       'discover_action_connect',
       jsonb_build_object('source', 'phase_6_discovery')
@@ -255,24 +256,28 @@ as $$
     from public.profiles p
     where p.user_id = auth.uid()
       and private.is_active_onboarded(p.user_id)
+  ),
+  requested_target as (
+    select $1 as user_id
   )
   select
     (
       select i.action
       from public.interactions i
       where i.source_user_id = c.user_id
-        and i.target_user_id = target_user_id
+        and i.target_user_id = rt.user_id
     ) as outgoing_action,
-    private.active_match_id(c.user_id, target_user_id) is not null as is_matched,
-    private.active_match_id(c.user_id, target_user_id) as match_id,
+    private.active_match_id(c.user_id, rt.user_id) is not null as is_matched,
+    private.active_match_id(c.user_id, rt.user_id) as match_id,
     false as blocked_by_me,
-    private.can_reveal_direct_contact(target_user_id) as can_direct_contact
+    private.can_reveal_direct_contact(rt.user_id) as can_direct_contact
   from caller c
-  where target_user_id <> c.user_id
+  cross join requested_target rt
+  where rt.user_id <> c.user_id
     and exists (
       select 1
       from public.profiles p
-      where p.user_id = target_user_id
+      where p.user_id = rt.user_id
         and p.profile_status = 'active'::public.profile_status
         and p.deleted_at is null
     );
