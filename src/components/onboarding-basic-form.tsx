@@ -29,12 +29,14 @@ type OnboardingBasicFormProps = Readonly<{
   faculties: FacultyOption[];
   programs: ProgramOption[];
   profile: BasicProfileValue | null;
+  suggestedFullName?: string | null;
 }>;
 
 export function OnboardingBasicForm({
   faculties,
   programs,
   profile,
+  suggestedFullName = null,
 }: OnboardingBasicFormProps) {
   const initialFacultyId = profile?.faculty_id ?? faculties[0]?.id ?? null;
   const [selectedFacultyId, setSelectedFacultyId] = useState<number | null>(
@@ -65,7 +67,7 @@ export function OnboardingBasicForm({
         <span className="text-sm font-semibold">Full name · Required</span>
         <input
           className="mt-2 h-12 w-full rounded-lg border border-border bg-surface px-4 text-foreground outline-none transition focus:border-primary"
-          defaultValue={profile?.full_name ?? ""}
+          defaultValue={profile?.full_name ?? suggestedFullName ?? ""}
           maxLength={120}
           minLength={2}
           name="fullName"
