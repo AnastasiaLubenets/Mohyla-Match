@@ -41,5 +41,14 @@ test("login page preserves next routing and avoids fake password reset UI", () =
   assert.match(page, /name="next"/);
   assert.match(page, /name: "email"/);
   assert.match(page, /name="password"/);
+  assert.match(page, /Email or password is incorrect\./);
+  assert.doesNotMatch(page, /confirmed|confirmation/i);
   assert.doesNotMatch(page, /forgot-password|Remember me/i);
+});
+
+test("auth shell uses stable benefit descriptions as React keys", () => {
+  const shell = source("src/components/auth/auth-page-shell.tsx");
+
+  assert.match(shell, /key=\{benefit\.description\}/);
+  assert.doesNotMatch(shell, /key=\{benefit\.title\}/);
 });

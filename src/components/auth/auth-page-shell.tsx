@@ -49,7 +49,7 @@ export function AuthPageShell({
               <PublicBenefit
                 description={benefit.description}
                 icon={benefit.icon}
-                key={benefit.title}
+                key={benefit.description}
                 title={benefit.title}
               />
             ))}

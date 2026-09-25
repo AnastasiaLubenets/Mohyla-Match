@@ -63,7 +63,7 @@ function loginMessage(
   if (error === "invalid") {
     return {
       tone: "error",
-      text: "Email or password is incorrect, or the email is not confirmed yet.",
+      text: "Email or password is incorrect.",
     };
   }
 
