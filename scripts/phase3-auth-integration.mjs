@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 
 import { createClient } from "@supabase/supabase-js";
 
+const execFileAsync = promisify(execFile);
 const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.API_URL ?? "";
 const anonKey =
@@ -12,6 +15,7 @@ const serviceRoleKey =
   process.env.SUPABASE_SERVICE_ROLE_KEY ??
   process.env.SERVICE_ROLE_KEY ??
   "";
+const localDatabaseUrl = process.env.LOCAL_SUPABASE_DB_URL ?? "";
 const appBaseUrl = process.env.APP_BASE_URL ?? "http://127.0.0.1:3000";
 const mailpitUrl = process.env.MAILPIT_URL ?? "http://127.0.0.1:54324";
 
@@ -46,6 +50,26 @@ async function expectNoSupabaseError(result, label) {
   }
 
   return result.data;
+}
+
+async function queryLocalJson(sql, variables, label) {
+  assert.ok(localDatabaseUrl, `${label}: LOCAL_SUPABASE_DB_URL is required`);
+
+  const args = [localDatabaseUrl, "-X", "-q", "-v", "ON_ERROR_STOP=1"];
+  Object.entries(variables).forEach(([name, value]) => {
+    args.push("-v", `${name}=${value}`);
+  });
+  args.push("-A", "-t", "-c", sql);
+
+  try {
+    const { stdout } = await execFileAsync("psql", args, {
+      maxBuffer: 1024 * 1024,
+    });
+    return JSON.parse(stdout.trim() || "null");
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${label}: ${message}`);
+  }
 }
 
 async function cleanup() {
@@ -1742,32 +1766,37 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
     0,
     "simplified discovery flow does not create a match",
   );
-  const legacySkipInteractions = await expectNoSupabaseError(
-    await service
-      .from("interactions")
-      .select("action")
-      .eq("source_user_id", userId)
-      .eq("target_user_id", peer.id)
-      .eq("action", "skip"),
+  const legacySkipInteractions = await queryLocalJson(
+    `select json_build_object('count', count(*))::text
+       from public.interactions
+      where source_user_id = :'source_user_id'::uuid
+        and target_user_id = :'target_user_id'::uuid
+        and action = 'skip';`,
+    {
+      source_user_id: userId,
+      target_user_id: peer.id,
+    },
     "load legacy skip interactions",
   );
   assert.equal(
-    legacySkipInteractions.length,
+    Number(legacySkipInteractions.count),
     0,
     "legacy skip route does not persist a skip interaction",
   );
-  const discoveryEvents = await expectNoSupabaseError(
-    await service
-      .from("product_events")
-      .select("event_name")
-      .eq("user_id", userId)
-      .eq("subject_user_id", peer.id)
-      .in("event_name", ["discover_action_skip", "discover_action_connect"])
-      .order("created_at", { ascending: true }),
+  const discoveryEventNames = await queryLocalJson(
+    `select coalesce(json_agg(event_name order by created_at), '[]'::json)::text
+       from public.product_events
+      where user_id = :'user_id'::uuid
+        and subject_user_id = :'subject_user_id'::uuid
+        and event_name in ('discover_action_skip', 'discover_action_connect');`,
+    {
+      user_id: userId,
+      subject_user_id: peer.id,
+    },
     "load simplified discovery action events",
   );
   assert.deepEqual(
-    discoveryEvents.map((event) => event.event_name),
+    discoveryEventNames,
     [],
     "legacy skip route emits no discovery skip or connect event",
   );
