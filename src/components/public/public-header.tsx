@@ -7,7 +7,7 @@ type PublicHeaderProps = Readonly<{
 export function PublicHeader({ active = "landing" }: PublicHeaderProps) {
   return (
     <header className="relative z-20">
-      <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between gap-4 px-5 py-6 sm:px-8 lg:px-12 xl:px-16">
+      <div className="mx-auto flex w-full max-w-[1800px] items-center justify-between gap-4 px-5 py-6 sm:px-8 lg:px-12 xl:px-[clamp(5rem,4vw,6rem)]">
         <Link
           href="/"
           className="text-[0.92rem] font-bold uppercase tracking-[0.14em] text-[#173f95] transition hover:text-[#101b55] sm:text-base"

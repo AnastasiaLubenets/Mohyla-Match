@@ -48,3 +48,33 @@ a {
   width: 0;
   height: 0;
 }
+
+.public-auth-shell input:-webkit-autofill,
+.public-auth-shell input:-webkit-autofill:hover,
+.public-auth-shell input:-webkit-autofill:focus {
+  caret-color: #101b55;
+  -webkit-text-fill-color: #101b55;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+  transition: background-color 9999s ease-out;
+}
+
+.public-auth-shell .auth-watercolor-image {
+  mix-blend-mode: multiply;
+}
+
+@media (min-width: 1024px) {
+  .public-auth-shell .auth-watercolor {
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      #000 15%,
+      #000 100%
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      #000 15%,
+      #000 100%
+    );
+  }
+}
