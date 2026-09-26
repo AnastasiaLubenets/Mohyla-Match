@@ -352,6 +352,22 @@ function assertTextExcludes(body, forbiddenText, label) {
   );
 }
 
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function assertAnchorHrefExcludes(body, forbiddenHref, label) {
+  const pattern = new RegExp(
+    `<a\\b[^>]*href=["']${escapeRegex(forbiddenHref)}(?:[?#][^"']*)?["'][^>]*>`,
+    "i",
+  );
+
+  assert.ok(
+    !pattern.test(body),
+    `${label}: expected page to omit anchor link to "${forbiddenHref}"`,
+  );
+}
+
 async function createConfirmedUser(email) {
   const { user } = await expectNoSupabaseError(
     await service.auth.admin.createUser({
@@ -1419,9 +1435,9 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
     "Connect",
     "discover page removes connect action",
   );
-  assertTextExcludes(
+  assertAnchorHrefExcludes(
     discoverBody,
-    "Matches",
+    "/matches",
     "primary navigation hides matches from discovery",
   );
   assertTextExcludes(
