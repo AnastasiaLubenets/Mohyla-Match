@@ -187,6 +187,7 @@ select is_empty(
   'legacy skip action is not persisted'
 );
 
+reset role;
 select is_empty(
   $$ select event_name
      from public.product_events
@@ -195,6 +196,9 @@ select is_empty(
        and event_name = 'discover_action_skip' $$,
   'legacy skip action does not emit a product event'
 );
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000001201', true);
 
 select results_eq(
   $$ select user_id
