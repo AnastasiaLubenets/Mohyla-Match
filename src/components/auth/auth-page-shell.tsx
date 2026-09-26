@@ -31,10 +31,10 @@ export function AuthPageShell({
   title,
 }: AuthPageShellProps) {
   return (
-    <main className="min-h-screen overflow-hidden bg-[#f7fbff] text-[#101b55]">
+    <main className="public-auth-shell min-h-screen overflow-hidden bg-[#f8fbff] text-[#101b55]">
       <PublicHeader active={active} />
-      <section className="relative mx-auto grid min-h-[calc(100vh-6rem)] w-full max-w-[1500px] gap-8 px-5 pb-10 pt-8 sm:px-8 lg:grid-cols-[0.46fr_0.54fr] lg:items-center lg:px-12 lg:pt-10 xl:px-16">
-        <div className="relative z-10 min-w-0 max-w-[38rem]">
+      <section className="relative mx-auto grid min-h-[calc(100vh-6rem)] w-full max-w-[1800px] gap-8 px-5 pb-10 pt-8 sm:px-8 lg:grid-cols-[0.43fr_0.57fr] lg:items-start lg:px-12 lg:pt-8 xl:px-[clamp(5rem,4vw,6rem)] xl:pt-10">
+        <div className="relative z-10 min-w-0 max-w-[43rem]">
           <PublicBadge icon={badgeIcon}>Student collaboration network</PublicBadge>
           <h1 className="relative mt-8 max-w-3xl font-serif text-5xl font-bold leading-[0.98] tracking-normal text-[#070d35] sm:text-7xl lg:text-[5.3rem]">
             {title}
@@ -44,7 +44,7 @@ export function AuthPageShell({
             {subtitle}
           </p>
           {children}
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-3 lg:gap-6">
             {benefits.map((benefit) => (
               <PublicBenefit
                 description={benefit.description}
@@ -56,8 +56,8 @@ export function AuthPageShell({
           </div>
         </div>
         <PublicWatercolor
-          className="relative z-0 min-h-[22rem] min-w-0 lg:absolute lg:bottom-0 lg:right-0 lg:top-20 lg:w-[61%]"
-          imageClassName="object-right-bottom"
+          className="auth-watercolor relative z-0 min-h-[22rem] min-w-0 lg:absolute lg:-top-28 lg:bottom-0 lg:right-0 lg:w-[62%] xl:w-[61%]"
+          imageClassName="auth-watercolor-image object-cover object-right-bottom"
           priority
         />
       </section>

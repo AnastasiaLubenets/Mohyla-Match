@@ -104,12 +104,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <input name="next" type="hidden" value={nextPath} />
           <AuthMessage message={message} />
           <AuthField
-            addon={
-              <span className="hidden rounded-full bg-[#edf4ff] px-3 py-1 text-sm font-bold text-[#174ca7] sm:inline-block">
-                @ukma.edu.ua
-              </span>
-            }
-            helper="Use your NaUKMA student email"
+            helper="Use your @ukma.edu.ua student email"
             icon={<MailIcon className="h-5 w-5" />}
             inputProps={{
               autoComplete: "email",

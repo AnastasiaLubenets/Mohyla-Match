@@ -46,9 +46,38 @@ test("login page preserves next routing and avoids fake password reset UI", () =
   assert.doesNotMatch(page, /forgot-password|Remember me/i);
 });
 
+test("auth email fields accept complete student emails without a visual suffix badge", () => {
+  const loginPage = source("src/app/login/page.tsx");
+  const signupPage = source("src/app/signup/page.tsx");
+
+  assert.doesNotMatch(loginPage, /addon=\{/);
+  assert.doesNotMatch(signupPage, /addon=\{/);
+  assert.doesNotMatch(loginPage, /rounded-full bg-\[#edf4ff\][\s\S]*@ukma\.edu\.ua/);
+  assert.doesNotMatch(signupPage, /rounded-full bg-\[#edf4ff\][\s\S]*@ukma\.edu\.ua/);
+  assert.match(loginPage, /helper="Use your @ukma\.edu\.ua student email"/);
+  assert.match(signupPage, /helper="Use your @ukma\.edu\.ua student email"/);
+});
+
 test("auth shell uses stable benefit descriptions as React keys", () => {
   const shell = source("src/components/auth/auth-page-shell.tsx");
 
   assert.match(shell, /key=\{benefit\.description\}/);
   assert.doesNotMatch(shell, /key=\{benefit\.title\}/);
+});
+
+test("auth desktop shell keeps the approved wide top-aligned watercolor composition", () => {
+  const shell = source("src/components/auth/auth-page-shell.tsx");
+  const header = source("src/components/public/public-header.tsx");
+  const globals = source("src/app/globals.css");
+
+  assert.match(header, /max-w-\[1800px\]/);
+  assert.match(shell, /max-w-\[1800px\]/);
+  assert.match(shell, /lg:items-start/);
+  assert.doesNotMatch(shell, /lg:items-center/);
+  assert.match(shell, /max-w-\[43rem\]/);
+  assert.doesNotMatch(shell, /max-w-\[38rem\]/);
+  assert.match(shell, /lg:-top-28/);
+  assert.match(shell, /auth-watercolor-image object-cover object-right-bottom/);
+  assert.match(globals, /\.public-auth-shell input:-webkit-autofill/);
+  assert.match(globals, /mix-blend-mode: multiply/);
 });
