@@ -138,9 +138,9 @@ select ok(
   has_function_privilege('authenticated', 'public.get_discovery_candidates(integer)', 'execute')
   and has_function_privilege('authenticated', 'public.set_discovery_action(uuid, public.interaction_action)', 'execute')
   and has_function_privilege('authenticated', 'public.get_my_matches(integer)', 'execute')
-  and has_function_privilege('authenticated', 'public.block_user(uuid)', 'execute')
+  and not has_function_privilege('authenticated', 'public.block_user(uuid)', 'execute')
   and has_function_privilege('authenticated', 'public.report_user(uuid, text, text)', 'execute'),
-  'authenticated users can execute phase 6 RPCs'
+  'authenticated users can execute active phase 6 RPCs while block RPC is disabled'
 );
 
 select ok(
@@ -362,10 +362,11 @@ select results_eq(
   'matched profile status is visible to the participant'
 );
 
-select is(
-  (select public.block_user('00000000-0000-4000-8000-000000000802')),
-  true,
-  'authenticated user can block a profile'
+select throws_ok(
+  $$ select public.block_user('00000000-0000-4000-8000-000000000802') $$,
+  '42501',
+  null,
+  'authenticated user cannot execute deprecated block RPC'
 );
 
 reset role;
@@ -376,28 +377,36 @@ select is(
     where user_low = '00000000-0000-4000-8000-000000000801'
       and user_high = '00000000-0000-4000-8000-000000000802'
   ),
-  'blocked',
-  'blocking closes the active match'
+  'active',
+  'deprecated block RPC leaves the active match unchanged'
 );
 
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000801', true);
 
-select is_empty(
+select results_eq(
   $$ select corporate_email
      from public.get_matched_contact_email('00000000-0000-4000-8000-000000000802') $$,
-  'blocked match cannot reveal contact email'
+  $$ values ('phase6-b@example.test'::text) $$,
+  'deprecated block path does not remove matched contact email'
 );
 
 reset role;
-set local role authenticated;
-select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000802', true);
+insert into public.blocks (blocker_user_id, blocked_user_id)
+values (
+  '00000000-0000-4000-8000-000000000801',
+  '00000000-0000-4000-8000-000000000803'
+);
 
-select is_empty(
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000801', true);
+
+select results_eq(
   $$ select user_id
      from public.get_discovery_candidates(10)
-     where user_id = '00000000-0000-4000-8000-000000000801' $$,
-  'blocked profile is excluded from discovery in both directions'
+     where user_id = '00000000-0000-4000-8000-000000000803' $$,
+  $$ values ('00000000-0000-4000-8000-000000000803'::uuid) $$,
+  'legacy block row does not exclude profile from discovery'
 );
 
 reset role;

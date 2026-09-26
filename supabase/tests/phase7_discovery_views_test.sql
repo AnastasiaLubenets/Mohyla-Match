@@ -1,6 +1,6 @@
 begin;
 
-select plan(17);
+select plan(24);
 
 insert into public.faculties (slug, display_name, avatar_theme_key, sort_order)
 values ('phase7-discovery-faculty', 'Phase 7 Discovery Faculty', 'phase7', 997)
@@ -172,10 +172,40 @@ select is_empty(
 );
 
 select results_eq(
-  $$ select saved, action::text
-     from public.set_saved_profile('00000000-0000-4000-8000-000000001202', true) $$,
-  $$ values (true, 'save'::text) $$,
-  'viewer can save a recommended profile'
+  $$ select action::text
+     from public.set_discovery_action('00000000-0000-4000-8000-000000001202', 'skip') $$,
+  $$ values ('skip'::text) $$,
+  'legacy skip action returns harmless success'
+);
+
+select is_empty(
+  $$ select action
+     from public.interactions
+     where source_user_id = '00000000-0000-4000-8000-000000001201'
+       and target_user_id = '00000000-0000-4000-8000-000000001202'
+       and action = 'skip'::public.interaction_action $$,
+  'legacy skip action is not persisted'
+);
+
+reset role;
+select is_empty(
+  $$ select event_name
+     from public.product_events
+     where user_id = '00000000-0000-4000-8000-000000001201'
+       and subject_user_id = '00000000-0000-4000-8000-000000001202'
+       and event_name = 'discover_action_skip' $$,
+  'legacy skip action does not emit a product event'
+);
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000001201', true);
+
+select results_eq(
+  $$ select user_id
+     from public.get_discovery_candidates(20)
+     where user_id = '00000000-0000-4000-8000-000000001202' $$,
+  $$ values ('00000000-0000-4000-8000-000000001202'::uuid) $$,
+  'legacy skip action does not remove profile from future recommended results'
 );
 
 select results_eq(
@@ -183,62 +213,117 @@ select results_eq(
      from public.get_all_discovery_profiles(500)
      where user_id = '00000000-0000-4000-8000-000000001202' $$,
   $$ values ('00000000-0000-4000-8000-000000001202'::uuid) $$,
-  'saved recommended profile remains visible in all students'
+  'legacy skipped profile remains visible in all students'
+);
+
+select results_eq(
+  $$ select saved, action::text
+     from public.set_saved_profile('00000000-0000-4000-8000-000000001202', true) $$,
+  $$ values (true, 'save'::text) $$,
+  'viewer can save a profile after a legacy skip action'
+);
+
+select results_eq(
+  $$ select user_id
+     from public.get_saved_profiles(10)
+     where user_id = '00000000-0000-4000-8000-000000001202' $$,
+  $$ values ('00000000-0000-4000-8000-000000001202'::uuid) $$,
+  'saved profiles includes the profile saved after legacy skip'
+);
+
+select results_eq(
+  $$ select user_id
+     from public.get_all_discovery_profiles(500)
+     where user_id = '00000000-0000-4000-8000-000000001202' $$,
+  $$ values ('00000000-0000-4000-8000-000000001202'::uuid) $$,
+  'saved profile remains visible in all students'
+);
+
+select results_eq(
+  $$ select saved, action::text
+     from public.set_saved_profile('00000000-0000-4000-8000-000000001202', false) $$,
+  $$ values (false, null::text) $$,
+  'viewer can unsave a profile after legacy skip'
+);
+
+select is_empty(
+  $$ select user_id
+     from public.get_saved_profiles(10)
+     where user_id = '00000000-0000-4000-8000-000000001202' $$,
+  'unsaved profile is removed from saved profiles'
+);
+
+select results_eq(
+  $$ select user_id
+     from public.get_all_discovery_profiles(500)
+     where user_id = '00000000-0000-4000-8000-000000001202' $$,
+  $$ values ('00000000-0000-4000-8000-000000001202'::uuid) $$,
+  'unsaved profile remains visible in all students'
+);
+
+reset role;
+insert into public.interactions (source_user_id, target_user_id, action)
+values (
+  '00000000-0000-4000-8000-000000001201',
+  '00000000-0000-4000-8000-000000001202',
+  'skip'::public.interaction_action
+)
+on conflict on constraint interactions_pkey do update
+set action = excluded.action,
+    updated_at = now();
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000001201', true);
+
+select results_eq(
+  $$ select saved, action::text
+     from public.set_saved_profile('00000000-0000-4000-8000-000000001202', true) $$,
+  $$ values (true, 'save'::text) $$,
+  'save replaces a persisted legacy skip interaction'
 );
 
 select results_eq(
   $$ select action::text
-     from public.set_discovery_action('00000000-0000-4000-8000-000000001202', 'skip') $$,
-  $$ values ('skip'::text) $$,
-  'viewer can skip the same recommended profile'
+     from public.interactions
+     where source_user_id = '00000000-0000-4000-8000-000000001201'
+       and target_user_id = '00000000-0000-4000-8000-000000001202' $$,
+  $$ values ('save'::text) $$,
+  'persisted legacy skip becomes canonical save state'
 );
 
-select is_empty(
-  $$ select user_id
-     from public.get_discovery_candidates(20)
-     where user_id = '00000000-0000-4000-8000-000000001202' $$,
-  'skipped profile disappears from recommended discovery'
-);
-
-select results_eq(
-  $$ select user_id
-     from public.get_all_discovery_profiles(500)
-     where user_id = '00000000-0000-4000-8000-000000001202' $$,
-  $$ values ('00000000-0000-4000-8000-000000001202'::uuid) $$,
-  'skipped profile remains visible in all students'
-);
-
-select results_eq(
+select throws_ok(
   $$ select public.block_user('00000000-0000-4000-8000-000000001202') $$,
-  $$ values (true) $$,
-  'viewer can block the same skipped profile'
+  '42501',
+  null,
+  'authenticated viewer cannot execute deprecated block RPC'
 );
 
-select is_empty(
-  $$ select user_id
-     from public.get_all_discovery_profiles(500)
-     where user_id = '00000000-0000-4000-8000-000000001202' $$,
-  'blocked profile disappears from all students'
-);
-
-select is_empty(
+select results_eq(
   $$ select user_id
      from public.get_all_discovery_profiles(500)
      where user_id in (
        '00000000-0000-4000-8000-000000001203',
        '00000000-0000-4000-8000-000000001204'
-     ) $$,
-  'blocked profiles are excluded from all students in both directions'
+     )
+     order by user_id $$,
+  $$ values
+       ('00000000-0000-4000-8000-000000001203'::uuid),
+       ('00000000-0000-4000-8000-000000001204'::uuid) $$,
+  'legacy block rows do not exclude profiles from all students'
 );
 
-select is_empty(
+select results_eq(
   $$ select user_id
      from public.get_discovery_candidates(20)
      where user_id in (
        '00000000-0000-4000-8000-000000001203',
        '00000000-0000-4000-8000-000000001204'
-     ) $$,
-  'blocked profiles are excluded from recommended discovery in both directions'
+     )
+     order by user_id $$,
+  $$ values
+       ('00000000-0000-4000-8000-000000001203'::uuid),
+       ('00000000-0000-4000-8000-000000001204'::uuid) $$,
+  'legacy block rows do not exclude profiles from recommended discovery'
 );
 
 select is_empty(

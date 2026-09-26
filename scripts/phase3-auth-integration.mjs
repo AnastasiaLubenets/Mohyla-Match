@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 
 import { createClient } from "@supabase/supabase-js";
 
+const execFileAsync = promisify(execFile);
 const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.API_URL ?? "";
 const anonKey =
@@ -12,6 +15,7 @@ const serviceRoleKey =
   process.env.SUPABASE_SERVICE_ROLE_KEY ??
   process.env.SERVICE_ROLE_KEY ??
   "";
+const localDatabaseUrl = process.env.LOCAL_SUPABASE_DB_URL ?? "";
 const appBaseUrl = process.env.APP_BASE_URL ?? "http://127.0.0.1:3000";
 const mailpitUrl = process.env.MAILPIT_URL ?? "http://127.0.0.1:54324";
 
@@ -46,6 +50,33 @@ async function expectNoSupabaseError(result, label) {
   }
 
   return result.data;
+}
+
+function sqlUuid(value, label) {
+  assert.match(
+    value,
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    label,
+  );
+
+  return `'${value}'::uuid`;
+}
+
+async function queryLocalJson(sql, label) {
+  assert.ok(localDatabaseUrl, `${label}: LOCAL_SUPABASE_DB_URL is required`);
+
+  const args = [localDatabaseUrl, "-X", "-q", "-v", "ON_ERROR_STOP=1"];
+  args.push("-A", "-t", "-c", sql);
+
+  try {
+    const { stdout } = await execFileAsync("psql", args, {
+      maxBuffer: 1024 * 1024,
+    });
+    return JSON.parse(stdout.trim() || "null");
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${label}: ${message}`);
+  }
 }
 
 async function cleanup() {
@@ -349,6 +380,22 @@ function assertTextExcludes(body, forbiddenText, label) {
   assert.ok(
     !body.includes(forbiddenText),
     `${label}: expected page to omit "${forbiddenText}"`,
+  );
+}
+
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function assertAnchorHrefExcludes(body, forbiddenHref, label) {
+  const pattern = new RegExp(
+    `<a\\b[^>]*href=["']${escapeRegex(forbiddenHref)}(?:[?#][^"']*)?["'][^>]*>`,
+    "i",
+  );
+
+  assert.ok(
+    !pattern.test(body),
+    `${label}: expected page to omit anchor link to "${forbiddenHref}"`,
   );
 }
 
@@ -1312,23 +1359,27 @@ async function runProfileFlow(
     "deleted target profile is unavailable",
   );
 
-  const blockedTarget = await createConfirmedUser(
+  const legacyBlockedTarget = await createConfirmedUser(
     `profile-blocked-${suffix}@${allowedDomain}`,
   );
-  await seedCompletedProfile(blockedTarget.id, taxonomy, {
-    fullName: "Phase Five Blocked Target",
+  await seedCompletedProfile(legacyBlockedTarget.id, taxonomy, {
+    fullName: "Phase Five Legacy Block Target",
   });
   await expectNoSupabaseError(
     await service.from("blocks").insert({
       blocker_user_id: userId,
-      blocked_user_id: blockedTarget.id,
+      blocked_user_id: legacyBlockedTarget.id,
     }),
-    "seed profile block",
+    "seed legacy profile block",
   );
-  await assertProfileUnavailable(
-    cookieJar,
-    blockedTarget.id,
-    "blocked target profile is unavailable",
+  const legacyBlockedProfileBody = await readPageText(
+    await getPath(`/profiles/${legacyBlockedTarget.id}`, cookieJar),
+    "legacy blocked target profile",
+  );
+  assertTextContains(
+    legacyBlockedProfileBody,
+    "Phase Five Legacy Block Target",
+    "legacy block row does not hide target profile",
   );
 
   await assertProfileUnavailable(
@@ -1407,12 +1458,17 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
   assertTextContains(discoverBody, "Skip", "discover page renders skip action");
   assertTextExcludes(
     discoverBody,
-    "Connect",
-    "discover page removes connect action",
+    'action="/app/action"',
+    "discover skip action is not posted to the legacy server route",
   );
   assertTextExcludes(
     discoverBody,
-    "Matches",
+    "Connect",
+    "discover page removes connect action",
+  );
+  assertAnchorHrefExcludes(
+    discoverBody,
+    "/matches",
     "primary navigation hides matches from discovery",
   );
   assertTextExcludes(
@@ -1504,13 +1560,13 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
   );
   assertTextContains(
     peerProfileBody,
-    "Block",
-    "other profile keeps block action",
-  );
-  assertTextContains(
-    peerProfileBody,
     "Report",
     "other profile keeps report action",
+  );
+  assertTextExcludes(
+    peerProfileBody,
+    "Block",
+    "other profile removes block action",
   );
   assertTextExcludes(
     peerProfileBody,
@@ -1710,32 +1766,43 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
     ),
     "/app",
     { status: "passed" },
-    "discover skip records the simplified dismissal action",
+    "legacy discover skip route returns harmless success",
   );
   assert.equal(
     await countActiveMatches(userId, peer.id),
     0,
     "simplified discovery flow does not create a match",
   );
-  const discoveryEvents = await expectNoSupabaseError(
-    await service
-      .from("product_events")
-      .select("event_name")
-      .eq("user_id", userId)
-      .eq("subject_user_id", peer.id)
-      .in("event_name", ["discover_action_skip", "discover_action_connect"])
-      .order("created_at", { ascending: true }),
+  const legacySkipInteractions = await queryLocalJson(
+    `select json_build_object('count', count(*))::text
+       from public.interactions
+      where source_user_id = ${sqlUuid(userId, "source user id")}
+        and target_user_id = ${sqlUuid(peer.id, "target user id")}
+        and action = 'skip';`,
+    "load legacy skip interactions",
+  );
+  assert.equal(
+    Number(legacySkipInteractions.count),
+    0,
+    "legacy skip route does not persist a skip interaction",
+  );
+  const discoveryEventNames = await queryLocalJson(
+    `select coalesce(json_agg(event_name order by created_at), '[]'::json)::text
+       from public.product_events
+      where user_id = ${sqlUuid(userId, "event user id")}
+        and subject_user_id = ${sqlUuid(peer.id, "event subject user id")}
+        and event_name in ('discover_action_skip', 'discover_action_connect');`,
     "load simplified discovery action events",
   );
   assert.deepEqual(
-    discoveryEvents.map((event) => event.event_name),
-    ["discover_action_skip"],
-    "simplified discovery product UI emits skip but no connect event",
+    discoveryEventNames,
+    [],
+    "legacy skip route emits no discovery skip or connect event",
   );
-  assertTextExcludes(
+  assertTextContains(
     await readPageText(await getPath("/app", cookieJar), "discover after skip"),
     "Phase Six Match Peer",
-    "skipped profile is removed from discovery",
+    "legacy skipped profile remains eligible after reload",
   );
   const allAfterSkipBody = await readPageText(
     await getPath("/app?view=all&q=Phase%20Six%20Match", cookieJar),
@@ -1787,51 +1854,53 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
     "profile report records a product event",
   );
 
-  assertRedirectWithParams(
-    await postForm(
-      "/profiles/block",
-      {
-        targetUserId: peer.id,
-      },
-      cookieJar,
-    ),
-    "/app",
-    { status: "blocked" },
-    "profile block route succeeds",
-  );
-  await assertProfileUnavailable(
+  const blockRouteResponse = await postForm(
+    "/profiles/block",
+    {
+      targetUserId: peer.id,
+    },
     cookieJar,
-    peer.id,
-    "blocked profile becomes unavailable",
   );
-  assertTextExcludes(
+  assert.equal(
+    blockRouteResponse.status,
+    404,
+    "profile block route is removed",
+  );
+  const profileAfterRemovedBlockRouteBody = await readPageText(
+    await getPath(`/profiles/${peer.id}`, cookieJar),
+    "profile after removed block route",
+  );
+  assertTextContains(
+    profileAfterRemovedBlockRouteBody,
+    "Phase Six Match Peer",
+    "removed block route leaves profile visible",
+  );
+  assertTextContains(
     await readPageText(
       await getPath("/app?view=all&q=Phase%20Six%20Match", cookieJar),
-      "all students after block",
+      "all students after removed block route",
     ),
     "Phase Six Match Peer",
-    "blocked profile is removed from all students",
+    "removed block route leaves profile visible in all students",
   );
-  const blockedContactResponse = await postJson(
+  const contactAfterRemovedBlockResponse = await postJson(
     "/profiles/contact",
     { targetUserId: peer.id },
     cookieJar,
   );
-  assert.equal(
-    blockedContactResponse.status,
-    404,
-    "blocked profile email contact request is rejected",
+  const contactAfterRemovedBlockPayload = await readJson(
+    contactAfterRemovedBlockResponse,
+    "profile direct email contact endpoint after removed block route",
   );
-  const blockedContactPayload = await blockedContactResponse.json();
-  assert.deepEqual(
-    blockedContactPayload,
-    { error: "Direct email contact is not available for this profile." },
-    "blocked profile email contact returns a safe error",
+  assert.equal(
+    contactAfterRemovedBlockPayload.email,
+    peer.email,
+    "removed block route leaves direct email contact available",
   );
   assert.equal(
     await countActiveMatches(userId, peer.id),
     0,
-    "blocking leaves no active integration match",
+    "removed block route creates no active integration match",
   );
 }
 

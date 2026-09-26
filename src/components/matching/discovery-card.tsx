@@ -1,7 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { AuthSubmitButton } from "@/components/auth-submit-button";
 import { ContactReveal } from "@/components/matching/contact-reveal";
 import { SaveProfileButton } from "@/components/matching/save-profile-button";
 import { SystemAvatar } from "@/components/profile/system-avatar";
@@ -13,15 +14,12 @@ function StatusMessage({
   status,
 }: Readonly<{ error?: string; status?: string }>) {
   const statusMessages: Record<string, string> = {
-    blocked: "Profile blocked. They will not appear in discovery.",
-    passed: "Skipped. Showing the next available profile.",
     reported: "Report submitted. Thank you for helping keep Mohyla Match safe.",
     saved: "Saved for later. You can find this profile in Saved.",
     unsaved: "Removed from Saved.",
   };
   const errorMessages: Record<string, string> = {
     "action-failed": "We could not save that discovery action. Try again.",
-    "block-failed": "We could not block that profile. Try again.",
     "report-failed": "We could not submit that report. Try again.",
     "save-failed": "We could not update Saved. Try again.",
   };
@@ -43,39 +41,6 @@ function StatusMessage({
   }
 
   return null;
-}
-
-function DiscoveryActionForm({
-  action,
-  children,
-  className,
-  pendingLabel,
-  returnTo,
-  targetUserId,
-}: Readonly<{
-  action: "skip";
-  children: ReactNode;
-  className?: string;
-  pendingLabel: string;
-  returnTo: string;
-  targetUserId: string;
-}>) {
-  return (
-    <form action="/app/action" method="post">
-      <input name="targetUserId" type="hidden" value={targetUserId} />
-      <input name="action" type="hidden" value={action} />
-      <input name="returnTo" type="hidden" value={returnTo} />
-      <AuthSubmitButton
-        className={
-          className ??
-          "inline-flex h-12 w-full items-center justify-center rounded-full border border-border px-5 text-sm font-semibold text-foreground transition hover:border-primary disabled:cursor-not-allowed disabled:opacity-70"
-        }
-        pendingLabel={pendingLabel}
-      >
-        {children}
-      </AuthSubmitButton>
-    </form>
-  );
 }
 
 function SectionIcon({
@@ -169,8 +134,9 @@ export function DiscoveryCard({
   candidate,
   emptyAction,
   error,
-  emptyDescription = "Your previous actions and blocks are already filtered out. Come back after more students complete onboarding.",
+  emptyDescription = "Your previous actions are already filtered out. Come back after more students complete onboarding.",
   emptyTitle = "No new profiles right now.",
+  onSkip,
   returnTo = "/app?view=recommended",
   saved = false,
   showProfileAction = true,
@@ -182,6 +148,7 @@ export function DiscoveryCard({
   emptyDescription?: string;
   emptyTitle?: string;
   error?: string;
+  onSkip?: (userId: string) => void;
   returnTo?: string;
   saved?: boolean;
   showProfileAction?: boolean;
@@ -223,6 +190,7 @@ export function DiscoveryCard({
       ? candidate.collaborationGoals
       : candidate.lookingForSkills;
   const showLookingForCategory = candidate.collaborationGoals.length === 0;
+  const canSkip = showSkip && typeof onSkip === "function";
 
   return (
     <>
@@ -348,18 +316,17 @@ export function DiscoveryCard({
             showIcon
             targetUserId={candidate.userId}
           />
-          {showSkip ? (
+          {canSkip ? (
             <div className="flex justify-center sm:col-start-3 sm:justify-end">
-              <DiscoveryActionForm
-                action="skip"
+              <button
+                aria-label={`Skip ${candidate.fullName}`}
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
-                pendingLabel="Skipping..."
-                returnTo={returnTo}
-                targetUserId={candidate.userId}
+                onClick={() => onSkip?.(candidate.userId)}
+                type="button"
               >
                 <span>Skip</span>
                 <ArrowRightIcon />
-              </DiscoveryActionForm>
+              </button>
             </div>
           ) : null}
         </footer>

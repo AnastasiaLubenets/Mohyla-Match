@@ -1,16 +1,14 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
 
 import { AllStudentsList } from "@/components/matching/all-students-list";
 import { AppSidebar } from "@/components/matching/app-chrome";
-import { DiscoveryCard } from "@/components/matching/discovery-card";
+import { RecommendedFeed } from "@/components/matching/recommended-feed";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import { requireAccountState } from "@/lib/auth/guards";
 import {
   loadAllDiscoveryProfiles,
   loadDiscoveryCandidates,
   loadSavedProfiles,
-  type DiscoveryCandidate,
 } from "@/lib/matching/data";
 import {
   buildDiscoveryFilterOptions,
@@ -350,75 +348,6 @@ function DiscoveryViewTabs({
   );
 }
 
-function DiscoveryFeed({
-  candidates,
-  emptyAction,
-  emptyDescription,
-  emptyTitle,
-  error,
-  loadError,
-  returnTo,
-  savedProfileIds,
-  showProfileAction,
-  showSkip,
-  status,
-}: Readonly<{
-  candidates: readonly DiscoveryCandidate[];
-  emptyAction?: ReactNode;
-  emptyDescription?: string;
-  emptyTitle?: string;
-  error?: string;
-  loadError?: boolean;
-  returnTo: string;
-  savedProfileIds: ReadonlySet<string>;
-  showProfileAction?: boolean;
-  showSkip?: boolean;
-  status?: string;
-}>) {
-  if (loadError) {
-    return (
-      <DiscoveryCard
-        candidate={null}
-        emptyDescription="Try again in a moment."
-        emptyTitle="Could not load recommendations."
-        error={error}
-        showProfileAction={false}
-        status={status}
-      />
-    );
-  }
-
-  if (candidates.length === 0) {
-    return (
-      <DiscoveryCard
-        candidate={null}
-        emptyAction={emptyAction}
-        emptyDescription={emptyDescription}
-        emptyTitle={emptyTitle}
-        error={error}
-        showProfileAction={showProfileAction}
-        status={status}
-      />
-    );
-  }
-
-  return (
-    <div className="space-y-5">
-      {candidates.map((candidate, index) => (
-        <DiscoveryCard
-          candidate={candidate}
-          error={index === 0 ? error : undefined}
-          key={candidate.userId}
-          returnTo={returnTo}
-          saved={savedProfileIds.has(candidate.userId)}
-          showSkip={showSkip}
-          status={index === 0 ? status : undefined}
-        />
-      ))}
-    </div>
-  );
-}
-
 export default async function AppPage({ searchParams }: PageProps) {
   const accountState = await requireAccountState("/app", ["active"]);
   const params = await searchParams;
@@ -458,15 +387,8 @@ export default async function AppPage({ searchParams }: PageProps) {
   const activeFilters = hasActiveDiscoveryFilters(filters);
   const options = buildDiscoveryFilterOptions(allCandidates);
   const returnTo = discoveryViewHref(params, view);
-  const recommendedEmptyAction = (
-    <Link
-      className="inline-flex h-12 items-center justify-center rounded-md bg-blue-800 px-5 text-sm font-bold text-white transition hover:bg-blue-900"
-      href={discoveryViewHref(params, "all")}
-      scroll={false}
-    >
-      Browse all students
-    </Link>
-  );
+  const savedProfileIdList = Array.from(savedProfileIds);
+  const allStudentsHref = discoveryViewHref(params, "all");
 
   return (
     <main className="min-h-screen bg-[#eef6fb] text-blue-950 xl:h-screen xl:overflow-hidden">
@@ -490,17 +412,15 @@ export default async function AppPage({ searchParams }: PageProps) {
                   totalCount={allCandidates.length}
                 />
               ) : (
-                <DiscoveryFeed
+                <RecommendedFeed
+                  allStudentsHref={allStudentsHref}
                   candidates={filteredCandidates}
-                  emptyAction={recommendedEmptyAction}
                   emptyDescription="No more recommendations right now. You can still browse all students."
                   emptyTitle="No more recommendations right now."
                   error={firstParam(params.error)}
                   loadError={candidatesResult.error}
                   returnTo={returnTo}
-                  savedProfileIds={savedProfileIds}
-                  showProfileAction={false}
-                  showSkip
+                  savedProfileIds={savedProfileIdList}
                   status={firstParam(params.status)}
                 />
               )}

@@ -443,18 +443,19 @@ on conflict do nothing;
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000901', true);
 
-select is_empty(
+select results_eq(
   $$ select user_id
      from public.get_saved_profiles(10)
      where user_id = '00000000-0000-4000-8000-000000000903' $$,
-  'blocked saved targets are excluded from saved profiles'
+  $$ values ('00000000-0000-4000-8000-000000000903'::uuid) $$,
+  'legacy block row does not hide saved targets'
 );
 
 select results_eq(
   $$ select saved, action::text
      from public.set_saved_profile('00000000-0000-4000-8000-000000000903', false) $$,
   $$ values (false, null::text) $$,
-  'caller can remove a saved profile even after a block hides it'
+  'caller can remove a saved profile even after a legacy block row'
 );
 
 select * from finish();

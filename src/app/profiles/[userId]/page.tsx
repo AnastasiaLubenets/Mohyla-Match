@@ -27,7 +27,6 @@ function ProfileStatusMessage({
   status,
 }: Readonly<{ error?: string; status?: string }>) {
   const statusMessages: Record<string, string> = {
-    passed: "Skipped.",
     reported: "Report submitted. Thank you for helping keep Mohyla Match safe.",
     saved: "Saved for later.",
     unsaved: "Removed from Saved.",

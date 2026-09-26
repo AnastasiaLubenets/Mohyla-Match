@@ -11,15 +11,12 @@ function AllStudentsStatusMessage({
   status,
 }: Readonly<{ error?: string; status?: string }>) {
   const statusMessages: Record<string, string> = {
-    blocked: "Profile blocked. They will not appear in discovery.",
-    passed: "Skipped. Showing the next available profile.",
     reported: "Report submitted. Thank you for helping keep Mohyla Match safe.",
     saved: "Saved for later. You can find this profile in Saved.",
     unsaved: "Removed from Saved.",
   };
   const errorMessages: Record<string, string> = {
     "action-failed": "We could not save that discovery action. Try again.",
-    "block-failed": "We could not block that profile. Try again.",
     "report-failed": "We could not submit that report. Try again.",
     "save-failed": "We could not update Saved. Try again.",
   };
