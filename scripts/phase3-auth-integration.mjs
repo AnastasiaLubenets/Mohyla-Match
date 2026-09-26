@@ -52,13 +52,20 @@ async function expectNoSupabaseError(result, label) {
   return result.data;
 }
 
-async function queryLocalJson(sql, variables, label) {
+function sqlUuid(value, label) {
+  assert.match(
+    value,
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    label,
+  );
+
+  return `'${value}'::uuid`;
+}
+
+async function queryLocalJson(sql, label) {
   assert.ok(localDatabaseUrl, `${label}: LOCAL_SUPABASE_DB_URL is required`);
 
   const args = [localDatabaseUrl, "-X", "-q", "-v", "ON_ERROR_STOP=1"];
-  Object.entries(variables).forEach(([name, value]) => {
-    args.push("-v", `${name}=${value}`);
-  });
   args.push("-A", "-t", "-c", sql);
 
   try {
@@ -1769,13 +1776,9 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
   const legacySkipInteractions = await queryLocalJson(
     `select json_build_object('count', count(*))::text
        from public.interactions
-      where source_user_id = :'source_user_id'::uuid
-        and target_user_id = :'target_user_id'::uuid
+      where source_user_id = ${sqlUuid(userId, "source user id")}
+        and target_user_id = ${sqlUuid(peer.id, "target user id")}
         and action = 'skip';`,
-    {
-      source_user_id: userId,
-      target_user_id: peer.id,
-    },
     "load legacy skip interactions",
   );
   assert.equal(
@@ -1786,13 +1789,9 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
   const discoveryEventNames = await queryLocalJson(
     `select coalesce(json_agg(event_name order by created_at), '[]'::json)::text
        from public.product_events
-      where user_id = :'user_id'::uuid
-        and subject_user_id = :'subject_user_id'::uuid
+      where user_id = ${sqlUuid(userId, "event user id")}
+        and subject_user_id = ${sqlUuid(peer.id, "event subject user id")}
         and event_name in ('discover_action_skip', 'discover_action_connect');`,
-    {
-      user_id: userId,
-      subject_user_id: peer.id,
-    },
     "load simplified discovery action events",
   );
   assert.deepEqual(
