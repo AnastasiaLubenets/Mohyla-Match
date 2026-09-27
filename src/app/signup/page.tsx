@@ -117,7 +117,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
       ]}
       subtitle="Become part of the Mohyla student network. Find people, share ideas, and build something together."
       title="Join Mohyla Match"
-      watercolorPlacement="right-of-content"
+      watercolorPlacement="full-bleed"
     >
       <section className="mt-7">
         <form action="/auth/signup" className="space-y-5" method="post">

@@ -63,6 +63,9 @@ a {
 }
 
 .public-auth-shell
+  .auth-watercolor--full-bleed
+  .auth-watercolor-image,
+.public-auth-shell
   .auth-watercolor--right-of-content
   .auth-watercolor-image {
   mix-blend-mode: normal;
@@ -85,6 +88,11 @@ a {
   }
 
   .public-auth-shell .auth-watercolor--right-of-content {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .public-auth-shell .auth-watercolor--full-bleed {
     -webkit-mask-image: none;
     mask-image: none;
   }
