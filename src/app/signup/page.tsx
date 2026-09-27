@@ -114,12 +114,11 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
           title: "",
         },
       ]}
-      benefitsPlacement="bottom-panel"
       subtitle="Become part of the Mohyla student network. Find people, share ideas, and build something together."
       title="Join Mohyla Match"
     >
-      <section className="mt-5 rounded-[1.35rem] border border-[#dce7f7] bg-white/92 p-4 shadow-[0_18px_50px_rgba(37,76,139,0.11)] backdrop-blur">
-        <form action="/auth/signup" className="space-y-2" method="post">
+      <section className="mt-7 rounded-[1.35rem] border border-[#dce7f7] bg-white/92 p-5 shadow-[0_18px_50px_rgba(37,76,139,0.11)] backdrop-blur sm:p-7">
+        <form action="/auth/signup" className="space-y-5" method="post">
           <AuthMessage message={message} />
           <AuthField
             helper="Your name as it appears at NaUKMA"
@@ -167,7 +166,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
             <ArrowRightIcon className="h-6 w-6" />
           </AuthSubmitButton>
         </form>
-        <div className="mt-3 flex items-center gap-5 text-sm font-semibold text-[#344268]">
+        <div className="mt-5 flex items-center gap-5 text-sm font-semibold text-[#344268]">
           <span className="h-px flex-1 bg-[#dce7f7]" />
           <p>
             Already have an account?{" "}
