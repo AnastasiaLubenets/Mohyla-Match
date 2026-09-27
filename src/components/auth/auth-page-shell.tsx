@@ -31,9 +31,9 @@ export function AuthPageShell({
   title,
 }: AuthPageShellProps) {
   return (
-    <main className="public-auth-shell min-h-screen overflow-hidden bg-[#f8fbff] text-[#101b55]">
-      <PublicHeader active={active} />
-      <section className="relative mx-auto grid min-h-[calc(100vh-6rem)] w-full max-w-[1800px] gap-8 px-5 pb-10 pt-8 sm:px-8 lg:grid-cols-[0.43fr_0.57fr] lg:items-start lg:px-12 lg:pt-8 xl:px-[clamp(5rem,4vw,6rem)] xl:pt-10">
+    <main className="public-auth-shell min-h-screen overflow-x-hidden bg-[#f8fbff] text-[#101b55] lg:min-h-[100dvh]">
+      <PublicHeader active={active} layout="auth" />
+      <section className="relative grid min-h-[calc(100vh-6rem)] w-full gap-8 px-5 pb-10 pt-8 sm:px-8 lg:min-h-[calc(100dvh-6rem)] lg:grid-cols-[minmax(0,43rem)_1fr] lg:items-start lg:px-[clamp(4.5rem,7vw,12rem)] lg:pt-8 xl:pt-10">
         <div className="relative z-10 min-w-0 max-w-[43rem]">
           <PublicBadge icon={badgeIcon}>Student collaboration network</PublicBadge>
           <h1 className="relative mt-8 max-w-3xl font-serif text-5xl font-bold leading-[0.98] tracking-normal text-[#070d35] sm:text-7xl lg:text-[5.3rem]">
@@ -56,7 +56,7 @@ export function AuthPageShell({
           </div>
         </div>
         <PublicWatercolor
-          className="auth-watercolor relative z-0 min-h-[22rem] min-w-0 lg:absolute lg:-top-28 lg:bottom-0 lg:right-0 lg:w-[62%] xl:w-[61%]"
+          className="auth-watercolor relative z-0 min-h-[22rem] min-w-0 lg:absolute lg:-top-28 lg:bottom-0 lg:right-0 lg:w-[58vw]"
           imageClassName="auth-watercolor-image object-cover object-right-bottom"
           priority
         />
