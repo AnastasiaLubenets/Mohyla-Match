@@ -21,7 +21,6 @@ type AuthPageShellProps = Readonly<{
   subtitle: string;
   title: string;
   benefitsDividers?: boolean;
-  watercolorPlacement?: "default" | "right-of-content" | "full-bleed";
 }>;
 
 export function AuthPageShell({
@@ -32,26 +31,22 @@ export function AuthPageShell({
   children,
   subtitle,
   title,
-  watercolorPlacement = "default",
 }: AuthPageShellProps) {
-  const watercolorClassName = {
-    default:
-      "auth-watercolor relative z-0 min-h-[22rem] min-w-0 lg:absolute lg:-top-28 lg:bottom-0 lg:right-0 lg:w-[58vw]",
-    "full-bleed":
-      "auth-watercolor auth-watercolor--full-bleed absolute inset-0 z-0 min-h-full w-full",
-    "right-of-content":
-      "auth-watercolor auth-watercolor--right-of-content relative z-0 min-h-[22rem] min-w-0 lg:absolute lg:-top-28 lg:bottom-0 lg:left-[calc(clamp(4.5rem,7vw,12rem)+43rem+1.5rem)] lg:right-0 lg:w-auto",
-  }[watercolorPlacement];
   const shellClassName =
-    watercolorPlacement === "full-bleed"
-      ? "public-auth-shell min-h-screen overflow-x-hidden bg-transparent text-[#101b55] lg:min-h-[100dvh]"
-      : "public-auth-shell min-h-screen overflow-x-hidden bg-[#f8fbff] text-[#101b55] lg:min-h-[100dvh]";
+    "public-auth-shell relative min-h-screen overflow-x-hidden bg-transparent text-[#101b55] lg:min-h-[100dvh]";
   const benefitsClassName = benefitsDividers
     ? "public-auth-inline-benefits mt-8 grid gap-4 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-[#dce7f7]"
     : "public-auth-inline-benefits mt-8 grid gap-4 sm:grid-cols-3 lg:gap-6";
 
   return (
     <main className={shellClassName}>
+      <PublicWatercolor
+        className="auth-watercolor auth-watercolor--full-bleed absolute inset-0 z-0 min-h-full w-full"
+        imageClassName="auth-watercolor-image object-cover object-right-bottom"
+        priority
+        preserveQuality
+        sizes="100vw"
+      />
       <PublicHeader active={active} layout="auth" />
       <section className="relative grid min-h-[calc(100vh-6rem)] w-full gap-8 px-5 pb-10 pt-8 sm:px-8 lg:min-h-[calc(100dvh-6rem)] lg:grid-cols-[minmax(0,43rem)_1fr] lg:items-start lg:px-[clamp(4.5rem,7vw,12rem)] lg:pt-8 xl:pt-10">
         <div className="relative z-10 min-w-0 max-w-[43rem]">
@@ -79,12 +74,6 @@ export function AuthPageShell({
             ))}
           </div>
         </div>
-        <PublicWatercolor
-          className={watercolorClassName}
-          imageClassName="auth-watercolor-image object-cover object-right-bottom"
-          priority
-          preserveQuality={watercolorPlacement !== "default"}
-        />
       </section>
     </main>
   );
