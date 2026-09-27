@@ -92,6 +92,20 @@ test("signup keeps benefits inline under the form and no bottom panel remains", 
   assert.match(loginPage, /Keep building/);
 });
 
+test("signup form renders directly on the page without an outer form card", () => {
+  const signupPage = source("src/app/signup/page.tsx");
+  const loginPage = source("src/app/login/page.tsx");
+
+  assert.match(signupPage, /<section className="mt-7">/);
+  assert.doesNotMatch(signupPage, /bg-white\/92/);
+  assert.doesNotMatch(signupPage, /shadow-\[0_18px_50px_rgba\(37,76,139,0\.11\)\]/);
+  assert.doesNotMatch(signupPage, /backdrop-blur/);
+  assert.doesNotMatch(signupPage, /rounded-\[1\.35rem\] border border-\[#dce7f7\]/);
+  assert.match(loginPage, /bg-white\/92/);
+  assert.match(loginPage, /shadow-\[0_18px_50px_rgba\(37,76,139,0\.11\)\]/);
+  assert.match(loginPage, /backdrop-blur/);
+});
+
 test("auth desktop shell keeps the approved wide top-aligned watercolor composition", () => {
   const shell = source("src/components/auth/auth-page-shell.tsx");
   const header = source("src/components/public/public-header.tsx");

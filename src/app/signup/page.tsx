@@ -119,7 +119,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
       title="Join Mohyla Match"
       watercolorPlacement="right-of-content"
     >
-      <section className="mt-7 rounded-[1.35rem] border border-[#dce7f7] bg-white/92 p-5 shadow-[0_18px_50px_rgba(37,76,139,0.11)] backdrop-blur sm:p-7">
+      <section className="mt-7">
         <form action="/auth/signup" className="space-y-5" method="post">
           <AuthMessage message={message} />
           <AuthField
