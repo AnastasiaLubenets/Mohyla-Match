@@ -20,6 +20,7 @@ type AuthPageShellProps = Readonly<{
   children: ReactNode;
   subtitle: string;
   title: string;
+  watercolorPlacement?: "default" | "right-of-content";
 }>;
 
 export function AuthPageShell({
@@ -29,7 +30,13 @@ export function AuthPageShell({
   children,
   subtitle,
   title,
+  watercolorPlacement = "default",
 }: AuthPageShellProps) {
+  const watercolorClassName =
+    watercolorPlacement === "right-of-content"
+      ? "auth-watercolor relative z-0 min-h-[22rem] min-w-0 lg:absolute lg:-top-28 lg:bottom-0 lg:left-[calc(clamp(4.5rem,7vw,12rem)+43rem+1.5rem)] lg:right-0 lg:w-auto"
+      : "auth-watercolor relative z-0 min-h-[22rem] min-w-0 lg:absolute lg:-top-28 lg:bottom-0 lg:right-0 lg:w-[58vw]";
+
   return (
     <main className="public-auth-shell min-h-screen overflow-x-hidden bg-[#f8fbff] text-[#101b55] lg:min-h-[100dvh]">
       <PublicHeader active={active} layout="auth" />
@@ -56,7 +63,7 @@ export function AuthPageShell({
           </div>
         </div>
         <PublicWatercolor
-          className="auth-watercolor relative z-0 min-h-[22rem] min-w-0 lg:absolute lg:-top-28 lg:bottom-0 lg:left-[calc(clamp(4.5rem,7vw,12rem)+43rem+1.5rem)] lg:right-0 lg:w-auto"
+          className={watercolorClassName}
           imageClassName="auth-watercolor-image object-cover object-right-bottom"
           priority
         />
