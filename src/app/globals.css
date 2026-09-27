@@ -59,32 +59,11 @@ a {
 }
 
 .public-auth-shell .auth-watercolor-image {
-  mix-blend-mode: multiply;
-}
-
-.public-auth-shell
-  .auth-watercolor--right-of-content
-  .auth-watercolor-image {
   mix-blend-mode: normal;
 }
 
 @media (min-width: 1024px) {
   .public-auth-shell .auth-watercolor {
-    -webkit-mask-image: linear-gradient(
-      90deg,
-      transparent 0%,
-      #000 15%,
-      #000 100%
-    );
-    mask-image: linear-gradient(
-      90deg,
-      transparent 0%,
-      #000 15%,
-      #000 100%
-    );
-  }
-
-  .public-auth-shell .auth-watercolor--right-of-content {
     -webkit-mask-image: none;
     mask-image: none;
   }

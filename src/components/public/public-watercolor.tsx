@@ -5,6 +5,7 @@ type PublicWatercolorProps = Readonly<{
   imageClassName?: string;
   preserveQuality?: boolean;
   priority?: boolean;
+  sizes?: string;
 }>;
 
 export function PublicWatercolor({
@@ -12,6 +13,7 @@ export function PublicWatercolor({
   imageClassName = "",
   preserveQuality = false,
   priority = false,
+  sizes = "(max-width: 768px) 100vw, 58vw",
 }: PublicWatercolorProps) {
   return (
     <div className={`pointer-events-none overflow-hidden ${className}`}>
@@ -21,7 +23,7 @@ export function PublicWatercolor({
         fill
         priority={priority}
         quality={preserveQuality ? 100 : undefined}
-        sizes="(max-width: 768px) 100vw, 58vw"
+        sizes={sizes}
         src="/branding/mohyla-campus-watercolor.png"
         unoptimized={preserveQuality}
       />

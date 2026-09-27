@@ -82,7 +82,7 @@ test("signup keeps benefits inline under the form and no bottom panel remains", 
   assert.doesNotMatch(shell, /public-auth-bottom-benefits/);
   assert.doesNotMatch(shell, /lg:fixed lg:inset-x-0 lg:bottom-0/);
   assert.doesNotMatch(shell, /lg:h-\[6\.25rem\]/);
-  assert.match(signupPage, /watercolorPlacement="right-of-content"/);
+  assert.doesNotMatch(signupPage, /watercolorPlacement=/);
   assert.doesNotMatch(loginPage, /watercolorPlacement=/);
   assert.match(signupPage, /Meet like-minded students/);
   assert.match(signupPage, /Find project teammates/);
@@ -92,21 +92,20 @@ test("signup keeps benefits inline under the form and no bottom panel remains", 
   assert.match(loginPage, /Keep building/);
 });
 
-test("signup form renders directly on the page without an outer form card", () => {
+test("signup and login forms render inside contained auth cards", () => {
   const signupPage = source("src/app/signup/page.tsx");
   const loginPage = source("src/app/login/page.tsx");
 
-  assert.match(signupPage, /<section className="mt-7">/);
-  assert.doesNotMatch(signupPage, /bg-white\/92/);
-  assert.doesNotMatch(signupPage, /shadow-\[0_18px_50px_rgba\(37,76,139,0\.11\)\]/);
-  assert.doesNotMatch(signupPage, /backdrop-blur/);
-  assert.doesNotMatch(signupPage, /rounded-\[1\.35rem\] border border-\[#dce7f7\]/);
+  assert.match(signupPage, /<section className="mt-7 rounded-\[1\.35rem\] border border-\[#dce7f7\] bg-white\/92 p-5 shadow-\[0_18px_50px_rgba\(37,76,139,0\.11\)\] backdrop-blur sm:p-7">/);
+  assert.match(signupPage, /<form action="\/auth\/signup"[\s\S]*Already have an account\?/);
+  assert.match(signupPage, /Already have an account\?[\s\S]*<\/section>/);
+  assert.match(loginPage, /<section className="mt-7 rounded-\[1\.35rem\] border border-\[#dce7f7\] bg-white\/92 p-5 shadow-\[0_18px_50px_rgba\(37,76,139,0\.11\)\] backdrop-blur sm:p-7">/);
   assert.match(loginPage, /bg-white\/92/);
   assert.match(loginPage, /shadow-\[0_18px_50px_rgba\(37,76,139,0\.11\)\]/);
   assert.match(loginPage, /backdrop-blur/);
 });
 
-test("auth desktop shell keeps the approved wide top-aligned watercolor composition", () => {
+test("auth shell uses one full-bleed watercolor background without a solid left panel", () => {
   const shell = source("src/components/auth/auth-page-shell.tsx");
   const header = source("src/components/public/public-header.tsx");
   const globals = source("src/app/globals.css");
@@ -121,23 +120,22 @@ test("auth desktop shell keeps the approved wide top-aligned watercolor composit
   assert.match(shell, /lg:items-start/);
   assert.doesNotMatch(shell, /lg:items-center/);
   assert.match(shell, /max-w-\[43rem\]/);
-  assert.doesNotMatch(shell, /max-w-\[38rem\]/);
-  assert.match(shell, /lg:-top-28/);
-  assert.match(shell, /watercolorPlacement = "default"/);
-  assert.match(
-    shell,
-    /lg:left-\[calc\(clamp\(4\.5rem,7vw,12rem\)\+43rem\+1\.5rem\)\]/,
-  );
-  assert.match(shell, /lg:right-0/);
-  assert.match(shell, /lg:w-auto/);
-  assert.match(shell, /lg:w-\[58vw\]/);
+  assert.match(shell, /public-auth-shell relative min-h-screen overflow-x-hidden bg-transparent/);
+  assert.doesNotMatch(shell, /bg-\[#f8fbff\]/);
+  assert.doesNotMatch(shell, /watercolorPlacement/);
+  assert.match(shell, /auth-watercolor--full-bleed absolute inset-0/);
+  assert.match(shell, /<PublicWatercolor[\s\S]*<PublicHeader/);
   assert.match(shell, /auth-watercolor-image object-cover object-right-bottom/);
-  assert.match(shell, /auth-watercolor--right-of-content/);
-  assert.match(shell, /preserveQuality=\{watercolorPlacement === "right-of-content"\}/);
+  assert.match(shell, /preserveQuality/);
+  assert.match(shell, /sizes="100vw"/);
+  assert.doesNotMatch(shell, /auth-watercolor--right-of-content/);
   assert.match(watercolor, /quality=\{preserveQuality \? 100 : undefined\}/);
   assert.match(watercolor, /unoptimized=\{preserveQuality\}/);
+  assert.match(watercolor, /sizes = "\(max-width: 768px\) 100vw, 58vw"/);
+  assert.match(watercolor, /sizes=\{sizes\}/);
   assert.match(globals, /\.public-auth-shell input:-webkit-autofill/);
-  assert.match(globals, /mix-blend-mode: multiply/);
-  assert.match(globals, /auth-watercolor--right-of-content[\s\S]*mix-blend-mode: normal/);
-  assert.match(globals, /auth-watercolor--right-of-content[\s\S]*mask-image: none/);
+  assert.match(globals, /mix-blend-mode: normal/);
+  assert.doesNotMatch(globals, /mix-blend-mode: multiply/);
+  assert.match(globals, /\.public-auth-shell \.auth-watercolor[\s\S]*mask-image: none/);
+  assert.doesNotMatch(globals, /linear-gradient\(\s*90deg,\s*transparent/);
 });
