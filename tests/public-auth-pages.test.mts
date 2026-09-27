@@ -65,6 +65,28 @@ test("auth shell uses stable benefit descriptions as React keys", () => {
   assert.doesNotMatch(shell, /key=\{benefit\.title\}/);
 });
 
+test("signup moves benefits into a dedicated bottom panel while login stays inline", () => {
+  const shell = source("src/components/auth/auth-page-shell.tsx");
+  const signupPage = source("src/app/signup/page.tsx");
+  const loginPage = source("src/app/login/page.tsx");
+
+  assert.match(signupPage, /benefitsPlacement="bottom-panel"/);
+  assert.doesNotMatch(loginPage, /benefitsPlacement=/);
+  assert.match(shell, /benefitsPlacement = "inline"/);
+  assert.match(shell, /benefitsPlacement === "inline"/);
+  assert.match(shell, /public-auth-inline-benefits/);
+  assert.match(shell, /public-auth-bottom-benefits/);
+  assert.match(shell, /hasBottomPanel \? \(/);
+  assert.match(shell, /border-t border-\[#dce7f7\] bg-white\/95/);
+  assert.match(shell, /sm:grid-cols-3 sm:divide-x/);
+  assert.match(shell, /lg:fixed lg:inset-x-0 lg:bottom-0/);
+  assert.match(shell, /lg:h-\[6\.25rem\]/);
+  assert.match(
+    shell,
+    /\[@media\(min-width:1024px\)_and_\(max-height:850px\)\]:relative/,
+  );
+});
+
 test("auth desktop shell keeps the approved wide top-aligned watercolor composition", () => {
   const shell = source("src/components/auth/auth-page-shell.tsx");
   const header = source("src/components/public/public-header.tsx");
