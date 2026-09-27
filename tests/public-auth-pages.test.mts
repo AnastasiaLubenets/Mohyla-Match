@@ -74,8 +74,11 @@ test("signup keeps benefits inline under the form and no bottom panel remains", 
   assert.doesNotMatch(loginPage, /benefitsPlacement=/);
   assert.doesNotMatch(shell, /benefitsPlacement/);
   assert.doesNotMatch(shell, /hasBottomPanel/);
+  assert.match(signupPage, /benefitsDividers/);
+  assert.doesNotMatch(loginPage, /benefitsDividers/);
+  assert.match(shell, /sm:divide-x sm:divide-\[#dce7f7\]/);
   assert.match(shell, /public-auth-inline-benefits/);
-  assert.match(shell, /\{children\}[\s\S]*public-auth-inline-benefits/);
+  assert.match(shell, /\{children\}[\s\S]*<div className=\{benefitsClassName\}>/);
   assert.doesNotMatch(shell, /public-auth-bottom-benefits/);
   assert.doesNotMatch(shell, /lg:fixed lg:inset-x-0 lg:bottom-0/);
   assert.doesNotMatch(shell, /lg:h-\[6\.25rem\]/);
@@ -93,6 +96,7 @@ test("auth desktop shell keeps the approved wide top-aligned watercolor composit
   const shell = source("src/components/auth/auth-page-shell.tsx");
   const header = source("src/components/public/public-header.tsx");
   const globals = source("src/app/globals.css");
+  const watercolor = source("src/components/public/public-watercolor.tsx");
 
   assert.match(shell, /<PublicHeader active=\{active\} layout="auth" \/>/);
   assert.doesNotMatch(shell, /mx-auto/);
@@ -114,6 +118,12 @@ test("auth desktop shell keeps the approved wide top-aligned watercolor composit
   assert.match(shell, /lg:w-auto/);
   assert.match(shell, /lg:w-\[58vw\]/);
   assert.match(shell, /auth-watercolor-image object-cover object-right-bottom/);
+  assert.match(shell, /auth-watercolor--right-of-content/);
+  assert.match(shell, /preserveQuality=\{watercolorPlacement === "right-of-content"\}/);
+  assert.match(watercolor, /quality=\{preserveQuality \? 100 : undefined\}/);
+  assert.match(watercolor, /unoptimized=\{preserveQuality\}/);
   assert.match(globals, /\.public-auth-shell input:-webkit-autofill/);
   assert.match(globals, /mix-blend-mode: multiply/);
+  assert.match(globals, /auth-watercolor--right-of-content[\s\S]*mix-blend-mode: normal/);
+  assert.match(globals, /auth-watercolor--right-of-content[\s\S]*mask-image: none/);
 });

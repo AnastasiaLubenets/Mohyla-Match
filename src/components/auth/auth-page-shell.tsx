@@ -20,6 +20,7 @@ type AuthPageShellProps = Readonly<{
   children: ReactNode;
   subtitle: string;
   title: string;
+  benefitsDividers?: boolean;
   watercolorPlacement?: "default" | "right-of-content";
 }>;
 
@@ -27,6 +28,7 @@ export function AuthPageShell({
   active,
   badgeIcon = <GraduationCapIcon className="h-4 w-4" />,
   benefits,
+  benefitsDividers = false,
   children,
   subtitle,
   title,
@@ -34,8 +36,11 @@ export function AuthPageShell({
 }: AuthPageShellProps) {
   const watercolorClassName =
     watercolorPlacement === "right-of-content"
-      ? "auth-watercolor relative z-0 min-h-[22rem] min-w-0 lg:absolute lg:-top-28 lg:bottom-0 lg:left-[calc(clamp(4.5rem,7vw,12rem)+43rem+1.5rem)] lg:right-0 lg:w-auto"
+      ? "auth-watercolor auth-watercolor--right-of-content relative z-0 min-h-[22rem] min-w-0 lg:absolute lg:-top-28 lg:bottom-0 lg:left-[calc(clamp(4.5rem,7vw,12rem)+43rem+1.5rem)] lg:right-0 lg:w-auto"
       : "auth-watercolor relative z-0 min-h-[22rem] min-w-0 lg:absolute lg:-top-28 lg:bottom-0 lg:right-0 lg:w-[58vw]";
+  const benefitsClassName = benefitsDividers
+    ? "public-auth-inline-benefits mt-8 grid gap-4 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-[#dce7f7]"
+    : "public-auth-inline-benefits mt-8 grid gap-4 sm:grid-cols-3 lg:gap-6";
 
   return (
     <main className="public-auth-shell min-h-screen overflow-x-hidden bg-[#f8fbff] text-[#101b55] lg:min-h-[100dvh]">
@@ -51,14 +56,18 @@ export function AuthPageShell({
             {subtitle}
           </p>
           {children}
-          <div className="public-auth-inline-benefits mt-8 grid gap-4 sm:grid-cols-3 lg:gap-6">
+          <div className={benefitsClassName}>
             {benefits.map((benefit) => (
-              <PublicBenefit
-                description={benefit.description}
-                icon={benefit.icon}
+              <div
+                className={benefitsDividers ? "sm:px-6 sm:first:pl-0 sm:last:pr-0" : ""}
                 key={benefit.description}
-                title={benefit.title}
-              />
+              >
+                <PublicBenefit
+                  description={benefit.description}
+                  icon={benefit.icon}
+                  title={benefit.title}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -66,6 +75,7 @@ export function AuthPageShell({
           className={watercolorClassName}
           imageClassName="auth-watercolor-image object-cover object-right-bottom"
           priority
+          preserveQuality={watercolorPlacement === "right-of-content"}
         />
       </section>
     </main>

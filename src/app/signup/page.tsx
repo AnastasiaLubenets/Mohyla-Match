@@ -97,6 +97,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
   return (
     <AuthPageShell
       active="signup"
+      benefitsDividers
       benefits={[
         {
           description: "Meet like-minded students",
