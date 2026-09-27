@@ -20,6 +20,23 @@ test("public landing keeps real auth navigation and static demo content", () => 
   assert.doesNotMatch(page, /createSupabase|from\(|rpc\(/);
 });
 
+test("public landing is a single-viewport watercolor entry screen", () => {
+  const page = source("src/app/page.tsx");
+
+  assert.match(page, /relative h-screen min-h-\[100dvh\] overflow-hidden bg-transparent/);
+  assert.match(page, /<PublicWatercolor[\s\S]*<PublicHeader active="landing"/);
+  assert.match(page, /className="absolute inset-0 z-0 min-h-full w-full"/);
+  assert.match(page, /imageClassName="object-cover object-right-bottom"/);
+  assert.match(page, /preserveQuality/);
+  assert.match(page, /sizes="100vw"/);
+  assert.match(page, /h-\[calc\(100dvh-6rem\)\]/);
+  assert.equal(page.match(/<section/g)?.length, 1);
+  assert.doesNotMatch(page, /bottomBenefits/);
+  assert.doesNotMatch(page, /PublicBenefit/);
+  assert.doesNotMatch(page, /More[\s\S]*Brighter[\s\S]*ideas/);
+  assert.doesNotMatch(page, /Connects/);
+});
+
 test("signup page keeps the auth action and required real fields", () => {
   const page = source("src/app/signup/page.tsx");
   const route = source("src/app/auth/signup/route.ts");
