@@ -70,13 +70,18 @@ test("auth desktop shell keeps the approved wide top-aligned watercolor composit
   const header = source("src/components/public/public-header.tsx");
   const globals = source("src/app/globals.css");
 
-  assert.match(header, /max-w-\[1800px\]/);
-  assert.match(shell, /max-w-\[1800px\]/);
+  assert.match(shell, /<PublicHeader active=\{active\} layout="auth" \/>/);
+  assert.doesNotMatch(shell, /mx-auto/);
+  assert.doesNotMatch(shell, /max-w-\[1800px\]/);
+  assert.match(header, /auth: "flex w-full/);
+  assert.match(header, /lg:px-\[clamp\(4\.5rem,7vw,12rem\)\]/);
+  assert.match(header, /landing:[\s\S]*max-w-\[1800px\]/);
   assert.match(shell, /lg:items-start/);
   assert.doesNotMatch(shell, /lg:items-center/);
   assert.match(shell, /max-w-\[43rem\]/);
   assert.doesNotMatch(shell, /max-w-\[38rem\]/);
   assert.match(shell, /lg:-top-28/);
+  assert.match(shell, /lg:w-\[58vw\]/);
   assert.match(shell, /auth-watercolor-image object-cover object-right-bottom/);
   assert.match(globals, /\.public-auth-shell input:-webkit-autofill/);
   assert.match(globals, /mix-blend-mode: multiply/);

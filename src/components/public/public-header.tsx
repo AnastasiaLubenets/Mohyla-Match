@@ -2,12 +2,22 @@ import Link from "next/link";
 
 type PublicHeaderProps = Readonly<{
   active?: "landing" | "login" | "signup";
+  layout?: "auth" | "landing";
 }>;
 
-export function PublicHeader({ active = "landing" }: PublicHeaderProps) {
+const headerLayoutClasses = {
+  auth: "flex w-full items-center justify-between gap-4 px-5 py-6 sm:px-8 lg:px-[clamp(4.5rem,7vw,12rem)]",
+  landing:
+    "mx-auto flex w-full max-w-[1800px] items-center justify-between gap-4 px-5 py-6 sm:px-8 lg:px-12 xl:px-[clamp(5rem,4vw,6rem)]",
+} as const;
+
+export function PublicHeader({
+  active = "landing",
+  layout = "landing",
+}: PublicHeaderProps) {
   return (
     <header className="relative z-20">
-      <div className="mx-auto flex w-full max-w-[1800px] items-center justify-between gap-4 px-5 py-6 sm:px-8 lg:px-12 xl:px-[clamp(5rem,4vw,6rem)]">
+      <div className={headerLayoutClasses[layout]}>
         <Link
           href="/"
           className="text-[0.92rem] font-bold uppercase tracking-[0.14em] text-[#173f95] transition hover:text-[#101b55] sm:text-base"
