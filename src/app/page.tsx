@@ -39,7 +39,7 @@ export default function LandingPage() {
       />
       <PublicHeader active="landing" />
 
-      <section className="landing-hero-section relative z-10 mx-auto grid h-[calc(100dvh-6rem)] w-full max-w-[1500px] items-center px-5 pb-6 pt-2 sm:px-8 lg:grid-cols-[0.48fr_0.52fr] lg:gap-10 lg:px-12 xl:px-16">
+      <section className="landing-hero-section relative z-10 mx-auto grid h-[calc(100dvh-6rem)] w-full max-w-[1500px] items-center px-5 pb-6 pt-2 sm:px-8 lg:grid-cols-[0.52fr_0.48fr] lg:gap-10 lg:px-12 xl:px-16">
         <div className="grid min-h-0 gap-8 lg:contents">
           <div className="landing-hero-copy max-w-[43rem]">
             <PublicBadge icon={<GraduationCapIcon className="h-4 w-4" />}>
@@ -96,7 +96,7 @@ export default function LandingPage() {
           </div>
 
           <div className="relative z-10 hidden min-h-0 items-center justify-center lg:flex lg:justify-end xl:justify-center">
-            <div className="landing-demo-scale relative z-10 scale-[0.92] xl:scale-100">
+            <div className="landing-demo-scale relative z-10">
               <LandingDemoCard />
             </div>
           </div>
