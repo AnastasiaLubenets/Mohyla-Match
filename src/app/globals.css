@@ -73,17 +73,86 @@ a {
   }
 
   .landing-hero-heading {
-    margin-top: 1.25rem;
-    line-height: 1;
+    margin-top: 1rem;
+    line-height: 1.1;
   }
 
   .landing-hero-description {
-    margin-top: 1.25rem;
+    margin-top: 0.75rem;
   }
 
   .landing-hero-actions,
   .landing-hero-benefits {
+    margin-top: 1.125rem;
+  }
+
+  .landing-demo-scale {
+    width: clamp(30rem, 38vw, 34rem);
+  }
+
+  .landing-demo-card {
+    max-width: none;
+    padding: 1.75rem;
+    border-radius: 1.65rem;
+  }
+
+  .landing-demo-meta {
+    margin-bottom: 1.35rem;
+  }
+
+  .landing-demo-eyebrow,
+  .landing-demo-match {
+    font-size: 0.95rem;
+  }
+
+  .landing-demo-profile-row {
+    gap: 1.25rem;
+  }
+
+  .landing-demo-avatar {
+    width: 6rem;
+    height: 6rem;
+  }
+
+  .landing-demo-name {
+    font-size: 2rem;
+    line-height: 1.1;
+  }
+
+  .landing-demo-program {
+    margin-top: 0.35rem;
+    font-size: 1.1rem;
+  }
+
+  .landing-demo-tags {
+    margin-top: 1.4rem;
+    gap: 0.6rem;
+  }
+
+  .landing-demo-tag {
+    padding: 0.55rem 1.05rem;
+    font-size: 0.95rem;
+  }
+
+  .landing-demo-description {
+    margin-top: 1.4rem;
+    font-size: 1.05rem;
+    line-height: 1.7rem;
+  }
+
+  .landing-demo-footer {
     margin-top: 1.5rem;
+    padding-top: 1.25rem;
+  }
+
+  .landing-demo-button {
+    height: 3.4rem;
+    font-size: 1.05rem;
+  }
+
+  .landing-demo-button-icon {
+    width: 1.35rem;
+    height: 1.35rem;
   }
 }
 
@@ -91,11 +160,81 @@ a {
   .landing-hero-copy {
     transform: translateX(-3rem);
   }
+
+  .landing-demo-scale {
+    width: clamp(30rem, 38vw, 35rem);
+  }
 }
 
 @media (min-width: 1536px) {
   .landing-hero-copy {
     transform: translateX(clamp(-10rem, calc(25rem - 29.1667vw), -3rem));
+  }
+
+  .landing-demo-scale {
+    width: clamp(36rem, 36vw, 39rem);
+  }
+
+  .landing-demo-card {
+    padding: 2.25rem;
+    border-radius: 1.9rem;
+  }
+
+  .landing-demo-meta {
+    margin-bottom: 1.55rem;
+  }
+
+  .landing-demo-eyebrow,
+  .landing-demo-match {
+    font-size: 1.05rem;
+  }
+
+  .landing-demo-profile-row {
+    gap: 1.55rem;
+  }
+
+  .landing-demo-avatar {
+    width: 7.5rem;
+    height: 7.5rem;
+  }
+
+  .landing-demo-name {
+    font-size: 2.45rem;
+  }
+
+  .landing-demo-program {
+    font-size: 1.25rem;
+  }
+
+  .landing-demo-tags {
+    margin-top: 1.65rem;
+    gap: 0.75rem;
+  }
+
+  .landing-demo-tag {
+    padding: 0.7rem 1.25rem;
+    font-size: 1.05rem;
+  }
+
+  .landing-demo-description {
+    margin-top: 1.65rem;
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+
+  .landing-demo-footer {
+    margin-top: 1.75rem;
+    padding-top: 1.5rem;
+  }
+
+  .landing-demo-button {
+    height: 4.25rem;
+    font-size: 1.2rem;
+  }
+
+  .landing-demo-button-icon {
+    width: 1.5rem;
+    height: 1.5rem;
   }
 }
 
@@ -113,20 +252,20 @@ a {
   }
 
   .landing-hero-heading {
-    margin-top: 0.75rem;
+    margin-top: 0.5rem;
     font-size: 4.55rem;
-    line-height: 0.98;
+    line-height: 1.05;
   }
 
   .landing-hero-description {
-    margin-top: 0.75rem;
+    margin-top: 0.5rem;
     max-width: 36rem;
     font-size: 1.25rem;
-    line-height: 1.55;
+    line-height: 1.45;
   }
 
   .landing-hero-actions {
-    margin-top: 0.875rem;
+    margin-top: 0.625rem;
   }
 
   .landing-hero-action {
@@ -137,7 +276,7 @@ a {
   }
 
   .landing-hero-benefits {
-    margin-top: 0.875rem;
+    margin-top: 0.75rem;
     gap: 0.625rem;
   }
 
@@ -157,8 +296,70 @@ a {
   }
 
   .landing-demo-scale {
-    transform: scale(0.82);
-    transform-origin: center;
+    width: clamp(27rem, 36vw, 31rem);
+  }
+
+  .landing-demo-card {
+    padding: 1.5rem;
+    border-radius: 1.45rem;
+  }
+
+  .landing-demo-meta {
+    margin-bottom: 1rem;
+  }
+
+  .landing-demo-eyebrow,
+  .landing-demo-match {
+    font-size: 0.85rem;
+  }
+
+  .landing-demo-profile-row {
+    gap: 1rem;
+  }
+
+  .landing-demo-avatar {
+    width: 5.5rem;
+    height: 5.5rem;
+  }
+
+  .landing-demo-name {
+    font-size: 1.75rem;
+  }
+
+  .landing-demo-program {
+    margin-top: 0.25rem;
+    font-size: 0.98rem;
+  }
+
+  .landing-demo-tags {
+    margin-top: 1rem;
+    gap: 0.45rem;
+  }
+
+  .landing-demo-tag {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.85rem;
+  }
+
+  .landing-demo-description {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.45rem;
+  }
+
+  .landing-demo-footer {
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+  }
+
+  .landing-demo-button {
+    height: 3.1rem;
+    font-size: 0.95rem;
+  }
+
+  .landing-demo-button-icon {
+    width: 1.15rem;
+    height: 1.15rem;
   }
 }
 
@@ -177,13 +378,13 @@ a {
   .landing-hero-heading {
     margin-top: 0.5rem;
     font-size: 4.25rem;
-    line-height: 0.96;
+    line-height: 1.02;
   }
 
   .landing-hero-description,
   .landing-hero-actions,
   .landing-hero-benefits {
-    margin-top: 0.75rem;
+    margin-top: 0.5rem;
   }
 
   .landing-hero-description {
@@ -196,6 +397,33 @@ a {
   }
 
   .landing-demo-scale {
-    transform: scale(0.76);
+    width: clamp(25rem, 36vw, 29rem);
+  }
+
+  .landing-demo-card {
+    padding: 1.25rem;
+  }
+
+  .landing-demo-avatar {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .landing-demo-name {
+    font-size: 1.6rem;
+  }
+
+  .landing-demo-description {
+    margin-top: 0.85rem;
+    line-height: 1.35rem;
+  }
+
+  .landing-demo-footer {
+    margin-top: 0.9rem;
+    padding-top: 0.85rem;
+  }
+
+  .landing-demo-button {
+    height: 2.95rem;
   }
 }
