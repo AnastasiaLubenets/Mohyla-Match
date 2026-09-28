@@ -87,9 +87,15 @@ a {
   }
 }
 
-@media (min-width: 1536px) {
+@media (min-width: 1280px) {
   .landing-hero-copy {
     transform: translateX(-3rem);
+  }
+}
+
+@media (min-width: 1536px) {
+  .landing-hero-copy {
+    transform: translateX(clamp(-10rem, calc(25rem - 29.1667vw), -3rem));
   }
 }
 
@@ -158,7 +164,7 @@ a {
 
 @media (min-width: 1280px) and (max-height: 800px) {
   .landing-hero-copy {
-    transform: translateX(-2rem);
+    transform: translateX(-3rem);
   }
 }
 
