@@ -178,7 +178,7 @@ export function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
         <div className="mb-5 pb-2 2xl:mb-8">
           <SidebarBuildingArt />
           <div className="px-3">
-            <p className="font-serif text-2xl font-semibold uppercase leading-[0.95] text-blue-950 2xl:text-3xl">
+            <p className="font-serif text-[1.42rem] font-semibold uppercase leading-[1.08] text-blue-950 2xl:text-[1.75rem]">
               Більше
               <br />
               людей
