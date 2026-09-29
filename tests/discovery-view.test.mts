@@ -26,15 +26,30 @@ test("discovery tab links preserve filters and search but drop transient status"
     discoveryViewHref(
       {
         error: "action-failed",
-        goal: "build-app",
-        program: "Computer Science",
+        goal: ["build-app", "research-project"],
+        program: ["Computer Science", "Economics"],
         q: "python",
+        skill: ["react", "figma"],
         status: "saved",
         view: "recommended",
+        year: ["3", "4"],
       },
       "all",
     ),
-    "/app?view=all&goal=build-app&program=Computer+Science&q=python",
+    "/app?view=all&goal=build-app&goal=research-project&program=Computer+Science&program=Economics&q=python&skill=react&skill=figma&year=3&year=4",
+  );
+});
+
+test("discovery tab links deduplicate repeated query values", () => {
+  assert.equal(
+    discoveryViewHref(
+      {
+        interest: ["startups", "startups", "  "],
+        view: "all",
+      },
+      "recommended",
+    ),
+    "/app?view=recommended&interest=startups",
   );
 });
 
@@ -220,5 +235,81 @@ test("all students loader calls the production RPC with an explicit limit", () =
     matchingDataSource,
     /get_all_discovery_profiles",\s*{}\)/,
     "the all-students RPC should never be called with an empty args object",
+  );
+});
+
+test("discover filters use searchable multi-selects and full taxonomy loader", () => {
+  const appPageSource = readFileSync(
+    join(repoRoot, "src/app/app/page.tsx"),
+    "utf8",
+  );
+  const matchingDataSource = readFileSync(
+    join(repoRoot, "src/lib/matching/data.ts"),
+    "utf8",
+  );
+  const multiSelectSource = readFileSync(
+    join(repoRoot, "src/components/matching/discovery-multi-select.tsx"),
+    "utf8",
+  );
+
+  assert.match(
+    appPageSource,
+    /loadDiscoveryFilterOptions\(supabase\)/,
+    "Discover should load filter choices from reference taxonomy tables",
+  );
+  assert.match(
+    appPageSource,
+    /<DiscoveryMultiSelect[\s\S]*?name="skill"/,
+    "Skills should use the shared searchable multi-select control",
+  );
+  assert.match(
+    appPageSource,
+    /<DiscoveryMultiSelect[\s\S]*?name="interest"/,
+    "Interests should use the shared searchable multi-select control",
+  );
+  assert.doesNotMatch(
+    appPageSource,
+    /function SelectField|<select/,
+    "Discover filters should not use browser-native select controls",
+  );
+  assert.match(
+    matchingDataSource,
+    /\.from\("academic_programs"\)[\s\S]*?\.eq\("is_active", true\)/,
+    "Academic program options should come from active reference rows",
+  );
+  assert.match(
+    matchingDataSource,
+    /\.from\("skills"\)[\s\S]*?\.eq\("is_active", true\)/,
+    "Skill options should come from active reference rows",
+  );
+  assert.match(
+    multiSelectSource,
+    /searchDiscoveryFilterOptions\(options, query\)/,
+    "Filter dropdowns should support partial text search",
+  );
+  assert.match(
+    multiSelectSource,
+    /name=\{name\} type="hidden"/,
+    "Selected values should submit as repeated query params",
+  );
+  assert.match(
+    appPageSource,
+    /<aside className="[^"]*xl:overflow-y-auto/,
+    "The desktop filter rail should scroll instead of clipping lower dropdowns",
+  );
+  assert.doesNotMatch(
+    appPageSource,
+    /<aside className="[^"]*xl:overflow-hidden/,
+    "The desktop filter rail must not hide overflowing dropdown content",
+  );
+  assert.match(
+    multiSelectSource,
+    /role="group"/,
+    "Filter option lists should keep checkbox semantics instead of an invalid listbox wrapper",
+  );
+  assert.doesNotMatch(
+    multiSelectSource,
+    /role="listbox"|aria-multiselectable/,
+    "Checkbox filter options should not be wrapped in incomplete listbox semantics",
   );
 });
