@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { AllStudentsList } from "@/components/matching/all-students-list";
 import { AppSidebar } from "@/components/matching/app-chrome";
-import { DiscoveryMultiSelect } from "@/components/matching/discovery-multi-select";
+import { DiscoveryFilterForm } from "@/components/matching/discovery-filter-form";
 import { RecommendedFeed } from "@/components/matching/recommended-feed";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import { requireAccountState } from "@/lib/auth/guards";
@@ -224,63 +224,7 @@ function DiscoveryFilterRail({
           Showing {resultCount} of {totalCount} available profiles.
         </p>
 
-        <form action="/app" className="mt-4 space-y-3">
-          <input name="view" type="hidden" value={view} />
-          {filters.searchQuery ? (
-            <input name="q" type="hidden" value={filters.searchQuery} />
-          ) : null}
-          <DiscoveryMultiSelect
-            key={`goal-${filters.collaborationGoalSlugs.join("\u001f")}`}
-            label="Collaboration goal"
-            name="goal"
-            options={options.collaborationGoals}
-            placeholder="Select goals"
-            searchPlaceholder="Search collaboration goals..."
-            selectedValues={filters.collaborationGoalSlugs}
-          />
-          <DiscoveryMultiSelect
-            key={`program-${filters.programNames.join("\u001f")}`}
-            label="Academic program"
-            name="program"
-            options={options.programs}
-            placeholder="Select programs"
-            searchPlaceholder="Search academic programs..."
-            selectedValues={filters.programNames}
-          />
-          <DiscoveryMultiSelect
-            key={`year-${filters.yearsOfStudy.join("\u001f")}`}
-            label="Year of study"
-            name="year"
-            options={options.years}
-            placeholder="Select years"
-            searchPlaceholder="Search years..."
-            selectedValues={filters.yearsOfStudy}
-          />
-          <DiscoveryMultiSelect
-            key={`skill-${filters.skillSlugs.join("\u001f")}`}
-            label="Skills"
-            name="skill"
-            options={options.skills}
-            placeholder="Select skills"
-            searchPlaceholder="Search skills..."
-            selectedValues={filters.skillSlugs}
-          />
-          <DiscoveryMultiSelect
-            key={`interest-${filters.interestSlugs.join("\u001f")}`}
-            label="Interests"
-            name="interest"
-            options={options.interests}
-            placeholder="Select interests"
-            searchPlaceholder="Search interests..."
-            selectedValues={filters.interestSlugs}
-          />
-          <button
-            className="mt-2 inline-flex h-12 w-full items-center justify-center rounded-md bg-blue-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900"
-            type="submit"
-          >
-            Apply filters
-          </button>
-        </form>
+        <DiscoveryFilterForm filters={filters} options={options} view={view} />
       </section>
 
       <section className="rounded-lg border border-blue-50 bg-[#fffaf0] p-7">
