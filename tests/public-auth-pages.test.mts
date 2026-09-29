@@ -128,12 +128,12 @@ test("auth shell uses one full-bleed watercolor background without a solid left 
   const globals = source("src/app/globals.css");
   const watercolor = source("src/components/public/public-watercolor.tsx");
 
-  assert.match(shell, /<PublicHeader active=\{active\} layout="auth" \/>/);
-  assert.doesNotMatch(shell, /mx-auto/);
-  assert.doesNotMatch(shell, /max-w-\[1800px\]/);
-  assert.match(header, /auth: "flex w-full/);
-  assert.match(header, /lg:px-\[clamp\(4\.5rem,7vw,12rem\)\]/);
-  assert.match(header, /landing:[\s\S]*max-w-\[1800px\]/);
+  assert.match(shell, /<PublicHeader active=\{active\} \/>/);
+  assert.doesNotMatch(shell, /layout="auth"/);
+  assert.doesNotMatch(header, /layout\?:|layout =|headerLayoutClasses|auth:|landing:/);
+  assert.match(header, /<header className="relative z-20 w-screen">/);
+  assert.match(header, /max-w-\[1800px\]/);
+  assert.match(header, /lg:px-12 xl:px-\[clamp\(5rem,4vw,6rem\)\]/);
   assert.match(shell, /lg:items-start/);
   assert.doesNotMatch(shell, /lg:items-center/);
   assert.match(shell, /max-w-\[43rem\]/);

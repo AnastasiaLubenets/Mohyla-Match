@@ -47,7 +47,7 @@ export function AuthPageShell({
         preserveQuality
         sizes="100vw"
       />
-      <PublicHeader active={active} layout="auth" />
+      <PublicHeader active={active} />
       <section className="relative grid min-h-[calc(100vh-6rem)] w-full gap-8 px-5 pb-10 pt-8 sm:px-8 lg:min-h-[calc(100dvh-6rem)] lg:grid-cols-[minmax(0,43rem)_1fr] lg:items-start lg:px-[clamp(4.5rem,7vw,12rem)] lg:pt-8 xl:pt-10">
         <div className="relative z-10 min-w-0 max-w-[43rem]">
           <PublicBadge icon={badgeIcon}>Student collaboration network</PublicBadge>
