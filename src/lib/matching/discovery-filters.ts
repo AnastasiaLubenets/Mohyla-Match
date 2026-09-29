@@ -1,12 +1,12 @@
 import type { DiscoveryCandidate, MatchingItem, MatchingSkill } from "./data";
 
 export type DiscoveryFilters = Readonly<{
-  collaborationGoalSlug: string;
-  interestSlug: string;
-  programName: string;
+  collaborationGoalSlugs: readonly string[];
+  interestSlugs: readonly string[];
+  programNames: readonly string[];
   searchQuery: string;
-  skillSlug: string;
-  yearOfStudy: string;
+  skillSlugs: readonly string[];
+  yearsOfStudy: readonly string[];
 }>;
 
 export type DiscoveryFilterOptions = Readonly<{
@@ -17,18 +17,18 @@ export type DiscoveryFilterOptions = Readonly<{
   years: FilterOption[];
 }>;
 
-type FilterOption = Readonly<{
+export type FilterOption = Readonly<{
   label: string;
   value: string;
 }>;
 
 const emptyFilters: DiscoveryFilters = {
-  collaborationGoalSlug: "",
-  interestSlug: "",
-  programName: "",
+  collaborationGoalSlugs: [],
+  interestSlugs: [],
+  programNames: [],
   searchQuery: "",
-  skillSlug: "",
-  yearOfStudy: "",
+  skillSlugs: [],
+  yearsOfStudy: [],
 };
 
 function normalize(value: string) {
@@ -45,12 +45,28 @@ function sortByLabel(options: FilterOption[]) {
   );
 }
 
-function skillMatchesSlug(skills: readonly MatchingSkill[], slug: string) {
-  return skills.some((skill) => skill.slug === slug);
+function uniqueValues(values: readonly string[] | string | undefined) {
+  const rawValues = Array.isArray(values) ? values : values ? [values] : [];
+
+  return [
+    ...new Set(
+      rawValues.map((value) => value.trim()).filter((value) => value.length > 0),
+    ),
+  ];
 }
 
-function itemMatchesSlug(items: readonly MatchingItem[], slug: string) {
-  return items.some((item) => item.slug === slug);
+function anySkillMatchesSlug(
+  skills: readonly MatchingSkill[],
+  slugs: readonly string[],
+) {
+  return skills.some((skill) => slugs.includes(skill.slug));
+}
+
+function anyItemMatchesSlug(
+  items: readonly MatchingItem[],
+  slugs: readonly string[],
+) {
+  return items.some((item) => slugs.includes(item.slug));
 }
 
 function searchableText(candidate: DiscoveryCandidate) {
@@ -83,18 +99,24 @@ export function createDiscoveryFilters(
   filters: Partial<DiscoveryFilters>,
 ): DiscoveryFilters {
   return {
-    collaborationGoalSlug:
-      filters.collaborationGoalSlug?.trim() ?? emptyFilters.collaborationGoalSlug,
-    interestSlug: filters.interestSlug?.trim() ?? emptyFilters.interestSlug,
-    programName: filters.programName?.trim() ?? emptyFilters.programName,
+    collaborationGoalSlugs: uniqueValues(filters.collaborationGoalSlugs),
+    interestSlugs: uniqueValues(filters.interestSlugs),
+    programNames: uniqueValues(filters.programNames),
     searchQuery: filters.searchQuery?.trim() ?? emptyFilters.searchQuery,
-    skillSlug: filters.skillSlug?.trim() ?? emptyFilters.skillSlug,
-    yearOfStudy: filters.yearOfStudy?.trim() ?? emptyFilters.yearOfStudy,
+    skillSlugs: uniqueValues(filters.skillSlugs),
+    yearsOfStudy: uniqueValues(filters.yearsOfStudy),
   };
 }
 
 export function hasActiveDiscoveryFilters(filters: DiscoveryFilters) {
-  return Object.values(filters).some((value) => value.length > 0);
+  return (
+    filters.searchQuery.length > 0 ||
+    filters.collaborationGoalSlugs.length > 0 ||
+    filters.interestSlugs.length > 0 ||
+    filters.programNames.length > 0 ||
+    filters.skillSlugs.length > 0 ||
+    filters.yearsOfStudy.length > 0
+  );
 }
 
 export function filterDiscoveryCandidates(
@@ -108,39 +130,39 @@ export function filterDiscoveryCandidates(
 
   return candidates.filter((candidate) => {
     if (
-      filters.programName &&
-      candidate.academicProgramName !== filters.programName
+      filters.programNames.length > 0 &&
+      !filters.programNames.includes(candidate.academicProgramName)
     ) {
       return false;
     }
 
     if (
-      filters.yearOfStudy &&
-      candidate.yearOfStudy.toString() !== filters.yearOfStudy
+      filters.yearsOfStudy.length > 0 &&
+      !filters.yearsOfStudy.includes(candidate.yearOfStudy.toString())
     ) {
       return false;
     }
 
     if (
-      filters.skillSlug &&
-      !skillMatchesSlug(candidate.offeredSkills, filters.skillSlug) &&
-      !skillMatchesSlug(candidate.lookingForSkills, filters.skillSlug)
+      filters.skillSlugs.length > 0 &&
+      !anySkillMatchesSlug(candidate.offeredSkills, filters.skillSlugs) &&
+      !anySkillMatchesSlug(candidate.lookingForSkills, filters.skillSlugs)
     ) {
       return false;
     }
 
     if (
-      filters.interestSlug &&
-      !itemMatchesSlug(candidate.interests, filters.interestSlug)
+      filters.interestSlugs.length > 0 &&
+      !anyItemMatchesSlug(candidate.interests, filters.interestSlugs)
     ) {
       return false;
     }
 
     if (
-      filters.collaborationGoalSlug &&
-      !itemMatchesSlug(
+      filters.collaborationGoalSlugs.length > 0 &&
+      !anyItemMatchesSlug(
         candidate.collaborationGoals,
-        filters.collaborationGoalSlug,
+        filters.collaborationGoalSlugs,
       )
     ) {
       return false;
@@ -210,4 +232,28 @@ export function buildDiscoveryFilterOptions(
     skills,
     years,
   };
+}
+
+export function buildSupportedYearOptions(): FilterOption[] {
+  return [1, 2, 3, 4, 5, 6].map((year) => ({
+    label: `Year ${year}`,
+    value: year.toString(),
+  }));
+}
+
+export function searchDiscoveryFilterOptions(
+  options: readonly FilterOption[],
+  query: string,
+) {
+  const normalizedQuery = normalize(query);
+
+  if (!normalizedQuery) {
+    return [...options];
+  }
+
+  return options.filter((option) =>
+    `${option.label} ${option.value}`.toLocaleLowerCase().includes(
+      normalizedQuery,
+    ),
+  );
 }

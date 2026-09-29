@@ -1,5 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import {
+  buildSupportedYearOptions,
+  type DiscoveryFilterOptions,
+} from "@/lib/matching/discovery-filters";
 import type { Database, Json } from "@/types/database";
 
 type SupabaseServerClient = SupabaseClient<Database>;
@@ -209,6 +213,70 @@ export async function loadAllDiscoveryProfiles(
 
   return {
     data: (result.data ?? []).map(mapDiscoveryCandidate),
+    error: false,
+  };
+}
+
+export async function loadDiscoveryFilterOptions(
+  supabase: SupabaseServerClient,
+): Promise<LoadResult<DiscoveryFilterOptions>> {
+  const [programsResult, skillsResult, interestsResult, goalsResult] =
+    await Promise.all([
+      supabase
+        .from("academic_programs")
+        .select("display_name, sort_order")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .order("display_name", { ascending: true }),
+      supabase
+        .from("skills")
+        .select("name, slug, sort_order")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .order("name", { ascending: true }),
+      supabase
+        .from("interests")
+        .select("name, slug, sort_order")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .order("name", { ascending: true }),
+      supabase
+        .from("collaboration_goals")
+        .select("name, slug, sort_order")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .order("name", { ascending: true }),
+    ]);
+
+  if (
+    programsResult.error ||
+    skillsResult.error ||
+    interestsResult.error ||
+    goalsResult.error
+  ) {
+    return { data: null, error: true };
+  }
+
+  return {
+    data: {
+      collaborationGoals: (goalsResult.data ?? []).map((goal) => ({
+        label: goal.name,
+        value: goal.slug,
+      })),
+      interests: (interestsResult.data ?? []).map((interest) => ({
+        label: interest.name,
+        value: interest.slug,
+      })),
+      programs: (programsResult.data ?? []).map((program) => ({
+        label: program.display_name,
+        value: program.display_name,
+      })),
+      skills: (skillsResult.data ?? []).map((skill) => ({
+        label: skill.name,
+        value: skill.slug,
+      })),
+      years: buildSupportedYearOptions(),
+    },
     error: false,
   };
 }

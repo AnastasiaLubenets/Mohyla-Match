@@ -2,12 +2,14 @@ import Link from "next/link";
 
 import { AllStudentsList } from "@/components/matching/all-students-list";
 import { AppSidebar } from "@/components/matching/app-chrome";
+import { DiscoveryMultiSelect } from "@/components/matching/discovery-multi-select";
 import { RecommendedFeed } from "@/components/matching/recommended-feed";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import { requireAccountState } from "@/lib/auth/guards";
 import {
   loadAllDiscoveryProfiles,
   loadDiscoveryCandidates,
+  loadDiscoveryFilterOptions,
   loadSavedProfiles,
 } from "@/lib/matching/data";
 import {
@@ -40,6 +42,16 @@ function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
 
+function paramValues(value: string | string[] | undefined): string[] {
+  const rawValues = Array.isArray(value) ? value : value ? [value] : [];
+
+  return [
+    ...new Set(
+      rawValues.map((item) => item.trim()).filter((item) => item.length > 0),
+    ),
+  ];
+}
+
 function SearchIcon() {
   return (
     <svg
@@ -70,21 +82,41 @@ function HiddenFilterInputs({
   return (
     <>
       <input name="view" type="hidden" value={view} />
-      {omit !== "programName" && filters.programName ? (
-        <input name="program" type="hidden" value={filters.programName} />
-      ) : null}
-      {omit !== "yearOfStudy" && filters.yearOfStudy ? (
-        <input name="year" type="hidden" value={filters.yearOfStudy} />
-      ) : null}
-      {omit !== "skillSlug" && filters.skillSlug ? (
-        <input name="skill" type="hidden" value={filters.skillSlug} />
-      ) : null}
-      {omit !== "interestSlug" && filters.interestSlug ? (
-        <input name="interest" type="hidden" value={filters.interestSlug} />
-      ) : null}
-      {omit !== "collaborationGoalSlug" && filters.collaborationGoalSlug ? (
-        <input name="goal" type="hidden" value={filters.collaborationGoalSlug} />
-      ) : null}
+      {omit !== "programNames"
+        ? filters.programNames.map((value) => (
+            <input
+              key={`program-${value}`}
+              name="program"
+              type="hidden"
+              value={value}
+            />
+          ))
+        : null}
+      {omit !== "yearsOfStudy"
+        ? filters.yearsOfStudy.map((value) => (
+            <input key={`year-${value}`} name="year" type="hidden" value={value} />
+          ))
+        : null}
+      {omit !== "skillSlugs"
+        ? filters.skillSlugs.map((value) => (
+            <input key={`skill-${value}`} name="skill" type="hidden" value={value} />
+          ))
+        : null}
+      {omit !== "interestSlugs"
+        ? filters.interestSlugs.map((value) => (
+            <input
+              key={`interest-${value}`}
+              name="interest"
+              type="hidden"
+              value={value}
+            />
+          ))
+        : null}
+      {omit !== "collaborationGoalSlugs"
+        ? filters.collaborationGoalSlugs.map((value) => (
+            <input key={`goal-${value}`} name="goal" type="hidden" value={value} />
+          ))
+        : null}
     </>
   );
 }
@@ -154,38 +186,6 @@ function TopBar({
   );
 }
 
-function SelectField({
-  label,
-  name,
-  options,
-  placeholder = "Any",
-  value,
-}: Readonly<{
-  label: string;
-  name: string;
-  options: readonly { label: string; value: string }[];
-  placeholder?: string;
-  value: string;
-}>) {
-  return (
-    <label className="block">
-      <span className="text-sm font-bold text-blue-900">{label}</span>
-      <select
-        className="mt-1.5 h-10 w-full rounded-md border border-blue-100 bg-white px-3 text-sm font-medium text-blue-900 outline-none transition focus:border-blue-300"
-        defaultValue={value}
-        name={name}
-      >
-        <option value="">{placeholder}</option>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
-
 function DiscoveryFilterRail({
   filters,
   hasActiveFilters,
@@ -229,37 +229,50 @@ function DiscoveryFilterRail({
           {filters.searchQuery ? (
             <input name="q" type="hidden" value={filters.searchQuery} />
           ) : null}
-          <SelectField
+          <DiscoveryMultiSelect
+            key={`goal-${filters.collaborationGoalSlugs.join("\u001f")}`}
             label="Collaboration goal"
             name="goal"
             options={options.collaborationGoals}
-            value={filters.collaborationGoalSlug}
+            placeholder="Select goals"
+            searchPlaceholder="Search collaboration goals..."
+            selectedValues={filters.collaborationGoalSlugs}
           />
-          <SelectField
+          <DiscoveryMultiSelect
+            key={`program-${filters.programNames.join("\u001f")}`}
             label="Academic program"
             name="program"
             options={options.programs}
-            value={filters.programName}
+            placeholder="Select programs"
+            searchPlaceholder="Search academic programs..."
+            selectedValues={filters.programNames}
           />
-          <SelectField
+          <DiscoveryMultiSelect
+            key={`year-${filters.yearsOfStudy.join("\u001f")}`}
             label="Year of study"
             name="year"
             options={options.years}
-            value={filters.yearOfStudy}
+            placeholder="Select years"
+            searchPlaceholder="Search years..."
+            selectedValues={filters.yearsOfStudy}
           />
-          <SelectField
+          <DiscoveryMultiSelect
+            key={`skill-${filters.skillSlugs.join("\u001f")}`}
             label="Skills"
             name="skill"
             options={options.skills}
             placeholder="Select skills"
-            value={filters.skillSlug}
+            searchPlaceholder="Search skills..."
+            selectedValues={filters.skillSlugs}
           />
-          <SelectField
+          <DiscoveryMultiSelect
+            key={`interest-${filters.interestSlugs.join("\u001f")}`}
             label="Interests"
             name="interest"
             options={options.interests}
             placeholder="Select interests"
-            value={filters.interestSlug}
+            searchPlaceholder="Search interests..."
+            selectedValues={filters.interestSlugs}
           />
           <button
             className="mt-2 inline-flex h-12 w-full items-center justify-center rounded-md bg-blue-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900"
@@ -353,15 +366,20 @@ export default async function AppPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const view = createDiscoveryView(params.view);
   const filters = createDiscoveryFilters({
-    collaborationGoalSlug: firstParam(params.goal),
-    interestSlug: firstParam(params.interest),
-    programName: firstParam(params.program),
+    collaborationGoalSlugs: paramValues(params.goal),
+    interestSlugs: paramValues(params.interest),
+    programNames: paramValues(params.program),
     searchQuery: firstParam(params.q),
-    skillSlug: firstParam(params.skill),
-    yearOfStudy: firstParam(params.year),
+    skillSlugs: paramValues(params.skill),
+    yearsOfStudy: paramValues(params.year),
   });
   const supabase = await createSupabaseServerClient();
-  const [candidatesResult, currentProfileResult, savedProfilesResult] =
+  const [
+    candidatesResult,
+    currentProfileResult,
+    savedProfilesResult,
+    filterOptionsResult,
+  ] =
     await Promise.all([
       view === "all"
         ? loadAllDiscoveryProfiles(supabase)
@@ -370,6 +388,7 @@ export default async function AppPage({ searchParams }: PageProps) {
         ? loadSafeProfile(supabase, accountState.userId)
         : Promise.resolve({ data: null, error: false }),
       loadSavedProfiles(supabase, 100),
+      loadDiscoveryFilterOptions(supabase),
     ]);
   const currentProfile = currentProfileResult.error
     ? null
@@ -385,7 +404,9 @@ export default async function AppPage({ searchParams }: PageProps) {
     : (candidatesResult.data ?? []);
   const filteredCandidates = filterDiscoveryCandidates(allCandidates, filters);
   const activeFilters = hasActiveDiscoveryFilters(filters);
-  const options = buildDiscoveryFilterOptions(allCandidates);
+  const options = filterOptionsResult.error
+    ? buildDiscoveryFilterOptions(allCandidates)
+    : (filterOptionsResult.data ?? buildDiscoveryFilterOptions(allCandidates));
   const returnTo = discoveryViewHref(params, view);
   const savedProfileIdList = Array.from(savedProfileIds);
   const allStudentsHref = discoveryViewHref(params, "all");

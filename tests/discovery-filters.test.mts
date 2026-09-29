@@ -4,9 +4,11 @@ import assert from "node:assert/strict";
 import type { DiscoveryCandidate } from "../src/lib/matching/data.ts";
 import {
   buildDiscoveryFilterOptions,
+  buildSupportedYearOptions,
   createDiscoveryFilters,
   filterDiscoveryCandidates,
   hasActiveDiscoveryFilters,
+  searchDiscoveryFilterOptions,
 } from "../src/lib/matching/discovery-filters.ts";
 
 function candidate(
@@ -107,11 +109,11 @@ test("discover filters by program, year, skill, interest, and goal", () => {
   const results = filterDiscoveryCandidates(
     candidates,
     createDiscoveryFilters({
-      collaborationGoalSlug: "research-together",
-      interestSlug: "fintech",
-      programName: "Economics",
-      skillSlug: "financial-analysis",
-      yearOfStudy: "4",
+      collaborationGoalSlugs: ["research-together"],
+      interestSlugs: ["fintech"],
+      programNames: ["Economics"],
+      skillSlugs: ["financial-analysis"],
+      yearsOfStudy: ["4"],
     }),
   );
 
@@ -119,6 +121,68 @@ test("discover filters by program, year, skill, interest, and goal", () => {
     results.map((result) => result.fullName),
     ["Oleh P."],
   );
+});
+
+test("discover multi-select filters use OR within categories and AND across categories", () => {
+  const candidates = [
+    candidate({
+      fullName: "React Startup Student",
+      interests: [{ id: 3, name: "Startups", slug: "startups" }],
+      offeredSkills: [
+        {
+          category: "Software & Web",
+          id: 8,
+          name: "React",
+          slug: "react",
+        },
+      ],
+      yearOfStudy: 3,
+    }),
+    candidate({
+      fullName: "Figma Research Student",
+      interests: [{ id: 4, name: "Research", slug: "research" }],
+      offeredSkills: [
+        {
+          category: "Design",
+          id: 9,
+          name: "Figma",
+          slug: "figma",
+        },
+      ],
+      userId: "00000000-0000-4000-8000-000000000009",
+      yearOfStudy: 4,
+    }),
+  ];
+
+  const results = filterDiscoveryCandidates(
+    candidates,
+    createDiscoveryFilters({
+      interestSlugs: ["startups"],
+      skillSlugs: ["react", "figma"],
+      yearsOfStudy: ["3", "4"],
+    }),
+  );
+
+  assert.deepEqual(
+    results.map((result) => result.fullName),
+    ["React Startup Student"],
+  );
+});
+
+test("discover filters deduplicate repeated query values", () => {
+  const filters = createDiscoveryFilters({
+    collaborationGoalSlugs: ["build-an-mvp", "build-an-mvp", "  "],
+    interestSlugs: ["startups", "startups"],
+    programNames: ["Economics", "Economics"],
+    skillSlugs: ["react", "react"],
+    yearsOfStudy: ["3", "3"],
+  });
+
+  assert.deepEqual(filters.collaborationGoalSlugs, ["build-an-mvp"]);
+  assert.deepEqual(filters.interestSlugs, ["startups"]);
+  assert.deepEqual(filters.programNames, ["Economics"]);
+  assert.deepEqual(filters.skillSlugs, ["react"]);
+  assert.deepEqual(filters.yearsOfStudy, ["3"]);
 });
 
 test("discover filters work for recommended and all-students candidate sets", () => {
@@ -184,6 +248,32 @@ test("discover filter options are deduplicated and sorted", () => {
     { label: "React", value: "react" },
   ]);
   assert.deepEqual(options.years, [{ label: "Year 2", value: "2" }]);
+});
+
+test("supported year options include the full product year taxonomy", () => {
+  assert.deepEqual(buildSupportedYearOptions(), [
+    { label: "Year 1", value: "1" },
+    { label: "Year 2", value: "2" },
+    { label: "Year 3", value: "3" },
+    { label: "Year 4", value: "4" },
+    { label: "Year 5", value: "5" },
+    { label: "Year 6", value: "6" },
+  ]);
+});
+
+test("discover filter option search supports case-insensitive partial text", () => {
+  const options = [
+    { label: "Figma", value: "figma" },
+    { label: "Behavioral Economics", value: "behavioral-economics" },
+    { label: "Research", value: "research" },
+  ];
+
+  assert.deepEqual(searchDiscoveryFilterOptions(options, "fig"), [
+    { label: "Figma", value: "figma" },
+  ]);
+  assert.deepEqual(searchDiscoveryFilterOptions(options, "ECO"), [
+    { label: "Behavioral Economics", value: "behavioral-economics" },
+  ]);
 });
 
 test("empty discover filters are treated as inactive", () => {
