@@ -36,6 +36,28 @@ test("onboarding uses the supplied full-viewport watercolor shell", () => {
   assert.match(onboardingShell, /unoptimized/);
 });
 
+test("onboarding header uses the dedicated Mohyla emblem asset", () => {
+  assert.equal(
+    existsSync("public/branding/mohyla-onboarding-emblem.png"),
+    true,
+  );
+  assert.match(
+    onboardingShell,
+    /src="\/branding\/mohyla-onboarding-emblem\.png"/,
+  );
+  assert.doesNotMatch(
+    onboardingShell,
+    /src="\/branding\/mohyla-match-logo\.png"/,
+  );
+  assert.match(onboardingShell, /className="h-11 w-auto object-contain"/);
+  assert.match(
+    onboardingShell,
+    /src="\/branding\/mohyla-onboarding-emblem\.png"[\s\S]*unoptimized/,
+  );
+  assert.match(onboardingShell, /width=\{563\}/);
+  assert.match(onboardingShell, /height=\{443\}/);
+});
+
 test("setup page renders one shared onboarding shell instead of the old plain card", () => {
   assert.match(setupPage, /<OnboardingShell/);
   assert.doesNotMatch(setupPage, /function ProgressHeader/);

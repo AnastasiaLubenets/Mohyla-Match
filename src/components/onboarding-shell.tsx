@@ -50,15 +50,16 @@ function BrandMark() {
       className="inline-flex items-center gap-3 text-[#07133f] no-underline"
       href="/"
     >
-      <span className="relative flex size-9 overflow-hidden rounded-lg">
-        <Image
-          alt=""
-          className="object-cover object-left"
-          fill
-          sizes="36px"
-          src="/branding/mohyla-match-logo.png"
-        />
-      </span>
+      <Image
+        alt=""
+        className="h-11 w-auto object-contain"
+        height={443}
+        priority
+        sizes="56px"
+        src="/branding/mohyla-onboarding-emblem.png"
+        unoptimized
+        width={563}
+      />
       <span className="font-serif text-2xl font-bold leading-none">
         Mohyla Match
       </span>
