@@ -50,7 +50,7 @@ function SkillToggle({
       onClick={() => onToggle(skill.id)}
       type="button"
     >
-      <span className="inline-flex items-center gap-3">
+      <span className="flex min-w-0 flex-1 items-center gap-3">
         <span
           className={`inline-flex size-6 shrink-0 items-center justify-center rounded-full border text-xs ${
             isSelected
@@ -61,9 +61,9 @@ function SkillToggle({
         >
           ✓
         </span>
-        <span>{skill.name}</span>
+        <span className="min-w-0 break-words">{skill.name}</span>
       </span>
-      <span className="text-xs font-semibold text-[#66769e]">
+      <span className="min-w-0 max-w-[45%] break-words text-right text-xs font-semibold leading-tight text-[#66769e]">
         {skill.category}
       </span>
     </button>
@@ -241,8 +241,10 @@ export function OnboardingSkillPicker({
               searchResults.map((skill, index) => (
                 <button
                   aria-selected={index === activeResultIndex}
-                  className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm transition hover:bg-surface-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-primary ${
-                    index === activeResultIndex ? "bg-surface-strong" : ""
+                  className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-primary ${
+                    index === activeResultIndex
+                      ? "bg-[#EAF2FF] hover:bg-[#EAF2FF]"
+                      : "bg-white hover:bg-[#F5F8FF]"
                   }`}
                   id={`${resultsId}-${skill.id}`}
                   key={skill.id}
@@ -250,8 +252,10 @@ export function OnboardingSkillPicker({
                   role="option"
                   type="button"
                 >
-                  <span className="font-semibold">{skill.name}</span>
-                  <span className="text-xs font-medium text-muted">
+                  <span className="min-w-0 flex-1 break-words font-semibold">
+                    {skill.name}
+                  </span>
+                  <span className="min-w-0 max-w-[45%] break-words text-right text-xs font-medium leading-tight text-[#66769e]">
                     {skill.category}
                   </span>
                 </button>

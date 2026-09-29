@@ -85,3 +85,19 @@ test("optional onboarding steps keep their skippable behavior visible", () => {
   assert.match(setupPage, /Interests · Optional/);
   assert.match(setupPage, /Collaboration goals · Optional/);
 });
+
+test("skill picker contains long names and categories inside cards", () => {
+  assert.match(skillPicker, /flex min-w-0 flex-1 items-center gap-3/);
+  assert.match(skillPicker, /inline-flex size-6 shrink-0/);
+  assert.match(skillPicker, /min-w-0 break-words/);
+  assert.match(skillPicker, /max-w-\[45%\] break-words text-right/);
+  assert.match(skillPicker, /leading-tight text-\[#66769e\]/);
+});
+
+test("skill search highlight uses Mohyla blue states instead of beige surface", () => {
+  assert.match(skillPicker, /bg-white hover:bg-\[#F5F8FF\]/);
+  assert.match(skillPicker, /bg-\[#EAF2FF\] hover:bg-\[#EAF2FF\]/);
+  assert.match(skillPicker, /text-\[#102653\]/);
+  assert.doesNotMatch(skillPicker, /bg-surface-strong/);
+  assert.doesNotMatch(skillPicker, /hover:bg-surface-strong/);
+});
