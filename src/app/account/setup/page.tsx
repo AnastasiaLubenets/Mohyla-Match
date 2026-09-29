@@ -5,16 +5,18 @@ import type { ReactNode } from "react";
 import { AuthSubmitButton } from "@/components/auth-submit-button";
 import { OnboardingSkillPicker } from "@/components/onboarding-skill-picker";
 import { OnboardingBasicForm } from "@/components/onboarding-basic-form";
+import { OnboardingShell } from "@/components/onboarding-shell";
+import {
+  onboardingPrimaryButtonClass,
+  onboardingSecondaryButtonClass,
+} from "@/components/onboarding-styles";
 import { destinationForAccountState } from "@/lib/auth/routing";
 import { normalizeSignupFullName } from "@/lib/auth/signup";
 import { getCurrentAccountState } from "@/lib/auth/state";
 import {
   canVisitOnboardingStep,
-  getCompletedOnboardingStepCount,
   getFirstIncompleteOnboardingStep,
-  onboardingStepCount,
   parseOnboardingStep,
-  type OnboardingStep,
 } from "@/lib/onboarding/progress";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -65,46 +67,6 @@ function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function ProgressHeader({
-  completedSteps,
-  step,
-}: Readonly<{
-  completedSteps: number;
-  step: OnboardingStep;
-}>) {
-  return (
-    <div>
-      <p className="text-sm font-semibold uppercase tracking-[0.08em] text-primary">
-        Step {step} of {onboardingStepCount}
-      </p>
-      <div className="mt-4 grid grid-cols-4 gap-2" aria-hidden="true">
-        {[1, 2, 3, 4].map((item) => (
-          <span
-            className={`h-2 rounded-full ${
-              item <= Math.max(step, completedSteps)
-                ? "bg-primary"
-                : "bg-surface-strong"
-            }`}
-            key={item}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ErrorMessage({ message }: Readonly<{ message?: string }>) {
-  if (!message) {
-    return null;
-  }
-
-  return (
-    <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-900">
-      {message}
-    </div>
-  );
-}
-
 function ChoiceCard({
   defaultChecked,
   fieldName,
@@ -129,9 +91,15 @@ function ChoiceCard({
         value={id}
       />
       <label
-        className="flex min-h-12 cursor-pointer items-center rounded-lg border border-border bg-surface px-4 py-3 text-sm font-semibold transition peer-checked:border-primary peer-checked:bg-surface-strong peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary"
+        className="flex min-h-12 cursor-pointer items-center gap-3 rounded-full border border-[#cddaf0] bg-white/75 px-4 py-3 text-sm font-bold text-[#102653] transition peer-checked:border-[#a9c6ee] peer-checked:bg-[#edf4ff] peer-checked:text-[#174ca7] peer-checked:[&_.choice-check]:border-[#3567a8] peer-checked:[&_.choice-check]:bg-[#3567a8] peer-checked:[&_.choice-check]:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#245ba2]"
         htmlFor={inputId}
       >
+        <span
+          className="choice-check inline-flex size-6 shrink-0 items-center justify-center rounded-full border border-[#bed0ea] bg-white text-xs text-transparent transition"
+          aria-hidden="true"
+        >
+          ✓
+        </span>
         {name}
       </label>
     </div>
@@ -150,13 +118,18 @@ function FormNavigation({
   return (
     <div className="flex flex-col-reverse gap-3 pt-3 sm:flex-row sm:items-center sm:justify-between">
       <Link
-        className="inline-flex h-12 items-center justify-center rounded-full border border-border px-5 text-sm font-semibold text-foreground transition hover:border-primary"
+        className={onboardingSecondaryButtonClass}
         href={backHref}
       >
         Back
       </Link>
       <div className="sm:w-52">
-        <AuthSubmitButton pendingLabel={pendingLabel}>{children}</AuthSubmitButton>
+        <AuthSubmitButton
+          className={onboardingPrimaryButtonClass}
+          pendingLabel={pendingLabel}
+        >
+          {children} <span aria-hidden="true">→</span>
+        </AuthSubmitButton>
       </div>
     </div>
   );
@@ -166,7 +139,6 @@ function SkillStep({
   action,
   backHref,
   defaultSkillIds,
-  description,
   fieldName,
   isOptional = false,
   skills,
@@ -175,7 +147,6 @@ function SkillStep({
   action: string;
   backHref: string;
   defaultSkillIds: Set<number>;
-  description: string;
   fieldName: string;
   isOptional?: boolean;
   skills: SkillOption[];
@@ -186,7 +157,6 @@ function SkillStep({
       action={action}
       backHref={backHref}
       defaultSkillIds={[...defaultSkillIds]}
-      description={description}
       fieldName={fieldName}
       isOptional={isOptional}
       skills={skills}
@@ -208,16 +178,10 @@ function BuildStep({
 }>) {
   return (
     <form action="/account/setup/build" className="mt-8 space-y-7" method="post">
-      <div>
-        <h1 className="text-3xl font-semibold">What do you want to build?</h1>
-        <p className="mt-3 leading-7 text-muted">
-          Choose interests and collaboration goals if you already know what you
-          want to explore, or skip this for now.
-        </p>
-      </div>
-
       <fieldset className="space-y-3">
-        <legend className="text-sm font-semibold">Interests · Optional</legend>
+        <legend className="text-sm font-bold text-[#132a56]">
+          Interests · Optional
+        </legend>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {interests.map((interest) => (
             <ChoiceCard
@@ -232,7 +196,7 @@ function BuildStep({
       </fieldset>
 
       <fieldset className="space-y-3">
-        <legend className="text-sm font-semibold">
+        <legend className="text-sm font-bold text-[#132a56]">
           Collaboration goals · Optional
         </legend>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -256,7 +220,7 @@ function BuildStep({
       </FormNavigation>
       <div className="flex justify-end">
         <button
-          className="text-sm font-semibold text-muted transition hover:text-foreground"
+          className="text-sm font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
           name="skip"
           type="submit"
           value="true"
@@ -410,53 +374,55 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
   }
 
   const error = firstParam(params.error);
-  const completedSteps = getCompletedOnboardingStepCount(progress);
   let stepContent: ReactNode;
+  let shellTitle: string;
+  let shellDescription: string;
 
   if (requestedStep === 1) {
+    shellTitle = "Basic profile";
+    shellDescription =
+      "Tell collaborators who you are. Your student email is already linked to your account and is not part of this form.";
     stepContent = (
-      <>
-        <div className="mt-8">
-          <h1 className="text-3xl font-semibold">Basic profile</h1>
-          <p className="mt-3 leading-7 text-muted">
-            Tell collaborators who you are. Your student email is already
-            linked to your account and is not part of this form.
-          </p>
-        </div>
-        <OnboardingBasicForm
-          faculties={(facultiesResult.data ?? []) as FacultyOption[]}
-          programs={(programsResult.data ?? []) as ProgramOption[]}
-          profile={profile}
-          suggestedFullName={suggestedFullName}
-        />
-      </>
+      <OnboardingBasicForm
+        faculties={(facultiesResult.data ?? []) as FacultyOption[]}
+        programs={(programsResult.data ?? []) as ProgramOption[]}
+        profile={profile}
+        suggestedFullName={suggestedFullName}
+      />
     );
   } else if (requestedStep === 2) {
+    shellTitle = "Skills you can offer";
+    shellDescription =
+      "Choose at least one skill you can bring to another student's project.";
     stepContent = (
       <SkillStep
         action="/account/setup/offer"
         backHref="/account/setup?step=1"
         defaultSkillIds={offerSkillIds}
-        description="Choose at least one skill you can bring to another student's project."
         fieldName="skillId"
         skills={(skillsResult.data ?? []) as SkillOption[]}
-        title="What can you offer?"
+        title={shellTitle}
       />
     );
   } else if (requestedStep === 3) {
+    shellTitle = "What are you looking for?";
+    shellDescription =
+      "Choose skills you would like to find in collaborators, or skip this for now.";
     stepContent = (
       <SkillStep
         action="/account/setup/looking-for"
         backHref="/account/setup?step=2"
         defaultSkillIds={lookingForSkillIds}
-        description="Choose skills you would like to find in collaborators, or skip this for now."
         fieldName="skillId"
         isOptional
         skills={(skillsResult.data ?? []) as SkillOption[]}
-        title="What are you looking for?"
+        title={shellTitle}
       />
     );
   } else {
+    shellTitle = "What do you want to build?";
+    shellDescription =
+      "Choose interests and collaboration goals if you already know what you want to explore, or skip this for now.";
     stepContent = (
       <BuildStep
         collaborationGoals={(goalsResult.data ?? []) as NamedOption[]}
@@ -468,28 +434,13 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
   }
 
   return (
-    <main className="min-h-screen px-5 py-6 sm:px-8 sm:py-8">
-      <section className="mx-auto w-full max-w-4xl">
-        <nav className="mb-6 flex items-center justify-between gap-4">
-          <Link href="/" className="text-sm font-semibold text-primary">
-            Mohyla Match
-          </Link>
-          <form action="/auth/logout" method="post">
-            <button
-              className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-foreground transition hover:border-primary"
-              type="submit"
-            >
-              Logout
-            </button>
-          </form>
-        </nav>
-
-        <div className="rounded-lg border border-border bg-surface p-5 shadow-sm sm:p-8">
-          <ProgressHeader completedSteps={completedSteps} step={requestedStep} />
-          <ErrorMessage message={error} />
-          {stepContent}
-        </div>
-      </section>
-    </main>
+    <OnboardingShell
+      description={shellDescription}
+      error={error}
+      step={requestedStep}
+      title={shellTitle}
+    >
+      {stepContent}
+    </OnboardingShell>
   );
 }

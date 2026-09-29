@@ -5,6 +5,13 @@ import { useId, useMemo, useState, type KeyboardEvent } from "react";
 
 import { AuthSubmitButton } from "@/components/auth-submit-button";
 import {
+  onboardingChipClass,
+  onboardingFieldClass,
+  onboardingLabelClass,
+  onboardingPrimaryButtonClass,
+  onboardingSecondaryButtonClass,
+} from "@/components/onboarding-styles";
+import {
   createSelectedSkillIds,
   getSelectedSkills,
   getSuggestedSkills,
@@ -17,7 +24,6 @@ type OnboardingSkillPickerProps = Readonly<{
   action: string;
   backHref: string;
   defaultSkillIds: number[];
-  description: string;
   fieldName: string;
   isOptional?: boolean;
   skills: SkillPickerOption[];
@@ -36,16 +42,30 @@ function SkillToggle({
   return (
     <button
       aria-pressed={isSelected}
-      className={`flex min-h-12 w-full cursor-pointer items-center justify-between gap-3 rounded-lg border px-4 py-3 text-left text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+      className={`flex min-h-12 w-full cursor-pointer items-center justify-between gap-3 rounded-full border px-4 py-3 text-left text-sm font-bold text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2] ${
         isSelected
-          ? "border-primary bg-surface-strong"
-          : "border-border bg-surface hover:border-primary"
+          ? "border-[#a9c6ee] bg-[#edf4ff] text-[#174ca7]"
+          : "border-[#cddaf0] bg-white/75 hover:border-[#3567a8]"
       }`}
       onClick={() => onToggle(skill.id)}
       type="button"
     >
-      <span>{skill.name}</span>
-      <span className="text-xs font-medium text-muted">{skill.category}</span>
+      <span className="inline-flex items-center gap-3">
+        <span
+          className={`inline-flex size-6 shrink-0 items-center justify-center rounded-full border text-xs ${
+            isSelected
+              ? "border-[#3567a8] bg-[#3567a8] text-white"
+              : "border-[#bed0ea] bg-white text-transparent"
+          }`}
+          aria-hidden="true"
+        >
+          ✓
+        </span>
+        <span>{skill.name}</span>
+      </span>
+      <span className="text-xs font-semibold text-[#66769e]">
+        {skill.category}
+      </span>
     </button>
   );
 }
@@ -58,7 +78,7 @@ function SelectedSkillChip({
   skill: SkillPickerOption;
 }>) {
   return (
-    <span className="inline-flex min-h-10 items-center gap-2 rounded-full border border-primary bg-surface-strong px-3 py-2 text-sm font-semibold">
+    <span className={onboardingChipClass}>
       {skill.name}
       <button
         aria-label={`Remove ${skill.name}`}
@@ -76,7 +96,6 @@ export function OnboardingSkillPicker({
   action,
   backHref,
   defaultSkillIds,
-  description,
   fieldName,
   isOptional = false,
   skills,
@@ -138,18 +157,19 @@ export function OnboardingSkillPicker({
   }
 
   return (
-    <form action={action} className="mt-8 space-y-7" method="post">
-      <div>
-        <h1 className="text-3xl font-semibold">{title}</h1>
-        <p className="mt-3 leading-7 text-muted">{description}</p>
-      </div>
+    <form
+      action={action}
+      aria-label={title}
+      className="mt-8 space-y-7"
+      method="post"
+    >
 
       {selectedSkillIds.map((skillId) => (
         <input key={skillId} name={fieldName} type="hidden" value={skillId} />
       ))}
 
       <fieldset className="space-y-3">
-        <legend className="text-sm font-semibold">Suggested skills</legend>
+        <legend className={onboardingLabelClass}>Suggested skills</legend>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {suggestedSkills.map((skill) => (
             <SkillToggle
@@ -163,7 +183,7 @@ export function OnboardingSkillPicker({
       </fieldset>
 
       <section className="space-y-3" aria-labelledby="selected-skills-heading">
-        <h2 className="text-sm font-semibold" id="selected-skills-heading">
+        <h2 className={onboardingLabelClass} id="selected-skills-heading">
           Selected skills
         </h2>
         {selectedSkills.length > 0 ? (
@@ -177,7 +197,7 @@ export function OnboardingSkillPicker({
             ))}
           </div>
         ) : (
-          <p className="rounded-lg border border-dashed border-border px-4 py-3 text-sm text-muted">
+          <p className="rounded-[0.875rem] border border-dashed border-[#cddaf0] bg-white/50 px-4 py-3 text-sm text-[#66769e]">
             {isOptional
               ? "No looking-for skills selected."
               : "Choose at least one offered skill."}
@@ -187,7 +207,7 @@ export function OnboardingSkillPicker({
 
       <div className="space-y-3">
         <label className="block" htmlFor="skill-search">
-          <span className="text-sm font-semibold">Add more skills</span>
+          <span className={onboardingLabelClass}>Add more skills</span>
           <input
             aria-activedescendant={
               hasQuery && searchResults[activeResultIndex]
@@ -197,7 +217,7 @@ export function OnboardingSkillPicker({
             aria-autocomplete="list"
             aria-controls={resultsId}
             aria-expanded={hasQuery}
-            className="mt-2 h-12 w-full rounded-lg border border-border bg-surface px-4 text-foreground outline-none transition focus:border-primary"
+            className={onboardingFieldClass}
             id="skill-search"
             onChange={(event) => {
               setQuery(event.target.value);
@@ -213,7 +233,7 @@ export function OnboardingSkillPicker({
 
         {hasQuery ? (
           <div
-            className="max-h-72 overflow-y-auto rounded-lg border border-border bg-surface shadow-sm"
+            className="max-h-72 overflow-y-auto rounded-[0.875rem] border border-[#cddaf0] bg-white/95 shadow-sm"
             id={resultsId}
             role="listbox"
           >
@@ -247,7 +267,7 @@ export function OnboardingSkillPicker({
 
       <div className="flex flex-col-reverse gap-3 pt-3 sm:flex-row sm:items-center sm:justify-between">
         <Link
-          className="inline-flex h-12 items-center justify-center rounded-full border border-border px-5 text-sm font-semibold text-foreground transition hover:border-primary"
+          className={onboardingSecondaryButtonClass}
           href={backHref}
         >
           Back
@@ -255,7 +275,7 @@ export function OnboardingSkillPicker({
         <div className="flex flex-col gap-3 sm:w-auto sm:min-w-52 sm:flex-row">
           {isOptional ? (
             <button
-              className="h-12 rounded-full border border-border px-5 text-sm font-semibold text-foreground transition hover:border-primary"
+              className="h-[3.25rem] rounded-full px-5 text-sm font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
               name="skip"
               type="submit"
               value="true"
@@ -264,7 +284,12 @@ export function OnboardingSkillPicker({
             </button>
           ) : null}
           <div className="sm:w-52">
-            <AuthSubmitButton pendingLabel="Saving...">Continue</AuthSubmitButton>
+            <AuthSubmitButton
+              className={onboardingPrimaryButtonClass}
+              pendingLabel="Saving..."
+            >
+              Continue <span aria-hidden="true">→</span>
+            </AuthSubmitButton>
           </div>
         </div>
       </div>

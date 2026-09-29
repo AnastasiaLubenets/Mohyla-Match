@@ -4,6 +4,13 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { AuthSubmitButton } from "@/components/auth-submit-button";
+import {
+  onboardingFieldClass,
+  onboardingLabelClass,
+  onboardingPrimaryButtonClass,
+  onboardingSecondaryButtonClass,
+  onboardingTextareaClass,
+} from "@/components/onboarding-styles";
 
 type FacultyOption = Readonly<{
   id: number;
@@ -64,9 +71,9 @@ export function OnboardingBasicForm({
   return (
     <form action="/account/setup/basic" className="mt-8 space-y-5" method="post">
       <label className="block">
-        <span className="text-sm font-semibold">Full name · Required</span>
+        <span className={onboardingLabelClass}>Full name · Required</span>
         <input
-          className="mt-2 h-12 w-full rounded-lg border border-border bg-surface px-4 text-foreground outline-none transition focus:border-primary"
+          className={onboardingFieldClass}
           defaultValue={profile?.full_name ?? suggestedFullName ?? ""}
           maxLength={120}
           minLength={2}
@@ -78,9 +85,9 @@ export function OnboardingBasicForm({
 
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="block">
-          <span className="text-sm font-semibold">Faculty · Required</span>
+          <span className={onboardingLabelClass}>Faculty · Required</span>
           <select
-            className="mt-2 h-12 w-full rounded-lg border border-border bg-surface px-4 text-foreground outline-none transition focus:border-primary"
+            className={onboardingFieldClass}
             name="facultyId"
             onChange={(event) => handleFacultyChange(event.target.value)}
             required
@@ -95,9 +102,11 @@ export function OnboardingBasicForm({
         </label>
 
         <label className="block">
-          <span className="text-sm font-semibold">Academic program · Required</span>
+          <span className={onboardingLabelClass}>
+            Academic program · Required
+          </span>
           <select
-            className="mt-2 h-12 w-full rounded-lg border border-border bg-surface px-4 text-foreground outline-none transition focus:border-primary"
+            className={onboardingFieldClass}
             disabled={!selectedFacultyId || availablePrograms.length === 0}
             name="academicProgramId"
             onChange={(event) => setSelectedProgramId(Number(event.target.value))}
@@ -114,9 +123,9 @@ export function OnboardingBasicForm({
       </div>
 
       <label className="block">
-        <span className="text-sm font-semibold">Year of study · Required</span>
+        <span className={onboardingLabelClass}>Year of study · Required</span>
         <select
-          className="mt-2 h-12 w-full rounded-lg border border-border bg-surface px-4 text-foreground outline-none transition focus:border-primary"
+          className={onboardingFieldClass}
           defaultValue={profile?.year_of_study ?? ""}
           name="yearOfStudy"
           required
@@ -133,9 +142,9 @@ export function OnboardingBasicForm({
       </label>
 
       <label className="block">
-        <span className="text-sm font-semibold">Bio · Optional</span>
+        <span className={onboardingLabelClass}>Bio · Optional</span>
         <textarea
-          className="mt-2 min-h-28 w-full resize-y rounded-lg border border-border bg-surface px-4 py-3 text-foreground outline-none transition focus:border-primary"
+          className={onboardingTextareaClass}
           defaultValue={profile?.bio ?? ""}
           maxLength={500}
           name="bio"
@@ -143,9 +152,9 @@ export function OnboardingBasicForm({
       </label>
 
       <label className="block">
-        <span className="text-sm font-semibold">Availability · Optional</span>
+        <span className={onboardingLabelClass}>Availability · Optional</span>
         <input
-          className="mt-2 h-12 w-full rounded-lg border border-border bg-surface px-4 text-foreground outline-none transition focus:border-primary"
+          className={onboardingFieldClass}
           defaultValue={profile?.availability ?? ""}
           maxLength={160}
           name="availability"
@@ -155,13 +164,18 @@ export function OnboardingBasicForm({
 
       <div className="flex flex-col-reverse gap-3 pt-3 sm:flex-row sm:items-center sm:justify-between">
         <Link
-          className="inline-flex h-12 items-center justify-center rounded-full border border-border px-5 text-sm font-semibold text-foreground transition hover:border-primary"
+          className={onboardingSecondaryButtonClass}
           href="/"
         >
           Back
         </Link>
         <div className="sm:w-48">
-          <AuthSubmitButton pendingLabel="Saving...">Continue</AuthSubmitButton>
+          <AuthSubmitButton
+            className={onboardingPrimaryButtonClass}
+            pendingLabel="Saving..."
+          >
+            Continue <span aria-hidden="true">→</span>
+          </AuthSubmitButton>
         </div>
       </div>
     </form>
