@@ -86,12 +86,16 @@ test("optional onboarding steps keep their skippable behavior visible", () => {
   assert.match(setupPage, /Collaboration goals · Optional/);
 });
 
-test("skill picker contains long names and categories inside cards", () => {
+test("skill picker keeps categories out of persistent card text", () => {
+  assert.match(skillPicker, /function SkillCategoryTooltip/);
+  assert.match(skillPicker, /role="tooltip"/);
+  assert.match(skillPicker, /group-hover:opacity-100/);
+  assert.match(skillPicker, /group-focus-visible:opacity-100/);
+  assert.match(skillPicker, /aria-describedby=\{tooltipId\}/);
   assert.match(skillPicker, /flex min-w-0 flex-1 items-center gap-3/);
   assert.match(skillPicker, /inline-flex size-6 shrink-0/);
-  assert.match(skillPicker, /min-w-0 break-words/);
-  assert.match(skillPicker, /max-w-\[45%\] break-words text-right/);
-  assert.match(skillPicker, /leading-tight text-\[#66769e\]/);
+  assert.match(skillPicker, /min-w-0 break-words leading-snug/);
+  assert.doesNotMatch(skillPicker, /max-w-\[45%\] break-words text-right/);
 });
 
 test("skill search highlight uses Mohyla blue states instead of beige surface", () => {

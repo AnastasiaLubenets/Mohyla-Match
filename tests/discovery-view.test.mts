@@ -247,6 +247,10 @@ test("discover filters use searchable multi-selects and full taxonomy loader", (
     join(repoRoot, "src/lib/matching/data.ts"),
     "utf8",
   );
+  const filterFormSource = readFileSync(
+    join(repoRoot, "src/components/matching/discovery-filter-form.tsx"),
+    "utf8",
+  );
   const multiSelectSource = readFileSync(
     join(repoRoot, "src/components/matching/discovery-multi-select.tsx"),
     "utf8",
@@ -259,11 +263,16 @@ test("discover filters use searchable multi-selects and full taxonomy loader", (
   );
   assert.match(
     appPageSource,
+    /<DiscoveryFilterForm[\s\S]*?filters=\{filters\}[\s\S]*?options=\{options\}/,
+    "Discover should render the shared filter form",
+  );
+  assert.match(
+    filterFormSource,
     /<DiscoveryMultiSelect[\s\S]*?name="skill"/,
     "Skills should use the shared searchable multi-select control",
   );
   assert.match(
-    appPageSource,
+    filterFormSource,
     /<DiscoveryMultiSelect[\s\S]*?name="interest"/,
     "Interests should use the shared searchable multi-select control",
   );
@@ -311,5 +320,57 @@ test("discover filters use searchable multi-selects and full taxonomy loader", (
     multiSelectSource,
     /role="listbox"|aria-multiselectable/,
     "Checkbox filter options should not be wrapped in incomplete listbox semantics",
+  );
+});
+
+test("discover filter dropdowns share one outside-click and escape controller", () => {
+  const filterFormSource = readFileSync(
+    join(repoRoot, "src/components/matching/discovery-filter-form.tsx"),
+    "utf8",
+  );
+  const multiSelectSource = readFileSync(
+    join(repoRoot, "src/components/matching/discovery-multi-select.tsx"),
+    "utf8",
+  );
+
+  assert.match(
+    filterFormSource,
+    /const \[openDropdown, setOpenDropdown\]/,
+    "The filter rail should keep exactly one active dropdown key",
+  );
+  assert.match(
+    filterFormSource,
+    /document\.addEventListener\("pointerdown", handlePointerDown\)/,
+    "Open dropdowns should close on outside pointer interaction",
+  );
+  assert.match(
+    filterFormSource,
+    /document\.addEventListener\("keydown", handleKeyDown\)/,
+    "Open dropdowns should close on Escape",
+  );
+  assert.match(
+    filterFormSource,
+    /document\.removeEventListener\("pointerdown", handlePointerDown\)/,
+    "Document pointer listeners should be cleaned up",
+  );
+  assert.match(
+    filterFormSource,
+    /openRoot\?\.contains\(target\)/,
+    "Clicks inside the active dropdown should not close it",
+  );
+  assert.match(
+    multiSelectSource,
+    /open: boolean/,
+    "Multi-select dropdown visibility should be controlled by the shared form",
+  );
+  assert.match(
+    multiSelectSource,
+    /onOpenChange\(!open\)/,
+    "A dropdown button should request the shared open-state change",
+  );
+  assert.doesNotMatch(
+    multiSelectSource,
+    /const \[open, setOpen\] = useState\(false\)/,
+    "Individual filters should not keep independent open state",
   );
 });

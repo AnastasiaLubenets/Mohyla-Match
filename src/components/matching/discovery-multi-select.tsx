@@ -62,6 +62,8 @@ function CheckIcon() {
 export function DiscoveryMultiSelect({
   label,
   name,
+  onOpenChange,
+  open,
   options,
   placeholder = "Select options",
   searchPlaceholder = "Search options...",
@@ -69,13 +71,14 @@ export function DiscoveryMultiSelect({
 }: Readonly<{
   label: string;
   name: string;
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
   options: readonly FilterOption[];
   placeholder?: string;
   searchPlaceholder?: string;
   selectedValues: readonly string[];
 }>) {
   const baseId = useId();
-  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<readonly string[]>(selectedValues);
   const selectedSet = useMemo(() => new Set(selected), [selected]);
@@ -101,7 +104,7 @@ export function DiscoveryMultiSelect({
   }
 
   return (
-    <div className="relative">
+    <div className="relative" data-discovery-filter={name}>
       {selected.map((value) => (
         <input key={value} name={name} type="hidden" value={value} />
       ))}
@@ -149,7 +152,7 @@ export function DiscoveryMultiSelect({
           aria-controls={`${baseId}-options`}
           aria-expanded={open}
           className="flex min-h-8 w-full items-center justify-between gap-3 rounded-sm px-1 text-left text-sm font-medium text-blue-900 outline-none transition hover:text-blue-950 focus-visible:ring-2 focus-visible:ring-blue-500"
-          onClick={() => setOpen((current) => !current)}
+          onClick={() => onOpenChange(!open)}
           type="button"
         >
           <span className={selected.length > 0 ? "text-blue-700" : "text-blue-400"}>

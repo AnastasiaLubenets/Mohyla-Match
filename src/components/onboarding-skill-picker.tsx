@@ -30,6 +30,30 @@ type OnboardingSkillPickerProps = Readonly<{
   title: string;
 }>;
 
+function SkillCategoryTooltip({
+  category,
+  id,
+  placement = "below",
+}: Readonly<{
+  category: string;
+  id: string;
+  placement?: "below" | "inline";
+}>) {
+  return (
+    <span
+      className={
+        placement === "inline"
+          ? "pointer-events-none absolute right-3 top-1/2 z-30 max-w-[14rem] -translate-y-1/2 rounded-lg border border-[#cddaf0] bg-white px-2.5 py-1.5 text-xs font-semibold leading-snug text-[#66769e] opacity-0 shadow-sm transition group-hover:opacity-100 group-focus-visible:opacity-100"
+          : "pointer-events-none absolute left-12 top-full z-30 mt-2 max-w-[14rem] rounded-lg border border-[#cddaf0] bg-white px-2.5 py-1.5 text-xs font-semibold leading-snug text-[#66769e] opacity-0 shadow-sm transition group-hover:opacity-100 group-focus-visible:opacity-100"
+      }
+      id={id}
+      role="tooltip"
+    >
+      {category}
+    </span>
+  );
+}
+
 function SkillToggle({
   isSelected,
   onToggle,
@@ -39,10 +63,13 @@ function SkillToggle({
   onToggle: (skillId: number) => void;
   skill: SkillPickerOption;
 }>) {
+  const tooltipId = useId();
+
   return (
     <button
+      aria-describedby={tooltipId}
       aria-pressed={isSelected}
-      className={`flex min-h-12 w-full cursor-pointer items-center justify-between gap-3 rounded-full border px-4 py-3 text-left text-sm font-bold text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2] ${
+      className={`group relative flex min-h-12 w-full cursor-pointer items-center justify-start gap-3 rounded-full border px-4 py-3 text-left text-sm font-bold text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2] ${
         isSelected
           ? "border-[#a9c6ee] bg-[#edf4ff] text-[#174ca7]"
           : "border-[#cddaf0] bg-white/75 hover:border-[#3567a8]"
@@ -61,11 +88,11 @@ function SkillToggle({
         >
           ✓
         </span>
-        <span className="min-w-0 break-words">{skill.name}</span>
+        <span className="min-w-0 break-words leading-snug">
+          {skill.name}
+        </span>
       </span>
-      <span className="min-w-0 max-w-[45%] break-words text-right text-xs font-semibold leading-tight text-[#66769e]">
-        {skill.category}
-      </span>
+      <SkillCategoryTooltip category={skill.category} id={tooltipId} />
     </button>
   );
 }
@@ -240,8 +267,9 @@ export function OnboardingSkillPicker({
             {searchResults.length > 0 ? (
               searchResults.map((skill, index) => (
                 <button
+                  aria-describedby={`${resultsId}-${skill.id}-category`}
                   aria-selected={index === activeResultIndex}
-                  className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-primary ${
+                  className={`group relative flex w-full items-center justify-start gap-3 px-4 py-3 text-left text-sm text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-primary ${
                     index === activeResultIndex
                       ? "bg-[#EAF2FF] hover:bg-[#EAF2FF]"
                       : "bg-white hover:bg-[#F5F8FF]"
@@ -252,12 +280,14 @@ export function OnboardingSkillPicker({
                   role="option"
                   type="button"
                 >
-                  <span className="min-w-0 flex-1 break-words font-semibold">
+                  <span className="min-w-0 flex-1 break-words pr-4 font-semibold leading-snug">
                     {skill.name}
                   </span>
-                  <span className="min-w-0 max-w-[45%] break-words text-right text-xs font-medium leading-tight text-[#66769e]">
-                    {skill.category}
-                  </span>
+                  <SkillCategoryTooltip
+                    category={skill.category}
+                    id={`${resultsId}-${skill.id}-category`}
+                    placement="inline"
+                  />
                 </button>
               ))
             ) : (

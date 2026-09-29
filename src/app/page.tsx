@@ -46,7 +46,7 @@ export default function LandingPage() {
               Student collaboration network
             </PublicBadge>
 
-            <h1 className="landing-hero-heading mt-5 font-serif text-[3.35rem] font-bold leading-[0.94] tracking-normal text-[#070d35] sm:mt-7 sm:text-7xl lg:text-[5.35rem] xl:text-[6.1rem]">
+            <h1 className="landing-hero-heading mt-6 font-serif text-[3.35rem] font-bold leading-[0.94] tracking-normal text-[#070d35] sm:mt-8 sm:text-7xl lg:text-[5.35rem] xl:text-[6.1rem]">
               Find your people.
               <br />
               Build something
@@ -57,12 +57,12 @@ export default function LandingPage() {
               </span>
             </h1>
 
-            <p className="landing-hero-description mt-5 max-w-2xl text-lg leading-7 text-[#56637f] sm:mt-7 sm:text-2xl sm:leading-8">
+            <p className="landing-hero-description mt-7 max-w-2xl text-lg leading-7 text-[#56637f] sm:mt-9 sm:text-2xl sm:leading-8">
               Discover students across Mohyla based on skills, interests and
               what they want to build.
             </p>
 
-            <div className="landing-hero-actions mt-7 flex flex-col gap-3 sm:flex-row sm:gap-4 lg:mt-8">
+            <div className="landing-hero-actions mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4 lg:mt-10">
               <Link
                 href="/signup"
                 className="landing-hero-action inline-flex h-14 items-center justify-center gap-4 rounded-full bg-[#3154b8] px-8 text-base font-bold text-white transition hover:bg-[#27469f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3154b8] sm:h-16 sm:px-9 sm:text-lg"
@@ -78,7 +78,7 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            <div className="landing-hero-benefits mt-7 grid gap-3 sm:grid-cols-3 lg:mt-8">
+            <div className="landing-hero-benefits mt-8 grid gap-3 sm:grid-cols-3 lg:mt-10">
               {miniBenefits.map((benefit) => (
                 <div
                   className="landing-hero-benefit flex items-center gap-3"
