@@ -179,9 +179,9 @@ export function DiscoveryMultiSelect({
           </div>
 
           <div
+            aria-label={`${label} options`}
             className="scrollbar-hidden mt-2 max-h-72 overflow-y-auto pr-1"
-            role="listbox"
-            aria-multiselectable="true"
+            role="group"
           >
             {visibleOptions.length > 0 ? (
               visibleOptions.map((option) => {

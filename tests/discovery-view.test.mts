@@ -292,4 +292,24 @@ test("discover filters use searchable multi-selects and full taxonomy loader", (
     /name=\{name\} type="hidden"/,
     "Selected values should submit as repeated query params",
   );
+  assert.match(
+    appPageSource,
+    /<aside className="[^"]*xl:overflow-y-auto/,
+    "The desktop filter rail should scroll instead of clipping lower dropdowns",
+  );
+  assert.doesNotMatch(
+    appPageSource,
+    /<aside className="[^"]*xl:overflow-hidden/,
+    "The desktop filter rail must not hide overflowing dropdown content",
+  );
+  assert.match(
+    multiSelectSource,
+    /role="group"/,
+    "Filter option lists should keep checkbox semantics instead of an invalid listbox wrapper",
+  );
+  assert.doesNotMatch(
+    multiSelectSource,
+    /role="listbox"|aria-multiselectable/,
+    "Checkbox filter options should not be wrapped in incomplete listbox semantics",
+  );
 });

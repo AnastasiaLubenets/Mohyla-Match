@@ -202,7 +202,7 @@ function DiscoveryFilterRail({
   view: DiscoveryView;
 }>) {
   return (
-    <aside className="space-y-4 xl:h-full xl:min-h-0 xl:overflow-hidden">
+    <aside className="scrollbar-hidden space-y-4 xl:h-full xl:min-h-0 xl:overflow-y-auto xl:pb-6">
       <section className="rounded-lg border border-blue-100 bg-white p-5">
         <div className="flex items-center justify-between gap-4">
           <h2 className="font-serif text-3xl font-bold leading-none text-blue-950">
