@@ -1,6 +1,6 @@
 begin;
 
-select plan(29);
+select plan(31);
 
 insert into public.faculties (slug, display_name, avatar_theme_key, sort_order)
 values
@@ -82,7 +82,9 @@ values
   ('00000000-0000-4000-8000-000000000401', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'phase4-a@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
   ('00000000-0000-4000-8000-000000000402', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'phase4-b@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
   ('00000000-0000-4000-8000-000000000403', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'phase4-suspended@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('00000000-0000-4000-8000-000000000404', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'phase4-mismatch@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb)
+  ('00000000-0000-4000-8000-000000000404', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'phase4-mismatch@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('00000000-0000-4000-8000-000000000405', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'phase4-optional-build@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('00000000-0000-4000-8000-000000000406', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'phase4-optional-looking@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb)
 on conflict (id) do update
 set email = excluded.email,
     email_confirmed_at = excluded.email_confirmed_at,
@@ -112,6 +114,22 @@ values
     (select id from public.academic_programs where slug = 'phase4-program-a'),
     2,
     'suspended'
+  ),
+  (
+    '00000000-0000-4000-8000-000000000405',
+    'Phase Four Optional Build',
+    (select id from public.faculties where slug = 'phase4-faculty-a'),
+    (select id from public.academic_programs where slug = 'phase4-program-a'),
+    2,
+    'active'
+  ),
+  (
+    '00000000-0000-4000-8000-000000000406',
+    'Phase Four Optional Looking',
+    (select id from public.faculties where slug = 'phase4-faculty-a'),
+    (select id from public.academic_programs where slug = 'phase4-program-a'),
+    2,
+    'active'
   )
 on conflict (user_id) do update
 set full_name = excluded.full_name,
@@ -407,6 +425,62 @@ select ok(
   private.is_active_onboarded('00000000-0000-4000-8000-000000000401'),
   'removing optional collaboration goals keeps effective onboarded eligibility'
 );
+
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000405', true);
+
+insert into public.profile_skills (user_id, skill_id, direction)
+values (
+  '00000000-0000-4000-8000-000000000405',
+  (select id from public.skills where slug = 'phase4-offer-skill'),
+  'offer'
+);
+
+insert into public.profile_interests (user_id, interest_id)
+values (
+  '00000000-0000-4000-8000-000000000405',
+  (select id from public.interests where slug = 'phase4-interest')
+);
+
+insert into public.profile_collaboration_goals (user_id, collaboration_goal_id)
+values (
+  '00000000-0000-4000-8000-000000000405',
+  (select id from public.collaboration_goals where slug = 'phase4-goal')
+);
+
+select isnt(
+  (select public.complete_onboarding()),
+  null,
+  'completion succeeds with empty looking-for skills and selected interests/goals'
+);
+
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000406', true);
+
+insert into public.profile_skills (user_id, skill_id, direction)
+values
+  (
+    '00000000-0000-4000-8000-000000000406',
+    (select id from public.skills where slug = 'phase4-offer-skill'),
+    'offer'
+  ),
+  (
+    '00000000-0000-4000-8000-000000000406',
+    (select id from public.skills where slug = 'phase4-looking-skill'),
+    'looking_for'
+  );
+
+select isnt(
+  (select public.complete_onboarding()),
+  null,
+  'completion succeeds with selected looking-for skills and empty interests/goals'
+);
+
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000401', true);
 
 select is(
   (select public.complete_onboarding()::text),
