@@ -197,7 +197,6 @@ export async function saveBasicProfile(request: NextRequest) {
   }
 
   const profilePayload = {
-    account_role: "student" as const,
     full_name: fullName,
     faculty_id: facultyId,
     academic_program_id: academicProgramId,
@@ -359,7 +358,6 @@ export async function saveFacultyProgramsStep(request: NextRequest) {
   }
 
   const profilePayload = {
-    account_role: "faculty" as const,
     academic_program_id: primaryProgram.id,
     availability,
     bio,

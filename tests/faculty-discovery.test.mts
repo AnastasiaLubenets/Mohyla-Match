@@ -166,6 +166,9 @@ test("database migration keeps student and faculty discovery paths role-separate
 test("onboarding source contains role split and faculty-specific steps", () => {
   const page = readFileSync(join(root, "src/app/account/setup/page.tsx"), "utf8");
   const server = readFileSync(join(root, "src/lib/onboarding/server.ts"), "utf8");
+  const directProfilePayloads = [
+    ...server.matchAll(/const profilePayload = \{([\s\S]*?)\n  \};/g),
+  ];
 
   assert.match(page, /RoleSelection/);
   assert.match(page, /FacultyProgramsForm/);
@@ -175,4 +178,8 @@ test("onboarding source contains role split and faculty-specific steps", () => {
   assert.match(server, /saveFacultyExpertiseStep/);
   assert.match(server, /completeFacultyOnboarding/);
   assert.doesNotMatch(server, /faculty_verification_status:\s*"verified"/);
+  assert.equal(directProfilePayloads.length, 2);
+  directProfilePayloads.forEach(([, payload]) => {
+    assert.doesNotMatch(payload, /account_role:/);
+  });
 });
