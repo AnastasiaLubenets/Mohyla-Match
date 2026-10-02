@@ -237,7 +237,11 @@ function TargetIcon() {
   );
 }
 
-function yearLabel(year: number) {
+function yearLabel(year: number | null) {
+  if (!year) {
+    return "Faculty";
+  }
+
   return `${year}${year === 1 ? "st" : year === 2 ? "nd" : year === 3 ? "rd" : "th"} year`;
 }
 
@@ -273,6 +277,25 @@ function LoginEmailText({ email }: Readonly<{ email: LoginEmailParts | null }>) 
 }
 
 function buildCompletionItems(profile: SafeProfile): CompletionItem[] {
+  if (profile.accountRole === "faculty") {
+    return [
+      { complete: Boolean(profile.bio?.trim()), label: "Add bio" },
+      {
+        complete: profile.academicPrograms.length > 0,
+        label: "Add academic programs",
+      },
+      { complete: profile.expertise.length > 0, label: "Add expertise" },
+      {
+        complete: profile.interests.length > 0,
+        label: "Add research interests",
+      },
+      {
+        complete: Boolean(profile.availability?.trim()),
+        label: "Add availability",
+      },
+    ];
+  }
+
   return [
     { complete: Boolean(profile.bio?.trim()), label: "Add bio" },
     { complete: profile.offeredSkills.length > 0, label: "Add skills" },
@@ -493,7 +516,11 @@ export function MyAccountCard({
       </h2>
       <ul className="mt-4 space-y-3 2xl:mt-5 2xl:space-y-4">
         <AccountFact icon={<GraduationIcon />}>
-          <strong className="block text-blue-950">Student at NaUKMA</strong>
+          <strong className="block text-blue-950">
+            {profile.accountRole === "faculty"
+              ? "Faculty at NaUKMA"
+              : "Student at NaUKMA"}
+          </strong>
           {profile.academicProgramName}
         </AccountFact>
         <AccountFact icon={<EnvelopeIcon />}>
@@ -515,7 +542,149 @@ export function MyAccountCard({
   );
 }
 
-export function MyProfileDashboard({
+function facultyProgramLabels(profile: SafeProfile) {
+  return profile.academicPrograms.map((program) => {
+    const level = program.studyLevel === "master" ? "Master" : "Bachelor";
+    const specialty = program.specialtyCode ? `${program.specialtyCode} · ` : "";
+
+    return `${specialty}${program.name} (${level})`;
+  });
+}
+
+function FacultyProfileDashboard({
+  profile,
+}: Readonly<{
+  profile: SafeProfile;
+}>) {
+  const primaryProgram =
+    profile.academicPrograms.find((program) => program.isPrimary) ??
+    profile.academicPrograms[0];
+  const expertiseNames = profile.expertise.map(
+    (expertise) => `${expertise.name} · ${expertise.category}`,
+  );
+
+  return (
+    <div className="space-y-4">
+      <section className="rounded-[1.375rem] border border-blue-100 bg-white p-5 sm:p-6">
+        <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)_14rem] lg:items-start">
+          <SystemAvatar
+            availability={profile.availability}
+            facultyName={profile.facultyName}
+            fullName={profile.fullName}
+            programName={profile.academicProgramName}
+            size="xl"
+            systemAvatarKey={profile.systemAvatarKey}
+          />
+
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
+              Faculty profile
+            </p>
+            <h2 className="mt-3 font-serif text-5xl font-semibold leading-none text-blue-950">
+              {profile.fullName}
+            </h2>
+            <p className="mt-3 text-base font-medium text-blue-800">
+              {primaryProgram?.name ?? profile.academicProgramName}{" "}
+              <span aria-hidden="true">•</span>{" "}
+              {profile.facultyVerificationStatus === "verified"
+                ? "Verified faculty"
+                : "Unverified faculty"}
+            </p>
+            <p className="mt-1 text-sm font-medium text-blue-700/80">
+              {profile.facultyName}
+            </p>
+            {profile.availability ? (
+              <p className="mt-3 text-sm font-semibold text-blue-700">
+                {profile.availability}
+              </p>
+            ) : null}
+            <p className="mt-5 max-w-2xl text-base leading-7 text-blue-900/80">
+              {profile.bio || "No bio yet."}
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Link
+              className="inline-flex h-12 items-center justify-center gap-3 rounded-md border border-blue-200 bg-white px-5 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
+              href="/profile/edit"
+            >
+              <EditIcon />
+              Edit full profile
+              <span className="sr-only">Edit profile</span>
+            </Link>
+            <p className="text-center text-xs font-semibold text-blue-600/80">
+              Open full edit page
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <section className="rounded-[1.375rem] border border-blue-100 bg-white p-5 sm:p-6">
+          <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
+            <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
+              <GraduationIcon />
+            </span>
+            Academic programs
+          </h2>
+          <div className="mt-4">
+            <ChipList
+              emptyLabel="No academic programs are visible."
+              items={facultyProgramLabels(profile)}
+            />
+          </div>
+        </section>
+
+        <section className="rounded-[1.375rem] border border-blue-100 bg-white p-5 sm:p-6">
+          <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
+            <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
+              <BarsIcon />
+            </span>
+            Expertise
+          </h2>
+          <div className="mt-4">
+            <ChipList
+              emptyLabel="No expertise is visible."
+              items={expertiseNames}
+            />
+          </div>
+        </section>
+
+        <section className="rounded-[1.375rem] border border-blue-100 bg-white p-5 sm:p-6">
+          <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
+            <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
+              <SparkIcon />
+            </span>
+            Research interests
+          </h2>
+          <div className="mt-4">
+            <ChipList
+              emptyLabel="No research interests are visible."
+              items={profile.interests}
+            />
+          </div>
+        </section>
+
+        <section className="rounded-[1.375rem] border border-blue-100 bg-white p-5 sm:p-6">
+          <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
+            <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
+              <CalendarIcon />
+            </span>
+            Availability
+          </h2>
+          <div className="mt-4">
+            <ChipList
+              emptyLabel="No availability is listed."
+              items={profile.availability ? [profile.availability] : []}
+            />
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function StudentProfileDashboard({
   editData,
   profile,
 }: Readonly<{
@@ -928,4 +1097,18 @@ export function MyProfileDashboard({
       </div>
     </div>
   );
+}
+
+export function MyProfileDashboard({
+  editData,
+  profile,
+}: Readonly<{
+  editData: EditProfileData;
+  profile: SafeProfile;
+}>) {
+  if (profile.accountRole === "faculty") {
+    return <FacultyProfileDashboard profile={profile} />;
+  }
+
+  return <StudentProfileDashboard editData={editData} profile={profile} />;
 }

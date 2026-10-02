@@ -95,6 +95,47 @@ function readIdList(formData: FormData, fieldName: string): number[] {
   return [...new Set(ids)];
 }
 
+type FacultyProfileUpdatePayload = Readonly<{
+  additionalAcademicProgramIds: number[];
+  allowDirectContact: boolean;
+  availability: string | null;
+  bio: string | null;
+  expertiseIds: number[];
+  fullName: string;
+  primaryAcademicProgramId: number;
+  researchInterestIds: number[];
+}>;
+
+function validateFacultyProfileUpdatePayload(
+  payload: FacultyProfileUpdatePayload,
+): ProfileUpdateSaveResult {
+  if (
+    !payload.fullName ||
+    payload.fullName.length < 2 ||
+    payload.fullName.length > 120
+  ) {
+    return { error: "Full name must be 2-120 characters.", ok: false };
+  }
+
+  if (!payload.primaryAcademicProgramId) {
+    return { error: "Choose a primary academic program.", ok: false };
+  }
+
+  if (payload.expertiseIds.length < 1) {
+    return { error: "Choose at least one expertise area.", ok: false };
+  }
+
+  if (payload.bio && payload.bio.length > 500) {
+    return { error: "Bio is limited to 500 characters.", ok: false };
+  }
+
+  if (payload.availability && payload.availability.length > 160) {
+    return { error: "Availability is limited to 160 characters.", ok: false };
+  }
+
+  return { ok: true };
+}
+
 export async function saveProfileUpdate(
   supabase: SupabaseClient<Database>,
   payload: ProfileUpdatePayload,
@@ -129,12 +170,70 @@ export async function saveProfileUpdate(
   return { ok: true };
 }
 
+async function saveFacultyProfileUpdate(
+  supabase: SupabaseClient<Database>,
+  payload: FacultyProfileUpdatePayload,
+): Promise<ProfileUpdateSaveResult> {
+  const validation = validateFacultyProfileUpdatePayload(payload);
+
+  if (!validation.ok) {
+    return validation;
+  }
+
+  const result = await supabase.rpc("update_faculty_profile", {
+    additional_academic_program_ids: payload.additionalAcademicProgramIds,
+    expertise_ids: payload.expertiseIds,
+    primary_academic_program_id: payload.primaryAcademicProgramId,
+    profile_allow_direct_contact: payload.allowDirectContact,
+    profile_availability: payload.availability,
+    profile_bio: payload.bio,
+    profile_full_name: payload.fullName,
+    research_interest_ids: payload.researchInterestIds,
+  });
+
+  if (result.error) {
+    return {
+      error: "We could not save your faculty profile. Check your selections.",
+      ok: false,
+    };
+  }
+
+  return { ok: true };
+}
+
 export async function updateMyProfile(request: NextRequest) {
   const formData = await request.formData();
   const context = await requireActiveProfileUpdate(request);
 
   if (context.response) {
     return context.response;
+  }
+
+  if (formData.get("profileRole") === "faculty") {
+    const facultyPayload: FacultyProfileUpdatePayload = {
+      additionalAcademicProgramIds: readIdList(
+        formData,
+        "additionalAcademicProgramId",
+      ),
+      allowDirectContact: formData.get("allowDirectContact") === "on",
+      availability: readOptionalString(formData, "availability"),
+      bio: readOptionalString(formData, "bio"),
+      expertiseIds: readIdList(formData, "expertiseId"),
+      fullName: readRequiredString(formData, "fullName") ?? "",
+      primaryAcademicProgramId:
+        readRequiredInteger(formData, "academicProgramId") ?? 0,
+      researchInterestIds: readIdList(formData, "interestId"),
+    };
+    const facultyResult = await saveFacultyProfileUpdate(
+      context.supabase,
+      facultyPayload,
+    );
+
+    if (!facultyResult.ok) {
+      return redirectTo(request, profileEditPath(facultyResult.error));
+    }
+
+    return redirectTo(request, "/profile?status=updated");
   }
 
   const payload: ProfileUpdatePayload = {

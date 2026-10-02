@@ -17,8 +17,11 @@ export type Database = {
           faculty_id: number;
           id: number;
           is_active: boolean;
+          official_source_url: string | null;
           slug: string;
           sort_order: number;
+          specialty_code: string | null;
+          study_level: Database["public"]["Enums"]["academic_program_level"];
           updated_at: string;
         };
         Insert: {
@@ -28,8 +31,11 @@ export type Database = {
           faculty_id: number;
           id?: number;
           is_active?: boolean;
+          official_source_url?: string | null;
           slug: string;
           sort_order?: number;
+          specialty_code?: string | null;
+          study_level?: Database["public"]["Enums"]["academic_program_level"];
           updated_at?: string;
         };
         Update: {
@@ -39,9 +45,33 @@ export type Database = {
           faculty_id?: number;
           id?: number;
           is_active?: boolean;
+          official_source_url?: string | null;
           slug?: string;
           sort_order?: number;
+          specialty_code?: string | null;
+          study_level?: Database["public"]["Enums"]["academic_program_level"];
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+      account_roles: {
+        Row: {
+          account_role: Database["public"]["Enums"]["account_role"];
+          created_at: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          account_role?: Database["public"]["Enums"]["account_role"];
+          created_at?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          account_role?: Database["public"]["Enums"]["account_role"];
+          created_at?: string;
+          updated_at?: string;
+          user_id?: string;
         };
         Relationships: [];
       };
@@ -105,6 +135,108 @@ export type Database = {
           slug?: string;
           sort_order?: number;
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+      expertise_categories: {
+        Row: {
+          created_at: string;
+          id: number;
+          is_active: boolean;
+          name: string;
+          slug: string;
+          sort_order: number;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          is_active?: boolean;
+          name: string;
+          slug: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          is_active?: boolean;
+          name?: string;
+          slug?: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      expertise: {
+        Row: {
+          category_id: number;
+          created_at: string;
+          id: number;
+          is_active: boolean;
+          name: string;
+          search_aliases: string[];
+          slug: string;
+          sort_order: number;
+          updated_at: string;
+        };
+        Insert: {
+          category_id: number;
+          created_at?: string;
+          id?: number;
+          is_active?: boolean;
+          name: string;
+          search_aliases?: string[];
+          slug: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Update: {
+          category_id?: number;
+          created_at?: string;
+          id?: number;
+          is_active?: boolean;
+          name?: string;
+          search_aliases?: string[];
+          slug?: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      academic_program_expertise: {
+        Row: {
+          academic_program_id: number;
+          created_at: string;
+          expertise_id: number;
+        };
+        Insert: {
+          academic_program_id: number;
+          created_at?: string;
+          expertise_id: number;
+        };
+        Update: {
+          academic_program_id?: number;
+          created_at?: string;
+          expertise_id?: number;
+        };
+        Relationships: [];
+      };
+      faculty_expertise: {
+        Row: {
+          created_at: string;
+          expertise_id: number;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          expertise_id: number;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          expertise_id?: number;
+          user_id?: string;
         };
         Relationships: [];
       };
@@ -366,14 +498,37 @@ export type Database = {
         };
         Relationships: [];
       };
+      profile_academic_programs: {
+        Row: {
+          academic_program_id: number;
+          created_at: string;
+          is_primary: boolean;
+          user_id: string;
+        };
+        Insert: {
+          academic_program_id: number;
+          created_at?: string;
+          is_primary?: boolean;
+          user_id: string;
+        };
+        Update: {
+          academic_program_id?: number;
+          created_at?: string;
+          is_primary?: boolean;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
+          account_role: Database["public"]["Enums"]["account_role"];
           academic_program_id: number;
           allow_direct_contact: boolean;
           availability: string | null;
           bio: string | null;
           created_at: string;
           deleted_at: string | null;
+          faculty_verification_status: Database["public"]["Enums"]["faculty_verification_status"];
           faculty_id: number;
           full_name: string;
           onboarding_completed_at: string | null;
@@ -381,15 +536,17 @@ export type Database = {
           system_avatar_key: string;
           updated_at: string;
           user_id: string;
-          year_of_study: number;
+          year_of_study: number | null;
         };
         Insert: {
+          account_role?: Database["public"]["Enums"]["account_role"];
           academic_program_id: number;
           allow_direct_contact?: boolean;
           availability?: string | null;
           bio?: string | null;
           created_at?: string;
           deleted_at?: string | null;
+          faculty_verification_status?: Database["public"]["Enums"]["faculty_verification_status"];
           faculty_id: number;
           full_name: string;
           onboarding_completed_at?: string | null;
@@ -397,15 +554,17 @@ export type Database = {
           system_avatar_key?: string;
           updated_at?: string;
           user_id: string;
-          year_of_study: number;
+          year_of_study?: number | null;
         };
         Update: {
+          account_role?: Database["public"]["Enums"]["account_role"];
           academic_program_id?: number;
           allow_direct_contact?: boolean;
           availability?: string | null;
           bio?: string | null;
           created_at?: string;
           deleted_at?: string | null;
+          faculty_verification_status?: Database["public"]["Enums"]["faculty_verification_status"];
           faculty_id?: number;
           full_name?: string;
           onboarding_completed_at?: string | null;
@@ -413,7 +572,7 @@ export type Database = {
           system_avatar_key?: string;
           updated_at?: string;
           user_id?: string;
-          year_of_study?: number;
+          year_of_study?: number | null;
         };
         Relationships: [];
       };
@@ -487,6 +646,12 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: string;
       };
+      save_account_role: {
+        Args: {
+          selected_role: Database["public"]["Enums"]["account_role"];
+        };
+        Returns: Database["public"]["Enums"]["account_role"];
+      };
       delete_my_profile: {
         Args: Record<PropertyKey, never>;
         Returns: boolean;
@@ -545,6 +710,24 @@ export type Database = {
           system_avatar_key: string;
           user_id: string;
           year_of_study: number;
+        }[];
+      };
+      get_faculty_discovery_profiles: {
+        Args: {
+          profile_limit?: number;
+        };
+        Returns: {
+          academic_programs: Json;
+          availability: string | null;
+          bio: string | null;
+          expertise: Json;
+          faculty_name: string;
+          full_name: string;
+          primary_academic_program_name: string;
+          research_interests: Json;
+          system_avatar_key: string;
+          user_id: string;
+          verification_status: Database["public"]["Enums"]["faculty_verification_status"];
         }[];
       };
       get_current_account_state: {
@@ -681,8 +864,24 @@ export type Database = {
         };
         Returns: undefined;
       };
+      update_faculty_profile: {
+        Args: {
+          additional_academic_program_ids: number[];
+          expertise_ids: number[];
+          primary_academic_program_id: number;
+          profile_allow_direct_contact?: boolean;
+          profile_availability: string | null;
+          profile_bio: string | null;
+          profile_full_name: string;
+          research_interest_ids: number[];
+        };
+        Returns: undefined;
+      };
     };
     Enums: {
+      account_role: "student" | "faculty";
+      academic_program_level: "bachelor" | "master";
+      faculty_verification_status: "unverified" | "verified";
       interaction_action: "connect" | "save" | "skip";
       match_status: "active" | "blocked" | "closed";
       profile_status: "active" | "suspended" | "deleted";

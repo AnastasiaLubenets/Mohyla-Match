@@ -83,7 +83,7 @@ export function profileEditDataToPayload(
     interestIds: normalizeIdList(data.interestIds),
     lookingForSkillIds: normalizeIdList(data.wantedSkillIds),
     offerSkillIds: normalizeIdList(data.offeredSkillIds),
-    yearOfStudy: data.profile.year_of_study,
+    yearOfStudy: data.profile.year_of_study ?? 0,
   };
 }
 

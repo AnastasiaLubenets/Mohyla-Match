@@ -25,8 +25,13 @@ type OnboardingSkillPickerProps = Readonly<{
   backHref: string;
   defaultSkillIds: number[];
   fieldName: string;
+  emptyLabel?: string;
   isOptional?: boolean;
+  searchLabel?: string;
+  searchPlaceholder?: string;
   skills: SkillPickerOption[];
+  suggestedLabel?: string;
+  selectedLabel?: string;
   title: string;
 }>;
 
@@ -123,9 +128,14 @@ export function OnboardingSkillPicker({
   action,
   backHref,
   defaultSkillIds,
+  emptyLabel,
   fieldName,
   isOptional = false,
+  searchLabel = "Add more skills",
+  searchPlaceholder = "Search skills",
   skills,
+  suggestedLabel = "Suggested skills",
+  selectedLabel = "Selected skills",
   title,
 }: OnboardingSkillPickerProps) {
   const [selectedSkillIds, setSelectedSkillIds] = useState(() =>
@@ -196,7 +206,7 @@ export function OnboardingSkillPicker({
       ))}
 
       <fieldset className="space-y-3">
-        <legend className={onboardingLabelClass}>Suggested skills</legend>
+        <legend className={onboardingLabelClass}>{suggestedLabel}</legend>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {suggestedSkills.map((skill) => (
             <SkillToggle
@@ -211,7 +221,7 @@ export function OnboardingSkillPicker({
 
       <section className="space-y-3" aria-labelledby="selected-skills-heading">
         <h2 className={onboardingLabelClass} id="selected-skills-heading">
-          Selected skills
+          {selectedLabel}
         </h2>
         {selectedSkills.length > 0 ? (
           <div className="flex flex-wrap gap-2">
@@ -226,15 +236,15 @@ export function OnboardingSkillPicker({
         ) : (
           <p className="rounded-[0.875rem] border border-dashed border-[#cddaf0] bg-white/50 px-4 py-3 text-sm text-[#66769e]">
             {isOptional
-              ? "No looking-for skills selected."
-              : "Choose at least one offered skill."}
+              ? (emptyLabel ?? "No looking-for skills selected.")
+              : (emptyLabel ?? "Choose at least one offered skill.")}
           </p>
         )}
       </section>
 
       <div className="space-y-3">
         <label className="block" htmlFor="skill-search">
-          <span className={onboardingLabelClass}>Add more skills</span>
+          <span className={onboardingLabelClass}>{searchLabel}</span>
           <input
             aria-activedescendant={
               hasQuery && searchResults[activeResultIndex]
@@ -251,7 +261,7 @@ export function OnboardingSkillPicker({
               setActiveResultIndex(0);
             }}
             onKeyDown={handleSearchKeyDown}
-            placeholder="Search skills"
+            placeholder={searchPlaceholder}
             role="combobox"
             type="search"
             value={query}

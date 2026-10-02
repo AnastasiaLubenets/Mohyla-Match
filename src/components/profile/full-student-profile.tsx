@@ -129,7 +129,11 @@ function ArrowLeftIcon() {
   );
 }
 
-function yearLabel(year: number) {
+function yearLabel(year: number | null) {
+  if (!year) {
+    return "Faculty";
+  }
+
   return `${year}${year === 1 ? "st" : year === 2 ? "nd" : year === 3 ? "rd" : "th"} year`;
 }
 
@@ -200,7 +204,24 @@ export function FullStudentProfile({
   returnTo,
   status,
 }: FullStudentProfileProps) {
-  const saved = status?.outgoingAction === "save";
+  const isFaculty = profile.accountRole === "faculty";
+  const saved = !isFaculty && status?.outgoingAction === "save";
+  const profileKind = isFaculty ? "Faculty profile" : "Student profile";
+  const primaryProgram =
+    profile.academicPrograms.find((program) => program.isPrimary) ??
+    profile.academicPrograms[0];
+  const programLine = isFaculty
+    ? (primaryProgram?.name ?? profile.academicProgramName)
+    : `${profile.academicProgramName} • ${yearLabel(profile.yearOfStudy)}`;
+  const facultyProgramLabels = profile.academicPrograms.map((program) => {
+    const level = program.studyLevel === "master" ? "Master" : "Bachelor";
+    const specialty = program.specialtyCode ? `${program.specialtyCode} · ` : "";
+
+    return `${specialty}${program.name} (${level})`;
+  });
+  const facultyExpertiseLabels = profile.expertise.map(
+    (expertise) => `${expertise.name} · ${expertise.category}`,
+  );
 
   return (
     <section className="min-w-0">
@@ -214,19 +235,21 @@ export function FullStudentProfile({
 
       <header className="mb-5">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-600">
-          Student profile
+          {profileKind}
         </p>
         <h1 className="mt-3 font-serif text-6xl font-bold leading-none text-blue-950 sm:text-7xl">
           Full profile
         </h1>
         <p className="mt-3 text-xl leading-8 text-blue-900/80 sm:text-2xl">
-          Learn more about {firstName(profile.fullName)} and see if you might
-          work well together.
+          {isFaculty
+            ? `Explore ${firstName(profile.fullName)}'s academic programs and expertise.`
+            : `Learn more about ${firstName(profile.fullName)} and see if you might work well together.`}
         </p>
       </header>
 
       <article className="relative rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
-        <div className="absolute right-5 top-5 z-10 sm:right-6 sm:top-6">
+        {!isFaculty ? (
+          <div className="absolute right-5 top-5 z-10 sm:right-6 sm:top-6">
           <SaveProfileButton
             className={
               saved
@@ -239,7 +262,8 @@ export function FullStudentProfile({
             saved={saved}
             targetUserId={profile.userId}
           />
-        </div>
+          </div>
+        ) : null}
 
         <div className="grid gap-6 pr-0 md:grid-cols-[14rem_minmax(0,1fr)] md:pr-24 xl:grid-cols-[15rem_minmax(0,1fr)]">
           <SystemAvatar
@@ -256,8 +280,16 @@ export function FullStudentProfile({
               {profile.fullName}
             </h2>
             <p className="mt-3 text-base font-semibold text-blue-800">
-              {profile.academicProgramName} <span aria-hidden="true">•</span>{" "}
-              {yearLabel(profile.yearOfStudy)}
+              {programLine}
+              {isFaculty ? (
+                <>
+                  {" "}
+                  <span aria-hidden="true">•</span>{" "}
+                  {profile.facultyVerificationStatus === "verified"
+                    ? "Verified faculty"
+                    : "Unverified faculty"}
+                </>
+              ) : null}
             </p>
             <p className="mt-1 text-sm font-semibold text-blue-700/75">
               {profile.facultyName}
@@ -276,17 +308,17 @@ export function FullStudentProfile({
             <ArrowLeftIcon />
             {backLabel}
           </Link>
-          {status?.canDirectContact ? (
+          {!isFaculty && status?.canDirectContact ? (
             <ContactReveal
               buttonClassName="inline-flex h-12 w-full items-center justify-center gap-3 rounded-md bg-blue-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
               showIcon
               targetUserId={profile.userId}
             />
-          ) : (
+          ) : !isFaculty ? (
             <p className="inline-flex min-h-12 items-center justify-center rounded-md border border-blue-100 bg-blue-50 px-5 text-center text-sm font-semibold text-blue-700">
               Email contact is off for this profile.
             </p>
-          )}
+          ) : null}
           <div className="sm:justify-self-end">
             <ProfileSafetyMenu returnTo={returnTo} targetUserId={profile.userId} />
           </div>
@@ -294,6 +326,54 @@ export function FullStudentProfile({
       </article>
 
       <div className="mt-5 grid gap-4 xl:grid-cols-2">
+        {isFaculty ? (
+          <>
+            <ProfileInfoCard
+              description="Official NaUKMA programs connected to this faculty profile."
+              icon={<GraduationIcon />}
+              title="Academic programs"
+            >
+              <ChipList
+                emptyLabel="No academic programs are visible."
+                items={facultyProgramLabels}
+              />
+            </ProfileInfoCard>
+
+            <ProfileInfoCard
+              description="Areas where this faculty profile can advise or collaborate."
+              icon={<BarsIcon />}
+              title="Expertise"
+            >
+              <ChipList
+                emptyLabel="No expertise is visible."
+                items={facultyExpertiseLabels}
+              />
+            </ProfileInfoCard>
+
+            <ProfileInfoCard
+              description="Research topics listed for this profile."
+              icon={<SparkIcon />}
+              title="Research interests"
+            >
+              <ChipList
+                emptyLabel="No research interests are visible."
+                items={profile.interests}
+              />
+            </ProfileInfoCard>
+
+            <ProfileInfoCard
+              description="When they're usually available."
+              icon={<CalendarIcon />}
+              title="Availability"
+            >
+              <ChipList
+                emptyLabel="No availability is listed."
+                items={profile.availability ? [profile.availability] : []}
+              />
+            </ProfileInfoCard>
+          </>
+        ) : (
+          <>
         <ProfileInfoCard
           description="Tools and expertise they can offer."
           icon={<BarsIcon />}
@@ -348,6 +428,8 @@ export function FullStudentProfile({
             items={profile.availability ? [profile.availability] : []}
           />
         </ProfileInfoCard>
+          </>
+        )}
       </div>
     </section>
   );

@@ -26,6 +26,10 @@ export function onboardingStepPath(step: number, error?: string): string {
   });
 }
 
+export function onboardingRolePath(error?: string): string {
+  return pathWithParams("/account/setup", { error });
+}
+
 export async function requireOnboardingRequest(
   request: NextRequest,
 ): Promise<OnboardingContext> {
@@ -144,6 +148,17 @@ export async function saveBasicProfile(request: NextRequest) {
     );
   }
 
+  const roleResult = await context.supabase.rpc("save_account_role", {
+    selected_role: "student",
+  });
+
+  if (roleResult.error) {
+    return redirectTo(
+      request,
+      onboardingStepPath(1, "We could not save your account type. Try again."),
+    );
+  }
+
   const [{ data: faculty }, { data: program }] = await Promise.all([
     context.supabase
       .from("faculties")
@@ -182,6 +197,7 @@ export async function saveBasicProfile(request: NextRequest) {
   }
 
   const profilePayload = {
+    account_role: "student" as const,
     full_name: fullName,
     faculty_id: facultyId,
     academic_program_id: academicProgramId,
@@ -207,6 +223,373 @@ export async function saveBasicProfile(request: NextRequest) {
   }
 
   return redirectTo(request, onboardingStepPath(2));
+}
+
+export async function saveAccountRole(request: NextRequest) {
+  const formData = await request.formData();
+  const context = await requireOnboardingRequest(request);
+
+  if (context.response) {
+    return context.response;
+  }
+
+  const role = readRequiredString(formData, "accountRole");
+
+  if (role !== "student" && role !== "faculty") {
+    return redirectTo(request, onboardingRolePath("Choose student or faculty."));
+  }
+
+  const result = await context.supabase.rpc("save_account_role", {
+    selected_role: role,
+  });
+
+  if (result.error) {
+    return redirectTo(
+      request,
+      onboardingRolePath("We could not save your account type. Try again."),
+    );
+  }
+
+  return redirectTo(request, role === "faculty" ? onboardingStepPath(1) : onboardingStepPath(1));
+}
+
+async function requireFacultyOnboarding(
+  request: NextRequest,
+): Promise<OnboardingContext> {
+  const context = await requireOnboardingRequest(request);
+
+  if (context.response) {
+    return context;
+  }
+
+  const { data: selectedRole } = await context.supabase
+    .from("account_roles")
+    .select("account_role")
+    .eq("user_id", context.userId)
+    .maybeSingle();
+
+  if (selectedRole?.account_role !== "faculty") {
+    return {
+      response: redirectTo(
+        request,
+        onboardingRolePath("Choose Faculty before continuing faculty setup."),
+      ),
+    };
+  }
+
+  return context;
+}
+
+export async function saveFacultyProgramsStep(request: NextRequest) {
+  const formData = await request.formData();
+  const context = await requireFacultyOnboarding(request);
+
+  if (context.response) {
+    return context.response;
+  }
+
+  const fullName = readRequiredString(formData, "fullName");
+  const primaryAcademicProgramId = readRequiredInteger(
+    formData,
+    "primaryAcademicProgramId",
+  );
+  const additionalAcademicProgramIds = readIdList(
+    formData,
+    "additionalAcademicProgramId",
+  ).filter((programId) => programId !== primaryAcademicProgramId);
+  const bio = readOptionalString(formData, "bio");
+  const availability = readOptionalString(formData, "availability");
+
+  if (!fullName || fullName.length < 2 || fullName.length > 120) {
+    return redirectTo(
+      request,
+      onboardingStepPath(1, "Full name must be 2-120 characters."),
+    );
+  }
+
+  if (!primaryAcademicProgramId) {
+    return redirectTo(
+      request,
+      onboardingStepPath(1, "Choose a primary academic program."),
+    );
+  }
+
+  if (bio && bio.length > 500) {
+    return redirectTo(request, onboardingStepPath(1, "Bio is limited to 500 characters."));
+  }
+
+  if (availability && availability.length > 160) {
+    return redirectTo(
+      request,
+      onboardingStepPath(1, "Availability is limited to 160 characters."),
+    );
+  }
+
+  const { data: primaryProgram } = await context.supabase
+    .from("academic_programs")
+    .select("id,faculty_id")
+    .eq("id", primaryAcademicProgramId)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (!primaryProgram) {
+    return redirectTo(
+      request,
+      onboardingStepPath(1, "Choose an active primary academic program."),
+    );
+  }
+
+  if (additionalAcademicProgramIds.length > 0) {
+    const { data: activeAdditionalPrograms, error: additionalError } =
+      await context.supabase
+        .from("academic_programs")
+        .select("id")
+        .in("id", additionalAcademicProgramIds)
+        .eq("is_active", true);
+
+    if (
+      additionalError ||
+      (activeAdditionalPrograms ?? []).length !== additionalAcademicProgramIds.length
+    ) {
+      return redirectTo(
+        request,
+        onboardingStepPath(1, "Choose only active additional academic programs."),
+      );
+    }
+  }
+
+  const profilePayload = {
+    account_role: "faculty" as const,
+    academic_program_id: primaryProgram.id,
+    availability,
+    bio,
+    faculty_id: primaryProgram.faculty_id,
+    full_name: fullName,
+    year_of_study: null,
+  };
+
+  const { data: existingProfile, error: profileLookupError } =
+    await context.supabase
+      .from("profiles")
+      .select("user_id")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+
+  if (profileLookupError) {
+    return redirectTo(
+      request,
+      onboardingStepPath(1, "We could not load your profile. Try again."),
+    );
+  }
+
+  const profileResult = existingProfile
+    ? await context.supabase
+        .from("profiles")
+        .update(profilePayload)
+        .eq("user_id", context.userId)
+    : await context.supabase.from("profiles").insert({
+        user_id: context.userId,
+        ...profilePayload,
+      });
+
+  if (profileResult.error) {
+    return redirectTo(
+      request,
+      onboardingStepPath(1, "We could not save your faculty profile. Try again."),
+    );
+  }
+
+  const deletePrograms = await context.supabase
+    .from("profile_academic_programs")
+    .delete()
+    .eq("user_id", context.userId);
+
+  if (deletePrograms.error) {
+    return redirectTo(
+      request,
+      onboardingStepPath(1, "We could not update your academic programs. Try again."),
+    );
+  }
+
+  const programRows = [
+    {
+      academic_program_id: primaryProgram.id,
+      is_primary: true,
+      user_id: context.userId,
+    },
+    ...additionalAcademicProgramIds.map((programId) => ({
+      academic_program_id: programId,
+      is_primary: false,
+      user_id: context.userId,
+    })),
+  ];
+  const insertPrograms = await context.supabase
+    .from("profile_academic_programs")
+    .insert(programRows);
+
+  if (insertPrograms.error) {
+    return redirectTo(
+      request,
+      onboardingStepPath(1, "We could not save your academic programs. Try again."),
+    );
+  }
+
+  return redirectTo(request, onboardingStepPath(2));
+}
+
+export async function saveFacultyExpertiseStep(request: NextRequest) {
+  const formData = await request.formData();
+  const context = await requireFacultyOnboarding(request);
+
+  if (context.response) {
+    return context.response;
+  }
+
+  const expertiseIds = readIdList(formData, "expertiseId");
+
+  if (expertiseIds.length < 1) {
+    return redirectTo(
+      request,
+      onboardingStepPath(2, "Choose at least one expertise area."),
+    );
+  }
+
+  const { data: profile } = await context.supabase
+    .from("profiles")
+    .select("user_id,account_role")
+    .eq("user_id", context.userId)
+    .eq("account_role", "faculty")
+    .eq("profile_status", "active")
+    .maybeSingle();
+
+  if (!profile) {
+    return redirectTo(
+      request,
+      onboardingStepPath(1, "Save your academic programs before choosing expertise."),
+    );
+  }
+
+  const { data: activeExpertise, error: expertiseError } =
+    await context.supabase
+      .from("expertise")
+      .select("id")
+      .in("id", expertiseIds)
+      .eq("is_active", true);
+
+  if (
+    expertiseError ||
+    (activeExpertise ?? []).length !== expertiseIds.length
+  ) {
+    return redirectTo(
+      request,
+      onboardingStepPath(2, "Choose active expertise areas from the list."),
+    );
+  }
+
+  const deleteResult = await context.supabase
+    .from("faculty_expertise")
+    .delete()
+    .eq("user_id", context.userId);
+
+  if (deleteResult.error) {
+    return redirectTo(
+      request,
+      onboardingStepPath(2, "We could not update your expertise. Try again."),
+    );
+  }
+
+  const insertResult = await context.supabase.from("faculty_expertise").insert(
+    expertiseIds.map((expertiseId) => ({
+      expertise_id: expertiseId,
+      user_id: context.userId,
+    })),
+  );
+
+  if (insertResult.error) {
+    return redirectTo(
+      request,
+      onboardingStepPath(2, "We could not save your expertise. Try again."),
+    );
+  }
+
+  return redirectTo(request, onboardingStepPath(3));
+}
+
+export async function saveFacultyResearchStep(request: NextRequest) {
+  const formData = await request.formData();
+  const context = await requireFacultyOnboarding(request);
+
+  if (context.response) {
+    return context.response;
+  }
+
+  const isSkipped = typeof formData.get("skip") === "string";
+  const interestIds = isSkipped ? [] : readIdList(formData, "interestId");
+
+  const { data: activeInterests, error: interestsError } =
+    interestIds.length > 0
+      ? await context.supabase
+          .from("interests")
+          .select("id")
+          .in("id", interestIds)
+          .eq("is_active", true)
+      : { data: [], error: null };
+
+  if (interestsError || (activeInterests ?? []).length !== interestIds.length) {
+    return redirectTo(
+      request,
+      onboardingStepPath(3, "Choose active research interests from the list."),
+    );
+  }
+
+  const deleteInterests = await context.supabase
+    .from("profile_interests")
+    .delete()
+    .eq("user_id", context.userId);
+
+  if (deleteInterests.error) {
+    return redirectTo(
+      request,
+      onboardingStepPath(3, "We could not update your research interests. Try again."),
+    );
+  }
+
+  if (interestIds.length > 0) {
+    const insertInterests = await context.supabase.from("profile_interests").insert(
+      interestIds.map((interestId) => ({
+        interest_id: interestId,
+        user_id: context.userId,
+      })),
+    );
+
+    if (insertInterests.error) {
+      return redirectTo(
+        request,
+        onboardingStepPath(3, "We could not save your research interests. Try again."),
+      );
+    }
+  }
+
+  return redirectTo(request, onboardingStepPath(4));
+}
+
+export async function completeFacultyOnboarding(request: NextRequest) {
+  const context = await requireFacultyOnboarding(request);
+
+  if (context.response) {
+    return context.response;
+  }
+
+  const completion = await context.supabase.rpc("complete_onboarding");
+
+  if (completion.error) {
+    return redirectTo(
+      request,
+      onboardingStepPath(4, "Complete all required faculty onboarding steps first."),
+    );
+  }
+
+  return redirectTo(request, "/app?audience=faculty");
 }
 
 export async function saveSkillStep(

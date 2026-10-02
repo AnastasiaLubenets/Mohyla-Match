@@ -53,6 +53,24 @@ function LinkIcon() {
   );
 }
 
+function GraduationIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <path d="M22 10 12 5 2 10l10 5 10-5Z" />
+      <path d="M6 12v5c3 2 9 2 12 0v-5" />
+    </svg>
+  );
+}
+
 function SparkIcon() {
   return (
     <svg
@@ -121,7 +139,294 @@ function namedOptions(options: EditProfileData["interests"]): TaxonomyPickerOpti
   }));
 }
 
-export function ProfileEditForm({
+function programOptions(
+  data: EditProfileData,
+  excludedProgramId?: number,
+): TaxonomyPickerOption[] {
+  const facultyById = new Map(
+    data.faculties.map((faculty) => [faculty.id, faculty.display_name]),
+  );
+
+  return data.programs
+    .filter((program) => program.id !== excludedProgramId)
+    .map((program) => ({
+      category: `${facultyById.get(program.faculty_id) ?? "NaUKMA"} · ${
+        program.study_level === "master" ? "Master" : "Bachelor"
+      }`,
+      id: program.id,
+      name: program.display_name,
+      search_aliases: [
+        program.slug,
+        program.specialty_code ?? "",
+        facultyById.get(program.faculty_id) ?? "",
+      ].filter(Boolean),
+    }));
+}
+
+function FacultyProfileEditForm({
+  data,
+  error,
+}: Readonly<{
+  data: EditProfileData;
+  error?: string;
+}>) {
+  const [selectedProgramId, setSelectedProgramId] = useState(
+    data.profile.academic_program_id,
+  );
+  const [additionalProgramIds, setAdditionalProgramIds] = useState(
+    data.additionalAcademicProgramIds.filter(
+      (programId) => programId !== data.profile.academic_program_id,
+    ),
+  );
+  const [expertiseIds, setExpertiseIds] = useState(data.facultyExpertiseIds);
+  const [interestIds, setInterestIds] = useState(data.interestIds);
+  const [bioValue, setBioValue] = useState(data.profile.bio ?? "");
+  const [clientError, setClientError] = useState<string | null>(null);
+  const selectedProgram = data.programs.find(
+    (program) => program.id === selectedProgramId,
+  );
+  const selectedFaculty = data.faculties.find(
+    (faculty) => faculty.id === selectedProgram?.faculty_id,
+  );
+  const additionalOptions = useMemo(
+    () => programOptions(data, selectedProgramId),
+    [data, selectedProgramId],
+  );
+
+  function handlePrimaryProgramChange(value: string) {
+    const nextProgramId = Number(value);
+
+    setSelectedProgramId(nextProgramId);
+    setAdditionalProgramIds((current) =>
+      current.filter((programId) => programId !== nextProgramId),
+    );
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    if (expertiseIds.length < 1) {
+      event.preventDefault();
+      setClientError("Choose at least one expertise area.");
+      return;
+    }
+
+    setClientError(null);
+  }
+
+  return (
+    <form
+      action="/profile/update"
+      className="space-y-5"
+      id="profile-edit-form"
+      method="post"
+      onSubmit={handleSubmit}
+    >
+      <input name="profileRole" type="hidden" value="faculty" />
+      <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.16em] text-blue-600">
+            Faculty profile
+          </p>
+          <h1 className="mt-3 font-serif text-6xl font-bold leading-none text-blue-950 sm:text-7xl">
+            Edit profile
+          </h1>
+          <p className="mt-3 text-xl leading-8 text-blue-900/80 sm:text-2xl">
+            Update your programs, expertise and research interests.
+          </p>
+        </div>
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
+          <Link
+            className="inline-flex h-12 items-center justify-center rounded-md border border-blue-300 bg-white px-8 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
+            href="/profile"
+          >
+            Cancel
+          </Link>
+          <AuthSubmitButton
+            className="inline-flex h-12 items-center justify-center rounded-md bg-blue-800 px-8 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+            pendingLabel="Saving..."
+          >
+            Save changes
+          </AuthSubmitButton>
+        </div>
+      </header>
+
+      {error || clientError ? (
+        <div
+          className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900"
+          role="alert"
+        >
+          {clientError ?? error}
+        </div>
+      ) : null}
+
+      <section className="rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
+        <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)]">
+          <SystemAvatar
+            availability={data.profile.availability}
+            avatarVariantKey={selectedProgram?.avatar_variant_key}
+            fullName={data.profile.full_name}
+            size="xl"
+            systemAvatarKey={data.profile.system_avatar_key}
+          />
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <label className="block">
+              <span className="text-sm font-bold text-blue-900">
+                Full name <span className="text-red-600">*</span>
+              </span>
+              <input
+                className={fieldClassName()}
+                defaultValue={data.profile.full_name}
+                maxLength={120}
+                minLength={2}
+                name="fullName"
+                required
+                type="text"
+              />
+            </label>
+
+            <div className="rounded-md border border-blue-100 bg-blue-50/60 px-4 py-3">
+              <p className="text-sm font-bold text-blue-950">
+                Verification status
+              </p>
+              <p className="mt-1 text-sm font-semibold text-blue-700">
+                {data.profile.faculty_verification_status === "verified"
+                  ? "Verified"
+                  : "Unverified"}
+              </p>
+            </div>
+
+            <label className="block lg:col-span-2">
+              <span className="text-sm font-bold text-blue-900">
+                Primary academic program <span className="text-red-600">*</span>
+              </span>
+              <select
+                className={fieldClassName()}
+                name="academicProgramId"
+                onChange={(event) =>
+                  handlePrimaryProgramChange(event.target.value)
+                }
+                required
+                value={selectedProgramId}
+              >
+                {data.programs.map((program) => (
+                  <option key={program.id} value={program.id}>
+                    {program.display_name}
+                    {program.study_level === "master" ? " · Master" : " · Bachelor"}
+                  </option>
+                ))}
+              </select>
+              <span className="mt-1 block text-xs font-semibold text-blue-500">
+                {selectedFaculty?.display_name ?? "NaUKMA"}
+              </span>
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-bold text-blue-900">
+                Availability
+              </span>
+              <input
+                className={fieldClassName()}
+                defaultValue={data.profile.availability ?? ""}
+                maxLength={160}
+                name="availability"
+                placeholder='e.g. office hours, "by appointment", online'
+                type="text"
+              />
+            </label>
+
+            <label className="flex items-start gap-3 rounded-md border border-blue-100 bg-blue-50/60 px-4 py-3">
+              <input
+                className="mt-1 h-4 w-4 accent-blue-800"
+                defaultChecked={data.profile.allow_direct_contact}
+                name="allowDirectContact"
+                type="checkbox"
+              />
+              <span>
+                <span className="block text-sm font-bold text-blue-950">
+                  Allow direct email contact
+                </span>
+                <span className="mt-1 block text-sm leading-6 text-blue-800/75">
+                  Email remains hidden unless a user explicitly requests it.
+                </span>
+              </span>
+            </label>
+
+            <label className="block lg:col-span-2">
+              <span className="text-sm font-bold text-blue-900">Bio</span>
+              <textarea
+                className="mt-2 min-h-28 w-full resize-y rounded-md border border-blue-200 bg-white px-4 py-3 text-sm font-medium leading-6 text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400"
+                maxLength={500}
+                name="bio"
+                onChange={(event) => setBioValue(event.target.value)}
+                value={bioValue}
+              />
+              <span className="mt-1 block text-right text-xs font-semibold text-blue-500">
+                {bioValue.length}/500
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <div className="grid gap-5 xl:grid-cols-2">
+        <PickerCard icon={<GraduationIcon />} title="Additional programs">
+          <TaxonomyMultiSelect
+            emptyLabel="No additional academic programs selected."
+            fieldName="additionalAcademicProgramId"
+            label="Additional academic programs"
+            onChange={setAdditionalProgramIds}
+            options={additionalOptions}
+            placeholder="Search academic programs..."
+            selectedIds={additionalProgramIds}
+          />
+        </PickerCard>
+
+        <PickerCard icon={<BarsIcon />} title="Expertise">
+          <TaxonomyMultiSelect
+            emptyLabel="Choose at least one expertise area."
+            fieldName="expertiseId"
+            label="Expertise"
+            onChange={setExpertiseIds}
+            options={data.expertise}
+            placeholder="Search expertise..."
+            required
+            selectedIds={expertiseIds}
+            suggestedLabel="Suggested expertise"
+          />
+        </PickerCard>
+
+        <PickerCard icon={<SparkIcon />} title="Research interests">
+          <TaxonomyMultiSelect
+            emptyLabel="No research interests selected."
+            fieldName="interestId"
+            label="Research interests"
+            onChange={setInterestIds}
+            options={namedOptions(data.interests)}
+            placeholder="Search research interests..."
+            selectedIds={interestIds}
+          />
+        </PickerCard>
+      </div>
+
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+        <Link
+          className="inline-flex h-12 items-center justify-center rounded-md border border-blue-300 bg-white px-8 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
+          href="/profile"
+        >
+          Cancel
+        </Link>
+        <AuthSubmitButton
+          className="inline-flex h-12 items-center justify-center rounded-md bg-blue-800 px-8 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+          pendingLabel="Saving..."
+        >
+          Save changes
+        </AuthSubmitButton>
+      </div>
+    </form>
+  );
+}
+
+function StudentProfileEditForm({
   data,
   error,
 }: Readonly<{
@@ -288,7 +593,7 @@ export function ProfileEditForm({
               </span>
               <select
                 className={fieldClassName()}
-                defaultValue={data.profile.year_of_study}
+                defaultValue={data.profile.year_of_study ?? ""}
                 name="yearOfStudy"
                 required
               >
@@ -416,4 +721,18 @@ export function ProfileEditForm({
       </div>
     </form>
   );
+}
+
+export function ProfileEditForm({
+  data,
+  error,
+}: Readonly<{
+  data: EditProfileData;
+  error?: string;
+}>) {
+  if (data.profile.account_role === "faculty") {
+    return <FacultyProfileEditForm data={data} error={error} />;
+  }
+
+  return <StudentProfileEditForm data={data} error={error} />;
 }
