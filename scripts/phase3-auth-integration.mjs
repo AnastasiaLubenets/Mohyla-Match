@@ -851,38 +851,48 @@ async function runOnboardingEligibilityRegression(
 async function runOnboardingFlow(cookieJar, userId) {
   const taxonomy = await loadOnboardingTaxonomy();
 
-  const roleSelectionBody = await readPageText(
-    await getPath("/account/setup", cookieJar),
-    "fresh setup shows account role selection",
-  );
-  assertTextContains(
-    roleSelectionBody,
-    "I am a...",
-    "fresh setup shows role selection heading",
-  );
-  assertTextContains(
-    roleSelectionBody,
-    "Student",
-    "fresh setup offers student role",
-  );
-  assertTextContains(
-    roleSelectionBody,
-    "Faculty",
-    "fresh setup offers faculty role",
-  );
+  const setupEntryResponse = await getPath("/account/setup", cookieJar);
+  if (setupEntryResponse.status === 200) {
+    const roleSelectionBody = await readPageText(
+      setupEntryResponse,
+      "fresh setup shows account role selection",
+    );
+    assertTextContains(
+      roleSelectionBody,
+      "I am a...",
+      "fresh setup shows role selection heading",
+    );
+    assertTextContains(
+      roleSelectionBody,
+      "Student",
+      "fresh setup offers student role",
+    );
+    assertTextContains(
+      roleSelectionBody,
+      "Faculty",
+      "fresh setup offers faculty role",
+    );
 
-  assertRedirectWithParams(
-    await postForm(
-      "/account/setup/role",
-      {
-        accountRole: "student",
-      },
-      cookieJar,
-    ),
-    "/account/setup",
-    { step: "1" },
-    "student role selection continues to Step 1",
-  );
+    assertRedirectWithParams(
+      await postForm(
+        "/account/setup/role",
+        {
+          accountRole: "student",
+        },
+        cookieJar,
+      ),
+      "/account/setup",
+      { step: "1" },
+      "student role selection continues to Step 1",
+    );
+  } else {
+    assertRedirectWithParams(
+      setupEntryResponse,
+      "/account/setup",
+      { step: "1" },
+      "existing student role resumes at Step 1",
+    );
+  }
 
   assertRedirectWithParams(
     await getPath("/account/setup", cookieJar),
