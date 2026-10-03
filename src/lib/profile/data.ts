@@ -5,6 +5,10 @@ import type { Database } from "@/types/database";
 
 type SupabaseServerClient = SupabaseClient<Database>;
 
+export type AccountRole = Database["public"]["Enums"]["account_role"];
+export type FacultyVerificationStatus =
+  Database["public"]["Enums"]["faculty_verification_status"];
+
 export type FacultyOption = Readonly<{
   id: number;
   display_name: string;
@@ -15,9 +19,20 @@ export type ProgramOption = Readonly<{
   id: number;
   faculty_id: number;
   display_name: string;
+  slug: string;
+  specialty_code: string | null;
+  study_level: Database["public"]["Enums"]["academic_program_level"];
 }>;
 
 export type SkillOption = Readonly<{
+  id: number;
+  category: string;
+  is_featured: boolean;
+  name: string;
+  search_aliases: string[];
+}>;
+
+export type ExpertiseOption = Readonly<{
   id: number;
   category: string;
   is_featured: boolean;
@@ -30,14 +45,33 @@ export type NamedOption = Readonly<{
   name: string;
 }>;
 
+export type SafeFacultyProgram = Readonly<{
+  facultyName: string;
+  id: number;
+  isPrimary: boolean;
+  name: string;
+  specialtyCode: string | null;
+  studyLevel: Database["public"]["Enums"]["academic_program_level"];
+}>;
+
+export type SafeFacultyExpertise = Readonly<{
+  category: string;
+  id: number;
+  name: string;
+}>;
+
 export type SafeProfile = Readonly<{
+  accountRole: AccountRole;
   academicProgramName: string;
+  academicPrograms: SafeFacultyProgram[];
   allowDirectContact: boolean;
   availability: string | null;
   bio: string | null;
   collaborationGoals: string[];
   createdAt: string;
+  expertise: SafeFacultyExpertise[];
   facultyName: string;
+  facultyVerificationStatus: FacultyVerificationStatus;
   fullName: string;
   interests: string[];
   offeredSkills: string[];
@@ -45,23 +79,28 @@ export type SafeProfile = Readonly<{
   systemAvatarKey: string;
   userId: string;
   wantedSkills: string[];
-  yearOfStudy: number;
+  yearOfStudy: number | null;
 }>;
 
 export type EditProfileData = Readonly<{
+  additionalAcademicProgramIds: number[];
   collaborationGoals: NamedOption[];
+  expertise: ExpertiseOption[];
   faculties: FacultyOption[];
+  facultyExpertiseIds: number[];
   interests: NamedOption[];
   offeredSkillIds: number[];
   profile: {
+    account_role: AccountRole;
     academic_program_id: number;
     allow_direct_contact: boolean;
     availability: string | null;
     bio: string | null;
     faculty_id: number;
+    faculty_verification_status: FacultyVerificationStatus;
     full_name: string;
     system_avatar_key: string;
-    year_of_study: number;
+    year_of_study: number | null;
   };
   programs: ProgramOption[];
   skills: SkillOption[];
@@ -134,6 +173,150 @@ async function loadSkillNamesById(
   };
 }
 
+async function loadSafeFacultyPrograms(
+  supabase: SupabaseServerClient,
+  userId: string,
+  primaryProgramId: number,
+): Promise<{
+  error: boolean;
+  programs: SafeFacultyProgram[];
+}> {
+  const linksResult = await supabase
+    .from("profile_academic_programs")
+    .select("academic_program_id,is_primary")
+    .eq("user_id", userId);
+
+  if (linksResult.error) {
+    return { error: true, programs: [] };
+  }
+
+  const links = linksResult.data ?? [];
+  const linkedProgramIds = links.map((link) => link.academic_program_id);
+  const programIds = [...new Set([primaryProgramId, ...linkedProgramIds])];
+
+  if (programIds.length === 0) {
+    return { error: false, programs: [] };
+  }
+
+  const programsResult = await supabase
+    .from("academic_programs")
+    .select("id,display_name,faculty_id,specialty_code,study_level")
+    .in("id", programIds)
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("display_name", { ascending: true });
+
+  if (programsResult.error) {
+    return { error: true, programs: [] };
+  }
+
+  const programs = programsResult.data ?? [];
+  const facultyIds = [...new Set(programs.map((program) => program.faculty_id))];
+  const facultiesResult = await supabase
+    .from("faculties")
+    .select("id,display_name")
+    .in("id", facultyIds)
+    .eq("is_active", true);
+
+  if (facultiesResult.error) {
+    return { error: true, programs: [] };
+  }
+
+  const facultyNamesById = new Map(
+    (facultiesResult.data ?? []).map((faculty) => [
+      faculty.id,
+      faculty.display_name,
+    ]),
+  );
+  const primaryProgramIds = new Set(
+    links
+      .filter((link) => link.is_primary)
+      .map((link) => link.academic_program_id),
+  );
+
+  return {
+    error: false,
+    programs: programs.map((program) => ({
+      facultyName: facultyNamesById.get(program.faculty_id) ?? "NaUKMA",
+      id: program.id,
+      isPrimary:
+        primaryProgramIds.size > 0
+          ? primaryProgramIds.has(program.id)
+          : program.id === primaryProgramId,
+      name: program.display_name,
+      specialtyCode: program.specialty_code,
+      studyLevel: program.study_level,
+    })),
+  };
+}
+
+async function loadSafeFacultyExpertise(
+  supabase: SupabaseServerClient,
+  userId: string,
+): Promise<{
+  error: boolean;
+  expertise: SafeFacultyExpertise[];
+}> {
+  const linksResult = await supabase
+    .from("faculty_expertise")
+    .select("expertise_id")
+    .eq("user_id", userId);
+
+  if (linksResult.error) {
+    return { error: true, expertise: [] };
+  }
+
+  const expertiseIds = [
+    ...new Set((linksResult.data ?? []).map((link) => link.expertise_id)),
+  ];
+
+  if (expertiseIds.length === 0) {
+    return { error: false, expertise: [] };
+  }
+
+  const expertiseResult = await supabase
+    .from("expertise")
+    .select("id,name,category_id,sort_order")
+    .in("id", expertiseIds)
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("name", { ascending: true });
+
+  if (expertiseResult.error) {
+    return { error: true, expertise: [] };
+  }
+
+  const expertise = expertiseResult.data ?? [];
+  const categoryIds = [
+    ...new Set(expertise.map((expertiseItem) => expertiseItem.category_id)),
+  ];
+  const categoriesResult = await supabase
+    .from("expertise_categories")
+    .select("id,name")
+    .in("id", categoryIds)
+    .eq("is_active", true);
+
+  if (categoriesResult.error) {
+    return { error: true, expertise: [] };
+  }
+
+  const categoryNamesById = new Map(
+    (categoriesResult.data ?? []).map((category) => [
+      category.id,
+      category.name,
+    ]),
+  );
+
+  return {
+    error: false,
+    expertise: expertise.map((expertiseItem) => ({
+      category: categoryNamesById.get(expertiseItem.category_id) ?? "Expertise",
+      id: expertiseItem.id,
+      name: expertiseItem.name,
+    })),
+  };
+}
+
 async function loadProfileSocialLinks(
   supabase: SupabaseServerClient,
   userId: string,
@@ -162,7 +345,7 @@ export async function loadSafeProfile(
   const profileResult = await supabase
     .from("profiles")
     .select(
-      "user_id,full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key,allow_direct_contact,created_at",
+      "user_id,account_role,faculty_verification_status,full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key,allow_direct_contact,created_at",
     )
     .eq("user_id", userId)
     .maybeSingle();
@@ -235,25 +418,43 @@ export async function loadSafeProfile(
   const goalIds = [
     ...new Set((goalsResult.data ?? []).map((goal) => goal.collaboration_goal_id)),
   ];
-  const [skillNames, interestNames, goalNames] = await Promise.all([
+  const [
+    facultyPrograms,
+    facultyExpertise,
+    skillNames,
+    interestNames,
+    goalNames,
+  ] = await Promise.all([
+    loadSafeFacultyPrograms(supabase, userId, profile.academic_program_id),
+    loadSafeFacultyExpertise(supabase, userId),
     loadSkillNamesById(supabase, skillIds),
     loadNamesById(supabase, "interests", interestIds),
     loadNamesById(supabase, "collaboration_goals", goalIds),
   ]);
 
-  if (skillNames.error || interestNames.error || goalNames.error) {
+  if (
+    facultyPrograms.error ||
+    facultyExpertise.error ||
+    skillNames.error ||
+    interestNames.error ||
+    goalNames.error
+  ) {
     return { data: null, error: true };
   }
 
   return {
     data: {
+      accountRole: profile.account_role,
       academicProgramName: programResult.data.display_name,
+      academicPrograms: facultyPrograms.programs,
       allowDirectContact: profile.allow_direct_contact,
       availability: profile.availability,
       bio: profile.bio,
       collaborationGoals: namesFromMap(goalIds, goalNames.namesById),
       createdAt: profile.created_at,
+      expertise: facultyExpertise.expertise,
       facultyName: facultyResult.data.display_name,
+      facultyVerificationStatus: profile.faculty_verification_status,
       fullName: profile.full_name,
       interests: namesFromMap(interestIds, interestNames.namesById),
       offeredSkills: namesFromMap(
@@ -285,10 +486,14 @@ export async function loadProfileEditData(
     facultiesResult,
     programsResult,
     skillsResult,
+    expertiseResult,
+    expertiseCategoriesResult,
     interestsResult,
     goalsResult,
     profileResult,
     profileSkillsResult,
+    profileExpertiseResult,
+    profileAcademicProgramsResult,
     profileInterestsResult,
     profileGoalsResult,
     profileSocialLinksResult,
@@ -301,13 +506,27 @@ export async function loadProfileEditData(
       .order("display_name", { ascending: true }),
     supabase
       .from("academic_programs")
-      .select("id,faculty_id,display_name,avatar_variant_key")
+      .select(
+        "id,faculty_id,display_name,avatar_variant_key,slug,specialty_code,study_level",
+      )
       .eq("is_active", true)
       .order("sort_order", { ascending: true })
       .order("display_name", { ascending: true }),
     supabase
       .from("skills")
       .select("id,category,is_featured,name,search_aliases")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true }),
+    supabase
+      .from("expertise")
+      .select("id,category_id,name,search_aliases")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true }),
+    supabase
+      .from("expertise_categories")
+      .select("id,name")
       .eq("is_active", true)
       .order("sort_order", { ascending: true })
       .order("name", { ascending: true }),
@@ -326,13 +545,21 @@ export async function loadProfileEditData(
     supabase
       .from("profiles")
       .select(
-        "full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key,allow_direct_contact",
+        "account_role,faculty_verification_status,full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key,allow_direct_contact",
       )
       .eq("user_id", userId)
       .maybeSingle(),
     supabase
       .from("profile_skills")
       .select("skill_id,direction")
+      .eq("user_id", userId),
+    supabase
+      .from("faculty_expertise")
+      .select("expertise_id")
+      .eq("user_id", userId),
+    supabase
+      .from("profile_academic_programs")
+      .select("academic_program_id,is_primary")
       .eq("user_id", userId),
     supabase
       .from("profile_interests")
@@ -349,10 +576,14 @@ export async function loadProfileEditData(
     facultiesResult.error,
     programsResult.error,
     skillsResult.error,
+    expertiseResult.error,
+    expertiseCategoriesResult.error,
     interestsResult.error,
     goalsResult.error,
     profileResult.error,
     profileSkillsResult.error,
+    profileExpertiseResult.error,
+    profileAcademicProgramsResult.error,
     profileInterestsResult.error,
     profileGoalsResult.error,
     profileSocialLinksResult.error,
@@ -367,14 +598,35 @@ export async function loadProfileEditData(
   }
 
   const profileSkills = profileSkillsResult.data ?? [];
+  const categoryNamesById = new Map(
+    (expertiseCategoriesResult.data ?? []).map((category) => [
+      category.id,
+      category.name,
+    ]),
+  );
+  const profileAcademicProgramRows = profileAcademicProgramsResult.data ?? [];
+  const primaryProgramId = profileResult.data.academic_program_id;
 
   return {
     data: {
+      additionalAcademicProgramIds: profileAcademicProgramRows
+        .filter((program) => !program.is_primary)
+        .map((program) => program.academic_program_id),
       collaborationGoalIds: (profileGoalsResult.data ?? []).map(
         (goal) => goal.collaboration_goal_id,
       ),
       collaborationGoals: (goalsResult.data ?? []) as NamedOption[],
+      expertise: (expertiseResult.data ?? []).map((expertise) => ({
+        category: categoryNamesById.get(expertise.category_id) ?? "Expertise",
+        id: expertise.id,
+        is_featured: false,
+        name: expertise.name,
+        search_aliases: expertise.search_aliases,
+      })),
       faculties: (facultiesResult.data ?? []) as FacultyOption[],
+      facultyExpertiseIds: (profileExpertiseResult.data ?? []).map(
+        (expertise) => expertise.expertise_id,
+      ),
       interestIds: (profileInterestsResult.data ?? []).map(
         (interest) => interest.interest_id,
       ),
@@ -382,7 +634,12 @@ export async function loadProfileEditData(
       offeredSkillIds: profileSkills
         .filter((skill) => skill.direction === "offer")
         .map((skill) => skill.skill_id),
-      profile: profileResult.data,
+      profile: {
+        ...profileResult.data,
+        academic_program_id:
+          profileAcademicProgramRows.find((program) => program.is_primary)
+            ?.academic_program_id ?? primaryProgramId,
+      },
       programs: (programsResult.data ?? []) as ProgramOption[],
       skills: (skillsResult.data ?? []) as SkillOption[],
       socialLinks: profileSocialLinksResult.socialLinks,

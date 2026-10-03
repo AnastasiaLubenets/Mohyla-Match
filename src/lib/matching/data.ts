@@ -21,6 +21,37 @@ export type MatchingItem = Readonly<{
   slug: string;
 }>;
 
+export type FacultyProgramItem = Readonly<{
+  facultyName: string;
+  id: number;
+  isPrimary: boolean;
+  name: string;
+  slug: string;
+  specialtyCode: string | null;
+  studyLevel: "bachelor" | "master";
+}>;
+
+export type FacultyExpertiseItem = Readonly<{
+  category: string;
+  id: number;
+  name: string;
+  slug: string;
+}>;
+
+export type FacultyDiscoveryProfile = Readonly<{
+  academicPrograms: FacultyProgramItem[];
+  availability: string | null;
+  bio: string | null;
+  expertise: FacultyExpertiseItem[];
+  facultyName: string;
+  fullName: string;
+  primaryAcademicProgramName: string;
+  researchInterests: MatchingItem[];
+  systemAvatarKey: string;
+  userId: string;
+  verificationStatus: "unverified" | "verified";
+}>;
+
 export type DiscoveryCandidate = Readonly<{
   academicProgramName: string;
   availability: string | null;
@@ -151,6 +182,72 @@ function parseNamedItems(value: Json): MatchingItem[] {
     .filter((item): item is MatchingItem => Boolean(item));
 }
 
+function parseFacultyProgramItems(value: Json): FacultyProgramItem[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((item) => {
+      if (!isRecord(item)) {
+        return null;
+      }
+
+      const id = readNumber(item.id);
+      const slug = readString(item.slug);
+      const name = readString(item.name);
+      const facultyName = readString(item.facultyName);
+      const studyLevel = readString(item.studyLevel);
+      const specialtyCode = readString(item.specialtyCode);
+
+      if (
+        id === null ||
+        !slug ||
+        !name ||
+        !facultyName ||
+        (studyLevel !== "bachelor" && studyLevel !== "master")
+      ) {
+        return null;
+      }
+
+      return {
+        facultyName,
+        id,
+        isPrimary: item.isPrimary === true,
+        name,
+        slug,
+        specialtyCode,
+        studyLevel,
+      };
+    })
+    .filter((item): item is FacultyProgramItem => Boolean(item));
+}
+
+function parseFacultyExpertiseItems(value: Json): FacultyExpertiseItem[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((item) => {
+      if (!isRecord(item)) {
+        return null;
+      }
+
+      const id = readNumber(item.id);
+      const slug = readString(item.slug);
+      const name = readString(item.name);
+      const category = readString(item.category);
+
+      if (id === null || !slug || !name || !category) {
+        return null;
+      }
+
+      return { category, id, name, slug };
+    })
+    .filter((item): item is FacultyExpertiseItem => Boolean(item));
+}
+
 export async function loadDiscoveryCandidates(
   supabase: SupabaseServerClient,
   limit = 12,
@@ -213,6 +310,45 @@ export async function loadAllDiscoveryProfiles(
 
   return {
     data: (result.data ?? []).map(mapDiscoveryCandidate),
+    error: false,
+  };
+}
+
+type FacultyDiscoveryRow =
+  Database["public"]["Functions"]["get_faculty_discovery_profiles"]["Returns"][number];
+
+function mapFacultyDiscoveryProfile(
+  profile: FacultyDiscoveryRow,
+): FacultyDiscoveryProfile {
+  return {
+    academicPrograms: parseFacultyProgramItems(profile.academic_programs),
+    availability: profile.availability,
+    bio: profile.bio,
+    expertise: parseFacultyExpertiseItems(profile.expertise),
+    facultyName: profile.faculty_name,
+    fullName: profile.full_name,
+    primaryAcademicProgramName: profile.primary_academic_program_name,
+    researchInterests: parseNamedItems(profile.research_interests),
+    systemAvatarKey: profile.system_avatar_key,
+    userId: profile.user_id,
+    verificationStatus: profile.verification_status,
+  };
+}
+
+export async function loadFacultyDiscoveryProfiles(
+  supabase: SupabaseServerClient,
+  limit = 500,
+): Promise<LoadResult<FacultyDiscoveryProfile[]>> {
+  const result = await supabase.rpc("get_faculty_discovery_profiles", {
+    profile_limit: limit,
+  });
+
+  if (result.error) {
+    return { data: null, error: true };
+  }
+
+  return {
+    data: (result.data ?? []).map(mapFacultyDiscoveryProfile),
     error: false,
   };
 }

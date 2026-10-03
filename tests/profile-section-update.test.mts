@@ -8,12 +8,23 @@ import {
 import type { EditProfileData } from "../src/lib/profile/data.ts";
 
 const editData: EditProfileData = {
+  additionalAcademicProgramIds: [],
   collaborationGoalIds: [301],
   collaborationGoals: [
     { id: 301, name: "Build a startup" },
     { id: 302, name: "Research together" },
   ],
+  expertise: [
+    {
+      category: "Computer Science",
+      id: 401,
+      is_featured: true,
+      name: "Software Engineering",
+      search_aliases: ["software"],
+    },
+  ],
   faculties: [{ display_name: "Faculty of Informatics", id: 1 }],
+  facultyExpertiseIds: [401],
   interestIds: [201],
   interests: [
     { id: 201, name: "Technology" },
@@ -21,11 +32,13 @@ const editData: EditProfileData = {
   ],
   offeredSkillIds: [101],
   profile: {
+    account_role: "student",
     academic_program_id: 11,
     allow_direct_contact: true,
     availability: "Evenings",
     bio: "Original bio",
     faculty_id: 1,
+    faculty_verification_status: "unverified",
     full_name: "Anastasiia L.",
     system_avatar_key: "stable-avatar",
     year_of_study: 2,
@@ -36,6 +49,9 @@ const editData: EditProfileData = {
       display_name: "Computer Science",
       faculty_id: 1,
       id: 11,
+      slug: "computer-science",
+      specialty_code: "F3",
+      study_level: "bachelor",
     },
   ],
   skills: [

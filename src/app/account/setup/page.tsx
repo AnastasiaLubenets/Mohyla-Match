@@ -39,6 +39,8 @@ type ProgramOption = Readonly<{
   id: number;
   faculty_id: number;
   display_name: string;
+  specialty_code?: string | null;
+  study_level?: "bachelor" | "master";
 }>;
 
 type SkillOption = Readonly<{
@@ -54,11 +56,14 @@ type NamedOption = Readonly<{
   name: string;
 }>;
 
+type AccountRole = "student" | "faculty";
+
 type ProfileValue = Readonly<{
+  account_role: AccountRole;
   full_name: string;
   faculty_id: number;
   academic_program_id: number;
-  year_of_study: number;
+  year_of_study: number | null;
   bio: string | null;
   availability: string | null;
 }>;
@@ -106,6 +111,65 @@ function ChoiceCard({
   );
 }
 
+function RoleSelection({ error }: Readonly<{ error?: string }>) {
+  return (
+    <OnboardingShell
+      description="Choose the profile type that best describes how you will use Mohyla Match."
+      error={error}
+      step={1}
+      title="I am a..."
+    >
+      <form action="/account/setup/role" className="mt-8 space-y-6" method="post">
+        <div className="grid gap-4 sm:grid-cols-2">
+          {[
+            {
+              description:
+                "Find collaborators, save student profiles, and join student projects.",
+              label: "Student",
+              value: "student",
+            },
+            {
+              description:
+                "Share academic programs, expertise, and research interests in a faculty directory.",
+              label: "Faculty",
+              value: "faculty",
+            },
+          ].map((role) => (
+            <label
+              className="group flex cursor-pointer flex-col rounded-[1.125rem] border border-[#cddaf0] bg-white/75 p-5 transition hover:border-[#3567a8] has-[:checked]:border-[#a9c6ee] has-[:checked]:bg-[#edf4ff]"
+              key={role.value}
+            >
+              <input
+                className="sr-only"
+                name="accountRole"
+                required
+                type="radio"
+                value={role.value}
+              />
+              <span className="font-serif text-3xl font-bold text-[#07133f]">
+                {role.label}
+              </span>
+              <span className="mt-3 text-sm leading-6 text-[#66769e]">
+                {role.description}
+              </span>
+            </label>
+          ))}
+        </div>
+        <div className="flex justify-end">
+          <div className="sm:w-52">
+            <AuthSubmitButton
+              className={onboardingPrimaryButtonClass}
+              pendingLabel="Saving..."
+            >
+              Continue <span aria-hidden="true">→</span>
+            </AuthSubmitButton>
+          </div>
+        </div>
+      </form>
+    </OnboardingShell>
+  );
+}
+
 function FormNavigation({
   backHref,
   children = "Continue",
@@ -139,17 +203,27 @@ function SkillStep({
   action,
   backHref,
   defaultSkillIds,
+  emptyLabel,
   fieldName,
   isOptional = false,
+  searchLabel,
+  searchPlaceholder,
   skills,
+  suggestedLabel,
+  selectedLabel,
   title,
 }: Readonly<{
   action: string;
   backHref: string;
   defaultSkillIds: Set<number>;
+  emptyLabel?: string;
   fieldName: string;
   isOptional?: boolean;
+  searchLabel?: string;
+  searchPlaceholder?: string;
   skills: SkillOption[];
+  suggestedLabel?: string;
+  selectedLabel?: string;
   title: string;
 }>) {
   return (
@@ -157,11 +231,213 @@ function SkillStep({
       action={action}
       backHref={backHref}
       defaultSkillIds={[...defaultSkillIds]}
+      emptyLabel={emptyLabel}
       fieldName={fieldName}
       isOptional={isOptional}
+      searchLabel={searchLabel}
+      searchPlaceholder={searchPlaceholder}
       skills={skills}
+      suggestedLabel={suggestedLabel}
+      selectedLabel={selectedLabel}
       title={title}
     />
+  );
+}
+
+function programLabel(program: ProgramOption) {
+  const level = program.study_level === "master" ? "Master" : "Bachelor";
+  const code = program.specialty_code ? `${program.specialty_code} · ` : "";
+
+  return `${program.display_name} (${code}${level})`;
+}
+
+function FacultyProgramsForm({
+  defaultProgramIds,
+  profile,
+  programs,
+  suggestedFullName,
+}: Readonly<{
+  defaultProgramIds: Set<number>;
+  profile: ProfileValue | null;
+  programs: ProgramOption[];
+  suggestedFullName?: string | null;
+}>) {
+  return (
+    <form action="/account/setup/faculty-programs" className="mt-8 space-y-6" method="post">
+      <label className="block">
+        <span className="text-sm font-bold text-[#132a56]">
+          Full name · Required
+        </span>
+        <input
+          className="mt-2 h-12 w-full rounded-[0.875rem] border border-[#cddaf0] bg-white/80 px-4 text-sm font-semibold text-[#102653] outline-none transition placeholder:text-[#93a0bc] focus:border-[#3567a8] focus:bg-white"
+          defaultValue={profile?.full_name ?? suggestedFullName ?? ""}
+          maxLength={120}
+          minLength={2}
+          name="fullName"
+          required
+          type="text"
+        />
+      </label>
+
+      <label className="block">
+        <span className="text-sm font-bold text-[#132a56]">
+          Primary academic program · Required
+        </span>
+        <select
+          className="mt-2 h-12 w-full rounded-[0.875rem] border border-[#cddaf0] bg-white/80 px-4 text-sm font-semibold text-[#102653] outline-none transition focus:border-[#3567a8] focus:bg-white"
+          defaultValue={profile?.academic_program_id ?? ""}
+          name="primaryAcademicProgramId"
+          required
+        >
+          <option disabled value="">
+            Select primary program
+          </option>
+          {programs.map((program) => (
+            <option key={program.id} value={program.id}>
+              {programLabel(program)}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <fieldset className="space-y-3">
+        <legend className="text-sm font-bold text-[#132a56]">
+          Additional academic programs · Optional
+        </legend>
+        <div className="max-h-72 space-y-2 overflow-y-auto rounded-[0.875rem] border border-[#cddaf0] bg-white/55 p-3">
+          {programs.map((program) => (
+            <label
+              className="flex items-start gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-[#102653] transition hover:bg-white/80"
+              key={program.id}
+            >
+              <input
+                className="mt-1 size-4 accent-[#3567a8]"
+                defaultChecked={defaultProgramIds.has(program.id)}
+                name="additionalAcademicProgramId"
+                type="checkbox"
+                value={program.id}
+              />
+              <span>{programLabel(program)}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <label className="block">
+        <span className="text-sm font-bold text-[#132a56]">Bio · Optional</span>
+        <textarea
+          className="mt-2 min-h-24 w-full rounded-[0.875rem] border border-[#cddaf0] bg-white/80 px-4 py-3 text-sm font-semibold text-[#102653] outline-none transition placeholder:text-[#93a0bc] focus:border-[#3567a8] focus:bg-white"
+          defaultValue={profile?.bio ?? ""}
+          maxLength={500}
+          name="bio"
+        />
+      </label>
+
+      <label className="block">
+        <span className="text-sm font-bold text-[#132a56]">
+          Availability · Optional
+        </span>
+        <input
+          className="mt-2 h-12 w-full rounded-[0.875rem] border border-[#cddaf0] bg-white/80 px-4 text-sm font-semibold text-[#102653] outline-none transition placeholder:text-[#93a0bc] focus:border-[#3567a8] focus:bg-white"
+          defaultValue={profile?.availability ?? ""}
+          maxLength={160}
+          name="availability"
+          type="text"
+        />
+      </label>
+
+      <FormNavigation backHref="/account/setup" pendingLabel="Saving..." />
+    </form>
+  );
+}
+
+function FacultyResearchStep({
+  defaultInterestIds,
+  interests,
+}: Readonly<{
+  defaultInterestIds: Set<number>;
+  interests: NamedOption[];
+}>) {
+  return (
+    <form action="/account/setup/faculty-research" className="mt-8 space-y-7" method="post">
+      <fieldset className="space-y-3">
+        <legend className="text-sm font-bold text-[#132a56]">
+          Research interests · Optional
+        </legend>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {interests.map((interest) => (
+            <ChoiceCard
+              defaultChecked={defaultInterestIds.has(interest.id)}
+              fieldName="interestId"
+              id={interest.id}
+              key={interest.id}
+              name={interest.name}
+            />
+          ))}
+        </div>
+      </fieldset>
+
+      <FormNavigation
+        backHref="/account/setup?step=2"
+        pendingLabel="Saving..."
+      />
+      <div className="flex justify-end">
+        <button
+          className="text-sm font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
+          name="skip"
+          type="submit"
+          value="true"
+        >
+          Skip for now
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function FacultyPreviewStep({
+  expertiseCount,
+  interestCount,
+  programCount,
+  profile,
+}: Readonly<{
+  expertiseCount: number;
+  interestCount: number;
+  programCount: number;
+  profile: ProfileValue | null;
+}>) {
+  return (
+    <form action="/account/setup/faculty-complete" className="mt-8 space-y-6" method="post">
+      <div className="rounded-[1rem] border border-[#cddaf0] bg-white/65 p-5">
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#245ba2]">
+          Preview
+        </p>
+        <h2 className="mt-3 font-serif text-3xl font-bold text-[#07133f]">
+          {profile?.full_name ?? "Faculty profile"}
+        </h2>
+        <dl className="mt-5 grid gap-3 text-sm text-[#66769e] sm:grid-cols-3">
+          <div>
+            <dt className="font-bold text-[#132a56]">Programs</dt>
+            <dd>{programCount}</dd>
+          </div>
+          <div>
+            <dt className="font-bold text-[#132a56]">Expertise</dt>
+            <dd>{expertiseCount}</dd>
+          </div>
+          <div>
+            <dt className="font-bold text-[#132a56]">Research interests</dt>
+            <dd>{interestCount}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <FormNavigation
+        backHref="/account/setup?step=3"
+        pendingLabel="Completing..."
+      >
+        Complete faculty profile
+      </FormNavigation>
+    </form>
   );
 }
 
@@ -242,17 +518,27 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
   }
 
   const [
+    accountRoleResult,
     facultiesResult,
     programsResult,
     skillsResult,
+    expertiseResult,
+    expertiseCategoriesResult,
     interestsResult,
     goalsResult,
     profileResult,
+    profileProgramsResult,
+    facultyExpertiseResult,
     profileSkillsResult,
     profileInterestsResult,
     profileGoalsResult,
     userResult,
   ] = await Promise.all([
+    supabase
+      .from("account_roles")
+      .select("account_role")
+      .eq("user_id", accountState.userId)
+      .maybeSingle(),
     supabase
       .from("faculties")
       .select("id,display_name")
@@ -261,13 +547,25 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
       .order("display_name", { ascending: true }),
     supabase
       .from("academic_programs")
-      .select("id,faculty_id,display_name")
+      .select("id,faculty_id,display_name,study_level,specialty_code")
       .eq("is_active", true)
       .order("sort_order", { ascending: true })
       .order("display_name", { ascending: true }),
     supabase
       .from("skills")
       .select("id,category,is_featured,name,search_aliases")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true }),
+    supabase
+      .from("expertise")
+      .select("id,category_id,name,search_aliases,sort_order")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true }),
+    supabase
+      .from("expertise_categories")
+      .select("id,name,sort_order")
       .eq("is_active", true)
       .order("sort_order", { ascending: true })
       .order("name", { ascending: true }),
@@ -286,10 +584,18 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
     supabase
       .from("profiles")
       .select(
-        "full_name,faculty_id,academic_program_id,year_of_study,bio,availability",
+        "account_role,full_name,faculty_id,academic_program_id,year_of_study,bio,availability",
       )
       .eq("user_id", accountState.userId)
       .maybeSingle(),
+    supabase
+      .from("profile_academic_programs")
+      .select("academic_program_id,is_primary")
+      .eq("user_id", accountState.userId),
+    supabase
+      .from("faculty_expertise")
+      .select("expertise_id")
+      .eq("user_id", accountState.userId),
     supabase
       .from("profile_skills")
       .select("skill_id,direction")
@@ -306,12 +612,17 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
   ]);
 
   const loadError = [
+    accountRoleResult.error,
     facultiesResult.error,
     programsResult.error,
     skillsResult.error,
+    expertiseResult.error,
+    expertiseCategoriesResult.error,
     interestsResult.error,
     goalsResult.error,
     profileResult.error,
+    profileProgramsResult.error,
+    facultyExpertiseResult.error,
     profileSkillsResult.error,
     profileInterestsResult.error,
     profileGoalsResult.error,
@@ -334,10 +645,36 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
   }
 
   const profile = (profileResult.data ?? null) as ProfileValue | null;
+  const selectedAccountRole =
+    profile?.account_role ??
+    ((accountRoleResult.data?.account_role ?? null) as AccountRole | null);
   const suggestedFullName = profile
     ? null
     : normalizeSignupFullName(userResult.data.user?.user_metadata?.full_name);
   const profileSkills = profileSkillsResult.data ?? [];
+  const profileProgramIds = new Set(
+    (profileProgramsResult.data ?? [])
+      .filter((program) => !program.is_primary)
+      .map((program) => program.academic_program_id),
+  );
+  const facultyExpertiseIds = new Set(
+    (facultyExpertiseResult.data ?? []).map(
+      (expertise) => expertise.expertise_id,
+    ),
+  );
+  const categoriesById = new Map(
+    (expertiseCategoriesResult.data ?? []).map((category) => [
+      category.id,
+      category.name,
+    ]),
+  );
+  const expertiseOptions = (expertiseResult.data ?? []).map((expertise) => ({
+    category: categoriesById.get(expertise.category_id) ?? "Expertise",
+    id: expertise.id,
+    is_featured: expertise.sort_order <= 160,
+    name: expertise.name,
+    search_aliases: expertise.search_aliases,
+  }));
   const offerSkillIds = new Set(
     profileSkills
       .filter((skill) => skill.direction === "offer")
@@ -354,6 +691,10 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
   const collaborationGoalIds = new Set(
     (profileGoalsResult.data ?? []).map((goal) => goal.collaboration_goal_id),
   );
+  if (!selectedAccountRole) {
+    return <RoleSelection error={firstParam(params.error)} />;
+  }
+
   const progress = {
     hasBasicProfile: Boolean(profile),
     offerSkillCount: offerSkillIds.size,
@@ -361,7 +702,14 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
     interestCount: interestIds.size,
     collaborationGoalCount: collaborationGoalIds.size,
   };
-  const firstIncompleteStep = getFirstIncompleteOnboardingStep(progress);
+  const firstIncompleteStep =
+    selectedAccountRole === "faculty"
+      ? !profile
+        ? 1
+        : facultyExpertiseIds.size < 1
+          ? 2
+          : null
+      : getFirstIncompleteOnboardingStep(progress);
   const requestedStep = parseOnboardingStep(firstParam(params.step));
   const defaultStep = firstIncompleteStep ?? 4;
 
@@ -378,7 +726,62 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
   let shellTitle: string;
   let shellDescription: string;
 
-  if (requestedStep === 1) {
+  if (selectedAccountRole === "faculty") {
+    if (requestedStep === 1) {
+      shellTitle = "Academic programs";
+      shellDescription =
+        "Choose your primary NaUKMA academic program and any additional programs you support.";
+      stepContent = (
+        <FacultyProgramsForm
+          defaultProgramIds={profileProgramIds}
+          profile={profile}
+          programs={(programsResult.data ?? []) as ProgramOption[]}
+          suggestedFullName={suggestedFullName}
+        />
+      );
+    } else if (requestedStep === 2) {
+      shellTitle = "Expertise";
+      shellDescription =
+        "Choose at least one expertise area students can use to find you.";
+      stepContent = (
+        <SkillStep
+          action="/account/setup/faculty-expertise"
+          backHref="/account/setup?step=1"
+          defaultSkillIds={facultyExpertiseIds}
+          emptyLabel="Choose at least one faculty expertise area."
+          fieldName="expertiseId"
+          searchLabel="Add more expertise"
+          searchPlaceholder="Search expertise"
+          selectedLabel="Selected expertise"
+          skills={expertiseOptions as SkillOption[]}
+          suggestedLabel="Suggested expertise"
+          title={shellTitle}
+        />
+      );
+    } else if (requestedStep === 3) {
+      shellTitle = "Research interests";
+      shellDescription =
+        "Add optional research interests, or skip this step for now.";
+      stepContent = (
+        <FacultyResearchStep
+          defaultInterestIds={interestIds}
+          interests={(interestsResult.data ?? []) as NamedOption[]}
+        />
+      );
+    } else {
+      shellTitle = "Preview faculty profile";
+      shellDescription =
+        "Review the required faculty details before joining the faculty directory.";
+      stepContent = (
+        <FacultyPreviewStep
+          expertiseCount={facultyExpertiseIds.size}
+          interestCount={interestIds.size}
+          programCount={profileProgramIds.size + (profile ? 1 : 0)}
+          profile={profile}
+        />
+      );
+    }
+  } else if (requestedStep === 1) {
     shellTitle = "Basic profile";
     shellDescription =
       "Tell collaborators who you are. Your student email is already linked to your account and is not part of this form.";
