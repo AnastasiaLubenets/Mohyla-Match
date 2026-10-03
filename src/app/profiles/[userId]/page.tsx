@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { AppChrome, BrandQuoteCard } from "@/components/matching/app-chrome";
 import { FullStudentProfile } from "@/components/profile/full-student-profile";
 import { requireAccountState } from "@/lib/auth/guards";
+import { saveStatusToast } from "@/lib/matching/action-toast";
 import { loadProfileConnectionStatus } from "@/lib/matching/data";
 import { isUuid, loadSafeProfile } from "@/lib/profile/data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -28,8 +29,6 @@ function ProfileStatusMessage({
 }: Readonly<{ error?: string; status?: string }>) {
   const statusMessages: Record<string, string> = {
     reported: "Report submitted. Thank you for helping keep Mohyla Match safe.",
-    saved: "Saved for later.",
-    unsaved: "Removed from Saved.",
   };
   const errorMessages: Record<string, string> = {
     "action-failed": "We could not save that action. Try again.",
@@ -77,6 +76,7 @@ export default async function StudentProfilePage({
   }
 
   const source = profileSource(firstParam(pageParams.from));
+  const status = firstParam(pageParams.status);
   const backHref = source === "saved" ? "/saved" : "/app";
   const backLabel = source === "saved" ? "Back to saved" : "Back to discover";
   const returnTo = `/profiles/${userId}?from=${source}`;
@@ -101,12 +101,13 @@ export default async function StudentProfilePage({
     <AppChrome
       active={source === "saved" ? "saved" : "discover"}
       currentProfile={currentProfile}
+      toast={saveStatusToast(status)}
     >
       <div className="grid gap-6 px-4 py-6 sm:px-6 xl:h-full xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_20rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
         <div className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
           <ProfileStatusMessage
             error={firstParam(pageParams.error)}
-            status={firstParam(pageParams.status)}
+            status={status}
           />
           <FullStudentProfile
             backHref={backHref}

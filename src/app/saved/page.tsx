@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AppChrome, BrandQuoteCard } from "@/components/matching/app-chrome";
 import { SavedProfileCard } from "@/components/matching/saved-profile-card";
 import { requireAccountState } from "@/lib/auth/guards";
+import { saveStatusToast } from "@/lib/matching/action-toast";
 import { loadSavedProfiles } from "@/lib/matching/data";
 import { loadSafeProfile } from "@/lib/profile/data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -40,12 +41,7 @@ function BookmarkIcon() {
 
 function SavedStatusMessage({
   error,
-  status,
-}: Readonly<{ error?: string; status?: string }>) {
-  const statusMessages: Record<string, string> = {
-    saved: "Saved for later.",
-    unsaved: "Removed from Saved.",
-  };
+}: Readonly<{ error?: string }>) {
   const errorMessages: Record<string, string> = {
     "action-failed": "We could not save that action. Try again.",
     "save-failed": "We could not update Saved. Try again.",
@@ -55,14 +51,6 @@ function SavedStatusMessage({
     return (
       <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900 shadow-sm">
         {errorMessages[error]}
-      </div>
-    );
-  }
-
-  if (status && statusMessages[status]) {
-    return (
-      <div className="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-950 shadow-sm">
-        {statusMessages[status]}
       </div>
     );
   }
@@ -122,10 +110,15 @@ export default async function SavedPage({ searchParams }: PageProps) {
   const currentProfile = currentProfileResult.error
     ? null
     : currentProfileResult.data;
+  const status = firstParam(params.status);
 
   if (savedResult.error) {
     return (
-      <AppChrome active="saved" currentProfile={currentProfile}>
+      <AppChrome
+        active="saved"
+        currentProfile={currentProfile}
+        toast={saveStatusToast(status)}
+      >
         <section className="scrollbar-hidden px-4 py-8 sm:px-6 xl:h-full xl:overflow-y-auto xl:px-8">
           <div className="mx-auto max-w-4xl rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
@@ -146,13 +139,14 @@ export default async function SavedPage({ searchParams }: PageProps) {
   const savedProfiles = savedResult.data ?? [];
 
   return (
-    <AppChrome active="saved" currentProfile={currentProfile}>
+    <AppChrome
+      active="saved"
+      currentProfile={currentProfile}
+      toast={saveStatusToast(status)}
+    >
       <div className="grid gap-6 px-4 py-6 sm:px-6 xl:h-full xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_20rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
         <section className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
-          <SavedStatusMessage
-            error={firstParam(params.error)}
-            status={firstParam(params.status)}
-          />
+          <SavedStatusMessage error={firstParam(params.error)} />
           <header className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h1 className="font-serif text-6xl font-bold leading-none text-blue-950 sm:text-7xl">

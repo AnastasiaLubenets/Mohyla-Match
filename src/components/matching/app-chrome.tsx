@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { ActionToastViewport } from "@/components/matching/action-toast";
+import type { ActionToast } from "@/lib/matching/action-toast";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import type { SafeProfile } from "@/lib/profile/data";
 
@@ -24,6 +26,7 @@ type AppChromeProps = Readonly<{
   active: NavKey;
   children: ReactNode;
   currentProfile: SafeProfile | null;
+  toast?: ActionToast | null;
 }>;
 
 type SidebarLinkProps = Readonly<{
@@ -262,9 +265,18 @@ function AppTopBar({
   );
 }
 
-export function AppChrome({ active, children, currentProfile }: AppChromeProps) {
+export function AppChrome({
+  active,
+  children,
+  currentProfile,
+  toast,
+}: AppChromeProps) {
   return (
     <main className="min-h-screen bg-[#eef6fb] text-blue-950 xl:h-screen xl:overflow-hidden">
+      <ActionToastViewport
+        clearSearchParams={toast ? ["status"] : []}
+        initialToast={toast}
+      />
       <div className="grid min-h-screen xl:h-screen xl:min-h-0 xl:grid-cols-[18rem_minmax(0,1fr)]">
         <AppSidebar active={active} />
         <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">

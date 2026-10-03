@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { ActionToastViewport } from "@/components/matching/action-toast";
 import { AllStudentsList } from "@/components/matching/all-students-list";
 import { AppSidebar } from "@/components/matching/app-chrome";
 import { DiscoveryFilterPanel } from "@/components/matching/discovery-filter-panel";
@@ -9,6 +10,7 @@ import { FacultyFilterForm } from "@/components/matching/faculty-filter-form";
 import { RecommendedFeed } from "@/components/matching/recommended-feed";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import { requireAccountState } from "@/lib/auth/guards";
+import { saveStatusToast } from "@/lib/matching/action-toast";
 import {
   loadAllDiscoveryProfiles,
   loadDiscoveryCandidates,
@@ -530,9 +532,15 @@ export default async function AppPage({ searchParams }: PageProps) {
   const returnTo = discoveryViewHref(params, view);
   const savedProfileIdList = Array.from(savedProfileIds);
   const allStudentsHref = discoveryViewHref(params, "all");
+  const status = firstParam(params.status);
+  const toast = saveStatusToast(status);
 
   return (
     <main className="min-h-screen bg-[#eef6fb] text-blue-950 xl:h-screen xl:overflow-hidden">
+      <ActionToastViewport
+        clearSearchParams={toast ? ["status"] : []}
+        initialToast={toast}
+      />
       <div className="grid min-h-screen xl:h-screen xl:min-h-0 xl:grid-cols-[18rem_minmax(0,1fr)]">
         <AppSidebar active="discover" />
           <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">
@@ -562,7 +570,7 @@ export default async function AppPage({ searchParams }: PageProps) {
                   loadError={candidatesResult.error}
                   returnTo={returnTo}
                   savedProfileIds={savedProfileIds}
-                  status={firstParam(params.status)}
+                  status={status}
                   totalCount={allCandidates.length}
                 />
               ) : (
@@ -575,7 +583,7 @@ export default async function AppPage({ searchParams }: PageProps) {
                   loadError={candidatesResult.error}
                   returnTo={returnTo}
                   savedProfileIds={savedProfileIdList}
-                  status={firstParam(params.status)}
+                  status={status}
                 />
               )}
             </section>
