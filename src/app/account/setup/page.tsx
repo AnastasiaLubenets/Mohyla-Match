@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { AuthSubmitButton } from "@/components/auth-submit-button";
+import { FacultyProgramsForm } from "@/components/faculty-programs-form";
 import { OnboardingSkillPicker } from "@/components/onboarding-skill-picker";
 import { OnboardingBasicForm } from "@/components/onboarding-basic-form";
 import { OnboardingShell } from "@/components/onboarding-shell";
@@ -39,8 +40,6 @@ type ProgramOption = Readonly<{
   id: number;
   faculty_id: number;
   display_name: string;
-  specialty_code?: string | null;
-  study_level?: "bachelor" | "master";
 }>;
 
 type SkillOption = Readonly<{
@@ -244,113 +243,6 @@ function SkillStep({
   );
 }
 
-function programLabel(program: ProgramOption) {
-  const level = program.study_level === "master" ? "Master" : "Bachelor";
-  const code = program.specialty_code ? `${program.specialty_code} · ` : "";
-
-  return `${program.display_name} (${code}${level})`;
-}
-
-function FacultyProgramsForm({
-  defaultProgramIds,
-  profile,
-  programs,
-  suggestedFullName,
-}: Readonly<{
-  defaultProgramIds: Set<number>;
-  profile: ProfileValue | null;
-  programs: ProgramOption[];
-  suggestedFullName?: string | null;
-}>) {
-  return (
-    <form action="/account/setup/faculty-programs" className="mt-8 space-y-6" method="post">
-      <label className="block">
-        <span className="text-sm font-bold text-[#132a56]">
-          Full name · Required
-        </span>
-        <input
-          className="mt-2 h-12 w-full rounded-[0.875rem] border border-[#cddaf0] bg-white/80 px-4 text-sm font-semibold text-[#102653] outline-none transition placeholder:text-[#93a0bc] focus:border-[#3567a8] focus:bg-white"
-          defaultValue={profile?.full_name ?? suggestedFullName ?? ""}
-          maxLength={120}
-          minLength={2}
-          name="fullName"
-          required
-          type="text"
-        />
-      </label>
-
-      <label className="block">
-        <span className="text-sm font-bold text-[#132a56]">
-          Primary academic program · Required
-        </span>
-        <select
-          className="mt-2 h-12 w-full rounded-[0.875rem] border border-[#cddaf0] bg-white/80 px-4 text-sm font-semibold text-[#102653] outline-none transition focus:border-[#3567a8] focus:bg-white"
-          defaultValue={profile?.academic_program_id ?? ""}
-          name="primaryAcademicProgramId"
-          required
-        >
-          <option disabled value="">
-            Select primary program
-          </option>
-          {programs.map((program) => (
-            <option key={program.id} value={program.id}>
-              {programLabel(program)}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <fieldset className="space-y-3">
-        <legend className="text-sm font-bold text-[#132a56]">
-          Additional academic programs · Optional
-        </legend>
-        <div className="max-h-72 space-y-2 overflow-y-auto rounded-[0.875rem] border border-[#cddaf0] bg-white/55 p-3">
-          {programs.map((program) => (
-            <label
-              className="flex items-start gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-[#102653] transition hover:bg-white/80"
-              key={program.id}
-            >
-              <input
-                className="mt-1 size-4 accent-[#3567a8]"
-                defaultChecked={defaultProgramIds.has(program.id)}
-                name="additionalAcademicProgramId"
-                type="checkbox"
-                value={program.id}
-              />
-              <span>{programLabel(program)}</span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      <label className="block">
-        <span className="text-sm font-bold text-[#132a56]">Bio · Optional</span>
-        <textarea
-          className="mt-2 min-h-24 w-full rounded-[0.875rem] border border-[#cddaf0] bg-white/80 px-4 py-3 text-sm font-semibold text-[#102653] outline-none transition placeholder:text-[#93a0bc] focus:border-[#3567a8] focus:bg-white"
-          defaultValue={profile?.bio ?? ""}
-          maxLength={500}
-          name="bio"
-        />
-      </label>
-
-      <label className="block">
-        <span className="text-sm font-bold text-[#132a56]">
-          Availability · Optional
-        </span>
-        <input
-          className="mt-2 h-12 w-full rounded-[0.875rem] border border-[#cddaf0] bg-white/80 px-4 text-sm font-semibold text-[#102653] outline-none transition placeholder:text-[#93a0bc] focus:border-[#3567a8] focus:bg-white"
-          defaultValue={profile?.availability ?? ""}
-          maxLength={160}
-          name="availability"
-          type="text"
-        />
-      </label>
-
-      <FormNavigation backHref="/account/setup" pendingLabel="Saving..." />
-    </form>
-  );
-}
-
 function FacultyResearchStep({
   defaultInterestIds,
   interests,
@@ -547,7 +439,7 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
       .order("display_name", { ascending: true }),
     supabase
       .from("academic_programs")
-      .select("id,faculty_id,display_name,study_level,specialty_code")
+      .select("id,faculty_id,display_name")
       .eq("is_active", true)
       .order("sort_order", { ascending: true })
       .order("display_name", { ascending: true }),
@@ -734,6 +626,7 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
       stepContent = (
         <FacultyProgramsForm
           defaultProgramIds={profileProgramIds}
+          faculties={(facultiesResult.data ?? []) as FacultyOption[]}
           profile={profile}
           programs={(programsResult.data ?? []) as ProgramOption[]}
           suggestedFullName={suggestedFullName}

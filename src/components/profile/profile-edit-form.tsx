@@ -155,17 +155,20 @@ function namedOptions(options: EditProfileData["interests"]): TaxonomyPickerOpti
 function programOptions(
   data: EditProfileData,
   excludedProgramId?: number,
+  facultyId?: number,
 ): TaxonomyPickerOption[] {
   const facultyById = new Map(
     data.faculties.map((faculty) => [faculty.id, faculty.display_name]),
   );
 
   return data.programs
-    .filter((program) => program.id !== excludedProgramId)
+    .filter(
+      (program) =>
+        program.id !== excludedProgramId &&
+        (facultyId === undefined || program.faculty_id === facultyId),
+    )
     .map((program) => ({
-      category: `${facultyById.get(program.faculty_id) ?? "NaUKMA"} · ${
-        program.study_level === "master" ? "Master" : "Bachelor"
-      }`,
+      category: facultyById.get(program.faculty_id) ?? "NaUKMA",
       id: program.id,
       name: program.display_name,
       search_aliases: [
@@ -183,12 +186,27 @@ function FacultyProfileEditForm({
   data: EditProfileData;
   error?: string;
 }>) {
-  const [selectedProgramId, setSelectedProgramId] = useState(
-    data.profile.academic_program_id,
+  const initialProgram = data.programs.find(
+    (program) => program.id === data.profile.academic_program_id,
   );
+  const initialFacultyId = initialProgram?.faculty_id ?? data.profile.faculty_id;
+  const initialAvailablePrograms = data.programs.filter(
+    (program) => program.faculty_id === initialFacultyId,
+  );
+  const initialProgramId =
+    initialProgram?.id ?? initialAvailablePrograms[0]?.id ?? 0;
+  const [selectedFacultyId, setSelectedFacultyId] = useState(
+    initialFacultyId,
+  );
+  const [selectedProgramId, setSelectedProgramId] = useState(initialProgramId);
   const [additionalProgramIds, setAdditionalProgramIds] = useState(
     data.additionalAcademicProgramIds.filter(
-      (programId) => programId !== data.profile.academic_program_id,
+      (programId) =>
+        programId !== initialProgramId &&
+        data.programs.some(
+          (program) =>
+            program.id === programId && program.faculty_id === initialFacultyId,
+        ),
     ),
   );
   const [expertiseIds, setExpertiseIds] = useState(data.facultyExpertiseIds);
@@ -199,12 +217,40 @@ function FacultyProfileEditForm({
     (program) => program.id === selectedProgramId,
   );
   const selectedFaculty = data.faculties.find(
-    (faculty) => faculty.id === selectedProgram?.faculty_id,
+    (faculty) => faculty.id === selectedFacultyId,
+  );
+  const availablePrograms = useMemo(
+    () =>
+      data.programs.filter(
+        (program) => program.faculty_id === selectedFacultyId,
+      ),
+    [data.programs, selectedFacultyId],
   );
   const additionalOptions = useMemo(
-    () => programOptions(data, selectedProgramId),
-    [data, selectedProgramId],
+    () => programOptions(data, selectedProgramId, selectedFacultyId),
+    [data, selectedFacultyId, selectedProgramId],
   );
+
+  function handleFacultyChange(value: string) {
+    const nextFacultyId = Number(value);
+    const nextPrograms = data.programs.filter(
+      (program) => program.faculty_id === nextFacultyId,
+    );
+    const nextProgramId = nextPrograms[0]?.id ?? 0;
+
+    setSelectedFacultyId(nextFacultyId);
+    setSelectedProgramId(nextProgramId);
+    setAdditionalProgramIds((current) =>
+      current.filter(
+        (programId) =>
+          programId !== nextProgramId &&
+          data.programs.some(
+            (program) =>
+              program.id === programId && program.faculty_id === nextFacultyId,
+          ),
+      ),
+    );
+  }
 
   function handlePrimaryProgramChange(value: string) {
     const nextProgramId = Number(value);
@@ -308,12 +354,32 @@ function FacultyProfileEditForm({
               </p>
             </div>
 
-            <label className="block lg:col-span-2">
+            <label className="block">
+              <span className="text-sm font-bold text-blue-900">
+                Faculty <span className="text-red-600">*</span>
+              </span>
+              <select
+                className={fieldClassName()}
+                name="facultyId"
+                onChange={(event) => handleFacultyChange(event.target.value)}
+                required
+                value={selectedFacultyId}
+              >
+                {data.faculties.map((faculty) => (
+                  <option key={faculty.id} value={faculty.id}>
+                    {faculty.display_name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
               <span className="text-sm font-bold text-blue-900">
                 Primary academic program <span className="text-red-600">*</span>
               </span>
               <select
                 className={fieldClassName()}
+                disabled={availablePrograms.length === 0}
                 name="academicProgramId"
                 onChange={(event) =>
                   handlePrimaryProgramChange(event.target.value)
@@ -321,10 +387,9 @@ function FacultyProfileEditForm({
                 required
                 value={selectedProgramId}
               >
-                {data.programs.map((program) => (
+                {availablePrograms.map((program) => (
                   <option key={program.id} value={program.id}>
                     {program.display_name}
-                    {program.study_level === "master" ? " · Master" : " · Bachelor"}
                   </option>
                 ))}
               </select>

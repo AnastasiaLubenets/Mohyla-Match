@@ -240,12 +240,9 @@ export function FullStudentProfile({
   const programLine = isFaculty
     ? (primaryProgram?.name ?? profile.academicProgramName)
     : `${profile.academicProgramName} • ${yearLabel(profile.yearOfStudy)}`;
-  const facultyProgramLabels = profile.academicPrograms.map((program) => {
-    const level = program.studyLevel === "master" ? "Master" : "Bachelor";
-    const specialty = program.specialtyCode ? `${program.specialtyCode} · ` : "";
-
-    return `${specialty}${program.name} (${level})`;
-  });
+  const facultyProgramLabels = profile.academicPrograms.map(
+    (program) => program.name,
+  );
   const facultyExpertiseLabels = profile.expertise.map(
     (expertise) => `${expertise.name} · ${expertise.category}`,
   );

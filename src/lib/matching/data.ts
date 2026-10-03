@@ -121,6 +121,10 @@ type LoadResult<T> = Readonly<{
   error: boolean;
 }>;
 
+function uniqueFilterOptions(options: { label: string; value: string }[]) {
+  return [...new Map(options.map((option) => [option.value, option])).values()];
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -403,10 +407,12 @@ export async function loadDiscoveryFilterOptions(
         label: interest.name,
         value: interest.slug,
       })),
-      programs: (programsResult.data ?? []).map((program) => ({
-        label: program.display_name,
-        value: program.display_name,
-      })),
+      programs: uniqueFilterOptions(
+        (programsResult.data ?? []).map((program) => ({
+          label: program.display_name,
+          value: program.display_name,
+        })),
+      ),
       skills: (skillsResult.data ?? []).map((skill) => ({
         label: skill.name,
         value: skill.slug,
