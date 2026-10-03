@@ -63,6 +63,7 @@ export function DiscoveryMultiSelect({
   label,
   name,
   onOpenChange,
+  onSelectedValuesChange,
   open,
   options,
   placeholder = "Select options",
@@ -72,6 +73,7 @@ export function DiscoveryMultiSelect({
   label: string;
   name: string;
   onOpenChange: (open: boolean) => void;
+  onSelectedValuesChange: (selectedValues: readonly string[]) => void;
   open: boolean;
   options: readonly FilterOption[];
   placeholder?: string;
@@ -80,32 +82,31 @@ export function DiscoveryMultiSelect({
 }>) {
   const baseId = useId();
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<readonly string[]>(selectedValues);
-  const selectedSet = useMemo(() => new Set(selected), [selected]);
+  const selectedSet = useMemo(() => new Set(selectedValues), [selectedValues]);
   const optionByValue = useMemo(
     () => new Map(options.map((option) => [option.value, option])),
     [options],
   );
-  const selectedOptions = selected.map(
+  const selectedOptions = selectedValues.map(
     (value) => optionByValue.get(value) ?? { label: value, value },
   );
   const visibleOptions = searchDiscoveryFilterOptions(options, query);
 
   function toggleValue(value: string) {
-    setSelected((current) =>
-      current.includes(value)
-        ? current.filter((item) => item !== value)
-        : [...current, value],
+    onSelectedValuesChange(
+      selectedValues.includes(value)
+        ? selectedValues.filter((item) => item !== value)
+        : [...selectedValues, value],
     );
   }
 
   function removeValue(value: string) {
-    setSelected((current) => current.filter((item) => item !== value));
+    onSelectedValuesChange(selectedValues.filter((item) => item !== value));
   }
 
   return (
     <div className="relative" data-discovery-filter={name}>
-      {selected.map((value) => (
+      {selectedValues.map((value) => (
         <input key={value} name={name} type="hidden" value={value} />
       ))}
       <div className="flex items-center justify-between gap-3">
@@ -115,10 +116,10 @@ export function DiscoveryMultiSelect({
         >
           {label}
         </label>
-        {selected.length > 0 ? (
+        {selectedValues.length > 0 ? (
           <button
             className="text-xs font-bold text-blue-600 transition hover:text-blue-950"
-            onClick={() => setSelected([])}
+            onClick={() => onSelectedValuesChange([])}
             type="button"
           >
             Clear
@@ -155,8 +156,8 @@ export function DiscoveryMultiSelect({
           onClick={() => onOpenChange(!open)}
           type="button"
         >
-          <span className={selected.length > 0 ? "text-blue-700" : "text-blue-400"}>
-            {selected.length > 0 ? "+ Select more..." : placeholder}
+          <span className={selectedValues.length > 0 ? "text-blue-700" : "text-blue-400"}>
+            {selectedValues.length > 0 ? "+ Select more..." : placeholder}
           </span>
           <ChevronIcon open={open} />
         </button>

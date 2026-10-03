@@ -20,6 +20,7 @@ export function FacultyFilterForm({
   options,
 }: FacultyFilterFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
+  const [draftFilters, setDraftFilters] = useState(filters);
   const [openDropdown, setOpenDropdown] =
     useState<FacultyFilterDropdown | null>(null);
 
@@ -65,55 +66,62 @@ export function FacultyFilterForm({
     setOpenDropdown(open ? dropdown : null);
   }
 
+  function updateFilter<Key extends keyof FacultyDiscoveryFilters>(
+    key: Key,
+    value: FacultyDiscoveryFilters[Key],
+  ) {
+    setDraftFilters((current) => ({ ...current, [key]: value }));
+  }
+
   return (
     <form action="/app" className="mt-4 space-y-3" ref={formRef}>
       <input name="audience" type="hidden" value="faculty" />
-      {filters.searchQuery ? (
-        <input name="q" type="hidden" value={filters.searchQuery} />
+      {draftFilters.searchQuery ? (
+        <input name="q" type="hidden" value={draftFilters.searchQuery} />
       ) : null}
       <DiscoveryMultiSelect
-        key={`faculty-${filters.facultyNames.join("\u001f")}`}
         label="Faculty"
         name="faculty"
         onOpenChange={(open) => setDropdownOpen("faculty", open)}
+        onSelectedValuesChange={(values) => updateFilter("facultyNames", values)}
         open={openDropdown === "faculty"}
         options={options.faculties}
         placeholder="Select faculties"
         searchPlaceholder="Search faculties..."
-        selectedValues={filters.facultyNames}
+        selectedValues={draftFilters.facultyNames}
       />
       <DiscoveryMultiSelect
-        key={`program-${filters.programNames.join("\u001f")}`}
         label="Academic program"
         name="program"
         onOpenChange={(open) => setDropdownOpen("program", open)}
+        onSelectedValuesChange={(values) => updateFilter("programNames", values)}
         open={openDropdown === "program"}
         options={options.programs}
         placeholder="Select programs"
         searchPlaceholder="Search academic programs..."
-        selectedValues={filters.programNames}
+        selectedValues={draftFilters.programNames}
       />
       <DiscoveryMultiSelect
-        key={`expertise-${filters.expertiseSlugs.join("\u001f")}`}
         label="Expertise"
         name="expertise"
         onOpenChange={(open) => setDropdownOpen("expertise", open)}
+        onSelectedValuesChange={(values) => updateFilter("expertiseSlugs", values)}
         open={openDropdown === "expertise"}
         options={options.expertise}
         placeholder="Select expertise"
         searchPlaceholder="Search expertise..."
-        selectedValues={filters.expertiseSlugs}
+        selectedValues={draftFilters.expertiseSlugs}
       />
       <DiscoveryMultiSelect
-        key={`interest-${filters.interestSlugs.join("\u001f")}`}
         label="Research interests"
         name="interest"
         onOpenChange={(open) => setDropdownOpen("interest", open)}
+        onSelectedValuesChange={(values) => updateFilter("interestSlugs", values)}
         open={openDropdown === "interest"}
         options={options.interests}
         placeholder="Select interests"
         searchPlaceholder="Search research interests..."
-        selectedValues={filters.interestSlugs}
+        selectedValues={draftFilters.interestSlugs}
       />
       <button
         className="mt-2 inline-flex h-12 w-full items-center justify-center rounded-md bg-blue-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900"

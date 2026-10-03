@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { ContactReveal } from "@/components/matching/contact-reveal";
 import { SaveProfileButton } from "@/components/matching/save-profile-button";
+import { SocialLinksList } from "@/components/profile/profile-social-links";
 import { ProfileSafetyMenu } from "@/components/profile/profile-safety-menu";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import type { ProfileConnectionStatus } from "@/lib/matching/data";
@@ -14,6 +15,14 @@ type FullStudentProfileProps = Readonly<{
   profile: SafeProfile;
   returnTo: string;
   status: ProfileConnectionStatus | null;
+}>;
+
+type ProfileSection = Readonly<{
+  children: ReactNode;
+  description: string;
+  icon: ReactNode;
+  key: string;
+  title: string;
 }>;
 
 function BarsIcon() {
@@ -50,6 +59,24 @@ function CalendarIcon() {
       <path d="M16 2v4" />
       <rect height="18" rx="2" width="18" x="3" y="4" />
       <path d="M3 10h18" />
+    </svg>
+  );
+}
+
+function LinkIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1" />
+      <path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.1-1.1" />
     </svg>
   );
 }
@@ -222,6 +249,109 @@ export function FullStudentProfile({
   const facultyExpertiseLabels = profile.expertise.map(
     (expertise) => `${expertise.name} · ${expertise.category}`,
   );
+  const profileSections: ProfileSection[] = [];
+
+  if (isFaculty) {
+    if (facultyProgramLabels.length > 0) {
+      profileSections.push({
+        children: (
+          <ChipList
+            emptyLabel="No academic programs are visible."
+            items={facultyProgramLabels}
+          />
+        ),
+        description: "Official NaUKMA programs connected to this faculty profile.",
+        icon: <GraduationIcon />,
+        key: "faculty-programs",
+        title: "Academic programs",
+      });
+    }
+
+    if (facultyExpertiseLabels.length > 0) {
+      profileSections.push({
+        children: (
+          <ChipList
+            emptyLabel="No expertise is visible."
+            items={facultyExpertiseLabels}
+          />
+        ),
+        description: "Areas where this faculty profile can advise or collaborate.",
+        icon: <BarsIcon />,
+        key: "faculty-expertise",
+        title: "Expertise",
+      });
+    }
+
+    if (profile.interests.length > 0) {
+      profileSections.push({
+        children: <ChipList emptyLabel="" items={profile.interests} />,
+        description: "Research topics listed for this profile.",
+        icon: <SparkIcon />,
+        key: "faculty-interests",
+        title: "Research interests",
+      });
+    }
+  } else {
+    if (profile.offeredSkills.length > 0) {
+      profileSections.push({
+        children: <ChipList emptyLabel="" items={profile.offeredSkills} />,
+        description: "Tools and expertise they can offer.",
+        icon: <BarsIcon />,
+        key: "skills",
+        title: "Skills",
+      });
+    }
+
+    if (profile.interests.length > 0) {
+      profileSections.push({
+        children: <ChipList emptyLabel="" items={profile.interests} />,
+        description: "Topics they're passionate about.",
+        icon: <GraduationIcon />,
+        key: "interests",
+        title: "Academic interests",
+      });
+    }
+
+    if (profile.wantedSkills.length > 0) {
+      profileSections.push({
+        children: <ChipList emptyLabel="" items={profile.wantedSkills} />,
+        description: "Skills they hope to find on Mohyla Match.",
+        icon: <TargetIcon />,
+        key: "wanted-skills",
+        title: "Looking-for skills",
+      });
+    }
+
+    if (profile.collaborationGoals.length > 0) {
+      profileSections.push({
+        children: <ChipList emptyLabel="" items={profile.collaborationGoals} />,
+        description: "What they want to achieve.",
+        icon: <SparkIcon />,
+        key: "goals",
+        title: "Collaboration goals",
+      });
+    }
+  }
+
+  if (profile.availability) {
+    profileSections.push({
+      children: <ChipList emptyLabel="" items={[profile.availability]} />,
+      description: "When they're usually available.",
+      icon: <CalendarIcon />,
+      key: "availability",
+      title: "Availability",
+    });
+  }
+
+  if (profile.socialLinks.length > 0) {
+    profileSections.push({
+      children: <SocialLinksList links={profile.socialLinks} />,
+      description: "Find this profile elsewhere online.",
+      icon: <LinkIcon />,
+      key: "social-links",
+      title: "Find me online",
+    });
+  }
 
   return (
     <section className="min-w-0">
@@ -294,9 +424,11 @@ export function FullStudentProfile({
             <p className="mt-1 text-sm font-semibold text-blue-700/75">
               {profile.facultyName}
             </p>
-            <p className="mt-5 max-w-3xl text-base leading-7 text-blue-900/80">
-              {profile.bio || "No bio yet."}
-            </p>
+            {profile.bio ? (
+              <p className="mt-5 max-w-3xl text-base leading-7 text-blue-900/80">
+                {profile.bio}
+              </p>
+            ) : null}
           </div>
         </div>
 
@@ -325,112 +457,20 @@ export function FullStudentProfile({
         </div>
       </article>
 
-      <div className="mt-5 grid gap-4 xl:grid-cols-2">
-        {isFaculty ? (
-          <>
+      {profileSections.length > 0 ? (
+        <div className="mt-5 grid gap-4 xl:grid-cols-2">
+          {profileSections.map((section) => (
             <ProfileInfoCard
-              description="Official NaUKMA programs connected to this faculty profile."
-              icon={<GraduationIcon />}
-              title="Academic programs"
+              description={section.description}
+              icon={section.icon}
+              key={section.key}
+              title={section.title}
             >
-              <ChipList
-                emptyLabel="No academic programs are visible."
-                items={facultyProgramLabels}
-              />
+              {section.children}
             </ProfileInfoCard>
-
-            <ProfileInfoCard
-              description="Areas where this faculty profile can advise or collaborate."
-              icon={<BarsIcon />}
-              title="Expertise"
-            >
-              <ChipList
-                emptyLabel="No expertise is visible."
-                items={facultyExpertiseLabels}
-              />
-            </ProfileInfoCard>
-
-            <ProfileInfoCard
-              description="Research topics listed for this profile."
-              icon={<SparkIcon />}
-              title="Research interests"
-            >
-              <ChipList
-                emptyLabel="No research interests are visible."
-                items={profile.interests}
-              />
-            </ProfileInfoCard>
-
-            <ProfileInfoCard
-              description="When they're usually available."
-              icon={<CalendarIcon />}
-              title="Availability"
-            >
-              <ChipList
-                emptyLabel="No availability is listed."
-                items={profile.availability ? [profile.availability] : []}
-              />
-            </ProfileInfoCard>
-          </>
-        ) : (
-          <>
-        <ProfileInfoCard
-          description="Tools and expertise they can offer."
-          icon={<BarsIcon />}
-          title="Skills"
-        >
-          <ChipList
-            emptyLabel="No offered skills are visible."
-            items={profile.offeredSkills}
-          />
-        </ProfileInfoCard>
-
-        <ProfileInfoCard
-          description="Topics they're passionate about."
-          icon={<GraduationIcon />}
-          title="Academic interests"
-        >
-          <ChipList
-            emptyLabel="No academic interests are visible."
-            items={profile.interests}
-          />
-        </ProfileInfoCard>
-
-        <ProfileInfoCard
-          description="Skills they hope to find on Mohyla Match."
-          icon={<TargetIcon />}
-          title="Looking-for skills"
-        >
-          <ChipList
-            emptyLabel="No looking-for skills are visible."
-            items={profile.wantedSkills}
-          />
-        </ProfileInfoCard>
-
-        <ProfileInfoCard
-          description="What they want to achieve."
-          icon={<SparkIcon />}
-          title="Collaboration goals"
-        >
-          <ChipList
-            emptyLabel="No collaboration goals are visible."
-            items={profile.collaborationGoals}
-          />
-        </ProfileInfoCard>
-
-        <ProfileInfoCard
-          description="When they're usually available."
-          icon={<CalendarIcon />}
-          title="Availability"
-        >
-          <ChipList
-            emptyLabel="No availability is listed."
-            items={profile.availability ? [profile.availability] : []}
-          />
-        </ProfileInfoCard>
-          </>
-        )}
-      </div>
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }

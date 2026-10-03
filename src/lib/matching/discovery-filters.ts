@@ -22,7 +22,7 @@ export type FilterOption = Readonly<{
   value: string;
 }>;
 
-const emptyFilters: DiscoveryFilters = {
+export const emptyDiscoveryFilters: DiscoveryFilters = {
   collaborationGoalSlugs: [],
   interestSlugs: [],
   programNames: [],
@@ -102,7 +102,7 @@ export function createDiscoveryFilters(
     collaborationGoalSlugs: uniqueValues(filters.collaborationGoalSlugs),
     interestSlugs: uniqueValues(filters.interestSlugs),
     programNames: uniqueValues(filters.programNames),
-    searchQuery: filters.searchQuery?.trim() ?? emptyFilters.searchQuery,
+    searchQuery: filters.searchQuery?.trim() ?? emptyDiscoveryFilters.searchQuery,
     skillSlugs: uniqueValues(filters.skillSlugs),
     yearsOfStudy: uniqueValues(filters.yearsOfStudy),
   };

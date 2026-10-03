@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { AllStudentsList } from "@/components/matching/all-students-list";
 import { AppSidebar } from "@/components/matching/app-chrome";
-import { DiscoveryFilterForm } from "@/components/matching/discovery-filter-form";
+import { DiscoveryFilterPanel } from "@/components/matching/discovery-filter-panel";
 import { FacultyDirectoryList } from "@/components/matching/faculty-directory-list";
 import { FacultyFilterForm } from "@/components/matching/faculty-filter-form";
 import { RecommendedFeed } from "@/components/matching/recommended-feed";
@@ -21,7 +21,6 @@ import {
   createDiscoveryFilters,
   filterDiscoveryCandidates,
   hasActiveDiscoveryFilters,
-  type DiscoveryFilterOptions,
   type DiscoveryFilters,
 } from "@/lib/matching/discovery-filters";
 import {
@@ -250,67 +249,6 @@ function TopBar({
   );
 }
 
-function DiscoveryFilterRail({
-  filters,
-  hasActiveFilters,
-  options,
-  resultCount,
-  totalCount,
-  view,
-}: Readonly<{
-  filters: DiscoveryFilters;
-  hasActiveFilters: boolean;
-  options: DiscoveryFilterOptions;
-  resultCount: number;
-  totalCount: number;
-  view: DiscoveryView;
-}>) {
-  return (
-    <aside className="scrollbar-hidden space-y-4 xl:h-full xl:min-h-0 xl:overflow-y-auto xl:pb-6">
-      <section className="rounded-lg border border-blue-100 bg-white p-5">
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="font-serif text-3xl font-bold leading-none text-blue-950">
-            Filters
-          </h2>
-          <Link
-            className={
-              hasActiveFilters
-                ? "text-sm font-bold text-blue-700 transition hover:text-blue-950"
-                : "text-sm font-bold text-blue-300"
-            }
-            href={discoveryViewHref({}, view)}
-          >
-            Reset
-          </Link>
-        </div>
-
-        <p className="sr-only">
-          Showing {resultCount} of {totalCount} available profiles.
-        </p>
-
-        <DiscoveryFilterForm filters={filters} options={options} view={view} />
-      </section>
-
-      <section className="rounded-lg border border-blue-50 bg-[#fffaf0] p-7">
-        <p className="font-serif text-6xl font-bold leading-none text-blue-800">“</p>
-        <p className="mt-1 font-serif text-3xl font-semibold italic leading-[1.02] text-blue-950">
-          Great things happen when Mohylians find each other.
-        </p>
-        <div className="mt-6 h-px w-16 bg-blue-300" />
-        <p className="mt-5 text-xs font-bold uppercase tracking-[0.22em] text-blue-500">
-          Community
-          <br />
-          Ideas
-          <br />
-          People
-          <br />
-          Impact
-        </p>
-      </section>
-    </aside>
-  );
-}
-
 function FacultyDiscoveryFilterRail({
   filters,
   hasActiveFilters,
@@ -369,7 +307,6 @@ function FacultyDiscoveryFilterRail({
     </aside>
   );
 }
-
 function Hero() {
   return (
     <header className="mb-6 text-center">
@@ -442,20 +379,33 @@ function DiscoveryViewTabs({
       aria-label="Discovery views"
       className="mb-5 flex justify-center"
     >
-      <div className="inline-flex rounded-lg border border-blue-100 bg-white p-1">
+      <div
+        className="relative grid w-full max-w-sm grid-cols-2 rounded-lg border border-blue-100 bg-white p-1"
+        role="tablist"
+      >
+        <span
+          aria-hidden="true"
+          className={
+            currentView === "all"
+              ? "absolute bottom-1 left-1 top-1 w-[calc(50%-0.25rem)] translate-x-full rounded-md bg-blue-800 transition-transform duration-200 ease-out motion-reduce:transition-none"
+              : "absolute bottom-1 left-1 top-1 w-[calc(50%-0.25rem)] translate-x-0 rounded-md bg-blue-800 transition-transform duration-200 ease-out motion-reduce:transition-none"
+          }
+        />
         {tabs.map((tab) => {
           const active = currentView === tab.view;
 
           return (
             <Link
               aria-current={active ? "page" : undefined}
+              aria-selected={active}
               className={
                 active
-                  ? "inline-flex h-9 items-center justify-center rounded-md bg-blue-800 px-4 text-sm font-bold text-white"
-                  : "inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-bold text-blue-700 transition hover:bg-blue-50 hover:text-blue-950"
+                  ? "relative z-10 inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-bold text-white"
+                  : "relative z-10 inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-bold text-blue-700 transition hover:text-blue-950"
               }
               href={discoveryViewHref(params, tab.view)}
               key={tab.view}
+              role="tab"
               scroll={false}
             >
               {tab.label}
@@ -630,14 +580,33 @@ export default async function AppPage({ searchParams }: PageProps) {
               )}
             </section>
 
-            <DiscoveryFilterRail
-              filters={filters}
-              hasActiveFilters={activeFilters}
-              options={options}
-              resultCount={filteredCandidates.length}
-              totalCount={allCandidates.length}
-              view={view}
-            />
+            <aside className="scrollbar-hidden space-y-4 xl:h-full xl:min-h-0 xl:overflow-y-auto xl:pb-6">
+              <DiscoveryFilterPanel
+                filters={filters}
+                options={options}
+                resultCount={filteredCandidates.length}
+                totalCount={allCandidates.length}
+                view={view}
+              />
+              <section className="rounded-lg border border-blue-50 bg-[#fffaf0] p-7">
+                <p className="font-serif text-6xl font-bold leading-none text-blue-800">
+                  &quot;
+                </p>
+                <p className="mt-1 font-serif text-3xl font-semibold italic leading-[1.02] text-blue-950">
+                  Great things happen when Mohylians find each other.
+                </p>
+                <div className="mt-6 h-px w-16 bg-blue-300" />
+                <p className="mt-5 text-xs font-bold uppercase tracking-[0.22em] text-blue-500">
+                  Community
+                  <br />
+                  Ideas
+                  <br />
+                  People
+                  <br />
+                  Impact
+                </p>
+              </section>
+            </aside>
           </div>
         </div>
       </div>
