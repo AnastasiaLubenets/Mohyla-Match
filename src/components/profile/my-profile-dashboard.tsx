@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type ReactNode } from "react";
 
+import { SocialLinksList } from "@/components/profile/profile-social-links";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import {
   TaxonomyMultiSelect,
@@ -685,6 +686,11 @@ export function MyProfileDashboard({
               <p className="mt-3 text-sm font-semibold text-blue-700">
                 {state.availability}
               </p>
+            ) : null}
+            {profile.socialLinks.length > 0 ? (
+              <div className="mt-4">
+                <SocialLinksList compact links={profile.socialLinks} />
+              </div>
             ) : null}
             <p className="mt-5 max-w-2xl text-base leading-7 text-blue-900/80">
               {state.bio || "No bio yet."}

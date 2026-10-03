@@ -61,6 +61,13 @@ const editData: EditProfileData = {
       search_aliases: ["figjam"],
     },
   ],
+  socialLinks: [
+    {
+      platform: "github",
+      sortOrder: 0,
+      url: "https://github.com/mohyla-match",
+    },
+  ],
   wantedSkillIds: [102],
 };
 
@@ -169,6 +176,13 @@ test("current edit data converts to a complete canonical update payload", () => 
     interestIds: [201],
     lookingForSkillIds: [102],
     offerSkillIds: [101],
+    socialLinks: [
+      {
+        platform: "github",
+        sortOrder: 0,
+        url: "https://github.com/mohyla-match",
+      },
+    ],
     yearOfStudy: 2,
   });
 });

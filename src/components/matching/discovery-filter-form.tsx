@@ -18,12 +18,14 @@ type DiscoveryFilterDropdown =
 
 type DiscoveryFilterFormProps = Readonly<{
   filters: DiscoveryFilters;
+  onFiltersChange: (filters: DiscoveryFilters) => void;
   options: DiscoveryFilterOptions;
   view: DiscoveryView;
 }>;
 
 export function DiscoveryFilterForm({
   filters,
+  onFiltersChange,
   options,
   view,
 }: DiscoveryFilterFormProps) {
@@ -73,6 +75,13 @@ export function DiscoveryFilterForm({
     setOpenDropdown(open ? dropdown : null);
   }
 
+  function updateFilter<Key extends keyof DiscoveryFilters>(
+    key: Key,
+    value: DiscoveryFilters[Key],
+  ) {
+    onFiltersChange({ ...filters, [key]: value });
+  }
+
   return (
     <form action="/app" className="mt-4 space-y-3" ref={formRef}>
       <input name="view" type="hidden" value={view} />
@@ -80,10 +89,12 @@ export function DiscoveryFilterForm({
         <input name="q" type="hidden" value={filters.searchQuery} />
       ) : null}
       <DiscoveryMultiSelect
-        key={`goal-${filters.collaborationGoalSlugs.join("\u001f")}`}
         label="Collaboration goal"
         name="goal"
         onOpenChange={(open) => setDropdownOpen("goal", open)}
+        onSelectedValuesChange={(values) =>
+          updateFilter("collaborationGoalSlugs", values)
+        }
         open={openDropdown === "goal"}
         options={options.collaborationGoals}
         placeholder="Select goals"
@@ -91,10 +102,10 @@ export function DiscoveryFilterForm({
         selectedValues={filters.collaborationGoalSlugs}
       />
       <DiscoveryMultiSelect
-        key={`program-${filters.programNames.join("\u001f")}`}
         label="Academic program"
         name="program"
         onOpenChange={(open) => setDropdownOpen("program", open)}
+        onSelectedValuesChange={(values) => updateFilter("programNames", values)}
         open={openDropdown === "program"}
         options={options.programs}
         placeholder="Select programs"
@@ -102,10 +113,10 @@ export function DiscoveryFilterForm({
         selectedValues={filters.programNames}
       />
       <DiscoveryMultiSelect
-        key={`year-${filters.yearsOfStudy.join("\u001f")}`}
         label="Year of study"
         name="year"
         onOpenChange={(open) => setDropdownOpen("year", open)}
+        onSelectedValuesChange={(values) => updateFilter("yearsOfStudy", values)}
         open={openDropdown === "year"}
         options={options.years}
         placeholder="Select years"
@@ -113,10 +124,10 @@ export function DiscoveryFilterForm({
         selectedValues={filters.yearsOfStudy}
       />
       <DiscoveryMultiSelect
-        key={`skill-${filters.skillSlugs.join("\u001f")}`}
         label="Skills"
         name="skill"
         onOpenChange={(open) => setDropdownOpen("skill", open)}
+        onSelectedValuesChange={(values) => updateFilter("skillSlugs", values)}
         open={openDropdown === "skill"}
         options={options.skills}
         placeholder="Select skills"
@@ -124,10 +135,10 @@ export function DiscoveryFilterForm({
         selectedValues={filters.skillSlugs}
       />
       <DiscoveryMultiSelect
-        key={`interest-${filters.interestSlugs.join("\u001f")}`}
         label="Interests"
         name="interest"
         onOpenChange={(open) => setDropdownOpen("interest", open)}
+        onSelectedValuesChange={(values) => updateFilter("interestSlugs", values)}
         open={openDropdown === "interest"}
         options={options.interests}
         placeholder="Select interests"

@@ -251,6 +251,10 @@ test("discover filters use searchable multi-selects and full taxonomy loader", (
     join(repoRoot, "src/components/matching/discovery-filter-form.tsx"),
     "utf8",
   );
+  const filterPanelSource = readFileSync(
+    join(repoRoot, "src/components/matching/discovery-filter-panel.tsx"),
+    "utf8",
+  );
   const multiSelectSource = readFileSync(
     join(repoRoot, "src/components/matching/discovery-multi-select.tsx"),
     "utf8",
@@ -263,8 +267,13 @@ test("discover filters use searchable multi-selects and full taxonomy loader", (
   );
   assert.match(
     appPageSource,
-    /<DiscoveryFilterForm[\s\S]*?filters=\{filters\}[\s\S]*?options=\{options\}/,
-    "Discover should render the shared filter form",
+    /<DiscoveryFilterPanel[\s\S]*?filters=\{filters\}[\s\S]*?options=\{options\}/,
+    "Discover should render the shared filter panel",
+  );
+  assert.match(
+    filterPanelSource,
+    /<DiscoveryFilterForm[\s\S]*?filters=\{draftFilters\}[\s\S]*?onFiltersChange=\{setDraftFilters\}/,
+    "The filter panel should pass draft values into the shared filter form",
   );
   assert.match(
     filterFormSource,
@@ -302,6 +311,16 @@ test("discover filters use searchable multi-selects and full taxonomy loader", (
     "Selected values should submit as repeated query params",
   );
   assert.match(
+    multiSelectSource,
+    /onSelectedValuesChange:\s*\(selectedValues: readonly string\[\]\) => void/,
+    "Multi-select selection state should be controlled by the filter panel",
+  );
+  assert.doesNotMatch(
+    multiSelectSource,
+    /useState<readonly string\[\]>/,
+    "Multi-selects should not keep stale private selected values after Reset",
+  );
+  assert.match(
     appPageSource,
     /<aside className="[^"]*xl:overflow-y-auto/,
     "The desktop filter rail should scroll instead of clipping lower dropdowns",
@@ -320,6 +339,72 @@ test("discover filters use searchable multi-selects and full taxonomy loader", (
     multiSelectSource,
     /role="listbox"|aria-multiselectable/,
     "Checkbox filter options should not be wrapped in incomplete listbox semantics",
+  );
+});
+
+test("discover filter reset clears draft state before applying", () => {
+  const filterPanelSource = readFileSync(
+    join(repoRoot, "src/components/matching/discovery-filter-panel.tsx"),
+    "utf8",
+  );
+
+  assert.match(
+    filterPanelSource,
+    /const \[draftFilters, setDraftFilters\] = useState\(filters\)/,
+    "Reset should operate on a draft filter state before Apply",
+  );
+  assert.match(
+    filterPanelSource,
+    /const resetEnabled = draftActive \|\| appliedActive/,
+    "Reset should be enabled when either draft or applied filters are active",
+  );
+  assert.match(
+    filterPanelSource,
+    /setDraftFilters\(emptyDiscoveryFilters\)/,
+    "Reset should clear the visible draft controls immediately",
+  );
+  assert.match(
+    filterPanelSource,
+    /router\.push\(discoveryViewHref\(\{\}, view\), \{ scroll: false \}\)/,
+    "Reset should clear applied URL filters without jumping the page",
+  );
+  assert.match(
+    filterPanelSource,
+    /disabled=\{!resetEnabled\}/,
+    "Reset should be disabled only when no draft or applied filters are active",
+  );
+});
+
+test("discover view tabs use an animated accessible segmented control", () => {
+  const appPageSource = readFileSync(
+    join(repoRoot, "src/app/app/page.tsx"),
+    "utf8",
+  );
+
+  assert.match(
+    appPageSource,
+    /role="tablist"/,
+    "Discovery view tabs should expose tablist semantics",
+  );
+  assert.match(
+    appPageSource,
+    /role="tab"/,
+    "Each discovery view link should expose tab semantics",
+  );
+  assert.match(
+    appPageSource,
+    /aria-selected=\{active\}/,
+    "The active discovery view should be announced",
+  );
+  assert.match(
+    appPageSource,
+    /translate-x-full[\s\S]*transition-transform duration-200/,
+    "The active tab indicator should slide between views",
+  );
+  assert.match(
+    appPageSource,
+    /motion-reduce:transition-none/,
+    "The tab indicator should respect reduced motion",
   );
 });
 

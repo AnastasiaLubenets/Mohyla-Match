@@ -1,3 +1,8 @@
+import {
+  normalizeProfileSocialLinks,
+  type ProfileSocialLinkInput,
+} from "./social-links.ts";
+
 export type ProfileUpdatePayload = Readonly<{
   academicProgramId: number;
   allowDirectContact: boolean;
@@ -9,6 +14,7 @@ export type ProfileUpdatePayload = Readonly<{
   interestIds: number[];
   lookingForSkillIds: number[];
   offerSkillIds: number[];
+  socialLinks: ProfileSocialLinkInput[];
   yearOfStudy: number;
 }>;
 
@@ -68,6 +74,12 @@ export function validateProfileUpdatePayload(
       error: "Choose at least one offered skill.",
       ok: false,
     };
+  }
+
+  const socialLinks = normalizeProfileSocialLinks(payload.socialLinks);
+
+  if (!socialLinks.ok) {
+    return { error: socialLinks.error, ok: false };
   }
 
   return { ok: true };

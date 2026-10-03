@@ -4,17 +4,30 @@ import Link from "next/link";
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 
 import { AuthSubmitButton } from "@/components/auth-submit-button";
+import { SocialPlatformIcon } from "@/components/profile/profile-social-links";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import {
   TaxonomyMultiSelect,
   type TaxonomyPickerOption,
 } from "@/components/profile/taxonomy-multi-select";
 import type { EditProfileData } from "@/lib/profile/data";
+import {
+  formatSocialUrl,
+  getSocialPlatformLabel,
+  normalizeProfileSocialLinks,
+  socialPlatformOptions,
+  type SocialPlatform,
+} from "@/lib/profile/social-links";
 
 type PickerCardProps = Readonly<{
   children: ReactNode;
   icon: ReactNode;
   title: string;
+}>;
+
+type DraftSocialLink = Readonly<{
+  platform: SocialPlatform;
+  url: string;
 }>;
 
 function BarsIcon() {
@@ -121,6 +134,13 @@ function namedOptions(options: EditProfileData["interests"]): TaxonomyPickerOpti
   }));
 }
 
+function draftSocialLinks(data: EditProfileData): DraftSocialLink[] {
+  return data.socialLinks.map((link) => ({
+    platform: link.platform,
+    url: link.url,
+  }));
+}
+
 export function ProfileEditForm({
   data,
   error,
@@ -138,6 +158,9 @@ export function ProfileEditForm({
   const [interestIds, setInterestIds] = useState(data.interestIds);
   const [collaborationGoalIds, setCollaborationGoalIds] = useState(
     data.collaborationGoalIds,
+  );
+  const [socialLinks, setSocialLinks] = useState<DraftSocialLink[]>(() =>
+    draftSocialLinks(data),
   );
   const [bioValue, setBioValue] = useState(data.profile.bio ?? "");
   const [clientError, setClientError] = useState<string | null>(null);
@@ -169,7 +192,50 @@ export function ProfileEditForm({
       return;
     }
 
+    const socialValidation = normalizeProfileSocialLinks(socialLinks);
+
+    if (!socialValidation.ok) {
+      event.preventDefault();
+      setClientError(socialValidation.error);
+      return;
+    }
+
     setClientError(null);
+  }
+
+  function addSocialLink() {
+    const selectedPlatforms = new Set(socialLinks.map((link) => link.platform));
+    const nextPlatform = socialPlatformOptions.find(
+      (platform) => !selectedPlatforms.has(platform.value),
+    );
+
+    if (!nextPlatform) {
+      setClientError("All supported social platforms are already added.");
+      return;
+    }
+
+    setSocialLinks((current) => [
+      ...current,
+      { platform: nextPlatform.value, url: "" },
+    ]);
+    setClientError(null);
+  }
+
+  function updateSocialLink(
+    index: number,
+    patch: Partial<DraftSocialLink>,
+  ) {
+    setSocialLinks((current) =>
+      current.map((link, linkIndex) =>
+        linkIndex === index ? { ...link, ...patch } : link,
+      ),
+    );
+  }
+
+  function removeSocialLink(index: number) {
+    setSocialLinks((current) =>
+      current.filter((_, linkIndex) => linkIndex !== index),
+    );
   }
 
   return (
@@ -397,6 +463,116 @@ export function ProfileEditForm({
             placeholder="Search skills you're looking for..."
             selectedIds={wantedSkillIds}
           />
+        </PickerCard>
+
+        <PickerCard icon={<LinkIcon />} title="Social links">
+          <div className="space-y-3">
+            {socialLinks.length > 0 ? (
+              socialLinks.map((link, index) => {
+                const selectedPlatforms = new Set(
+                  socialLinks
+                    .filter((_, linkIndex) => linkIndex !== index)
+                    .map((item) => item.platform),
+                );
+
+                return (
+                  <div
+                    className="grid gap-3 rounded-lg border border-blue-100 bg-blue-50/40 p-3 sm:grid-cols-[minmax(0,12rem)_minmax(0,1fr)_auto] sm:items-end"
+                    key={`${link.platform}-${index}`}
+                  >
+                    <label className="block">
+                      <span className="text-sm font-bold text-blue-900">
+                        Platform
+                      </span>
+                      <select
+                        className={fieldClassName()}
+                        name="socialPlatform"
+                        onChange={(event) =>
+                          updateSocialLink(index, {
+                            platform: event.target.value as SocialPlatform,
+                          })
+                        }
+                        value={link.platform}
+                      >
+                        {socialPlatformOptions.map((platform) => (
+                          <option
+                            disabled={selectedPlatforms.has(platform.value)}
+                            key={platform.value}
+                            value={platform.value}
+                          >
+                            {platform.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="block">
+                      <span className="text-sm font-bold text-blue-900">
+                        URL
+                      </span>
+                      <input
+                        className={fieldClassName()}
+                        name="socialUrl"
+                        onChange={(event) =>
+                          updateSocialLink(index, { url: event.target.value })
+                        }
+                        placeholder="https://..."
+                        type="text"
+                        value={link.url}
+                      />
+                    </label>
+
+                    <button
+                      className="inline-flex h-11 items-center justify-center rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-800 transition hover:border-blue-300 hover:bg-blue-50"
+                      onClick={() => removeSocialLink(index)}
+                      type="button"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-sm font-medium text-blue-700/75">
+                Add optional public social links when you want classmates to find
+                your work elsewhere.
+              </p>
+            )}
+
+            <button
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
+              onClick={addSocialLink}
+              type="button"
+            >
+              <SocialPlatformIcon
+                className="h-5 w-5"
+                platform="personal-website"
+              />
+              Add social link
+            </button>
+
+            {socialLinks.length > 0 ? (
+              <ul className="flex flex-wrap gap-2">
+                {socialLinks
+                  .filter((link) => link.url.trim())
+                  .map((link) => (
+                    <li
+                      className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-800 ring-1 ring-blue-100"
+                      key={`${link.platform}-preview`}
+                    >
+                      <SocialPlatformIcon
+                        className="h-4 w-4"
+                        platform={link.platform}
+                      />
+                      {getSocialPlatformLabel(link.platform)}
+                      <span className="max-w-[12rem] truncate text-blue-600">
+                        {formatSocialUrl(link.url)}
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+            ) : null}
+          </div>
         </PickerCard>
       </div>
 

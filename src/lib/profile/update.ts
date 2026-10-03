@@ -8,6 +8,7 @@ import {
   validateProfileUpdatePayload,
   type ProfileUpdatePayload,
 } from "@/lib/profile/update-payload";
+import { normalizeProfileSocialLinks } from "./social-links.ts";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -95,6 +96,20 @@ function readIdList(formData: FormData, fieldName: string): number[] {
   return [...new Set(ids)];
 }
 
+function readSocialLinks(formData: FormData): ProfileUpdatePayload["socialLinks"] {
+  const platforms = formData.getAll("socialPlatform");
+  const urls = formData.getAll("socialUrl");
+  const count = Math.max(platforms.length, urls.length);
+
+  return Array.from({ length: count }, (_, index) => ({
+    platform:
+      typeof platforms[index] === "string"
+        ? (platforms[index] as string)
+        : "",
+    url: typeof urls[index] === "string" ? (urls[index] as string) : "",
+  })).filter((link) => link.platform.trim() || link.url.trim());
+}
+
 export async function saveProfileUpdate(
   supabase: SupabaseClient<Database>,
   payload: ProfileUpdatePayload,
@@ -103,6 +118,22 @@ export async function saveProfileUpdate(
 
   if (!validation.ok) {
     return validation;
+  }
+
+  const normalizedSocialLinks = normalizeProfileSocialLinks(payload.socialLinks);
+
+  if (!normalizedSocialLinks.ok) {
+    return normalizedSocialLinks;
+  }
+
+  const userResult = await supabase.auth.getUser();
+  const userId = userResult.data.user?.id ?? null;
+
+  if (userResult.error || !userId) {
+    return {
+      error: "We could not save your profile. Sign in and try again.",
+      ok: false,
+    };
   }
 
   const result = await supabase.rpc("update_my_profile", {
@@ -124,6 +155,36 @@ export async function saveProfileUpdate(
       error: "We could not save your profile. Check your selections.",
       ok: false,
     };
+  }
+
+  const deleteResult = await supabase
+    .from("profile_social_links")
+    .delete()
+    .eq("user_id", userId);
+
+  if (deleteResult.error) {
+    return {
+      error: "We could not save your social links. Try again.",
+      ok: false,
+    };
+  }
+
+  if (normalizedSocialLinks.links.length > 0) {
+    const insertResult = await supabase.from("profile_social_links").insert(
+      normalizedSocialLinks.links.map((link) => ({
+        platform: link.platform,
+        sort_order: link.sortOrder,
+        url: link.url,
+        user_id: userId,
+      })),
+    );
+
+    if (insertResult.error) {
+      return {
+        error: "We could not save your social links. Check the URLs.",
+        ok: false,
+      };
+    }
   }
 
   return { ok: true };
@@ -148,6 +209,7 @@ export async function updateMyProfile(request: NextRequest) {
     interestIds: readIdList(formData, "interestId"),
     lookingForSkillIds: readIdList(formData, "lookingForSkillId"),
     offerSkillIds: readIdList(formData, "offerSkillId"),
+    socialLinks: readSocialLinks(formData),
     yearOfStudy: readRequiredInteger(formData, "yearOfStudy") ?? 0,
   };
 

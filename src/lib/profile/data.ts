@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import type { ProfileSocialLink, SocialPlatform } from "./social-links.ts";
 import type { Database } from "@/types/database";
 
 type SupabaseServerClient = SupabaseClient<Database>;
@@ -40,6 +41,7 @@ export type SafeProfile = Readonly<{
   fullName: string;
   interests: string[];
   offeredSkills: string[];
+  socialLinks: ProfileSocialLink[];
   systemAvatarKey: string;
   userId: string;
   wantedSkills: string[];
@@ -66,6 +68,7 @@ export type EditProfileData = Readonly<{
   wantedSkillIds: number[];
   interestIds: number[];
   collaborationGoalIds: number[];
+  socialLinks: ProfileSocialLink[];
 }>;
 
 type LoadResult<T> = Readonly<{
@@ -131,6 +134,27 @@ async function loadSkillNamesById(
   };
 }
 
+async function loadProfileSocialLinks(
+  supabase: SupabaseServerClient,
+  userId: string,
+) {
+  const result = await supabase
+    .from("profile_social_links")
+    .select("platform,url,sort_order")
+    .eq("user_id", userId)
+    .order("sort_order", { ascending: true })
+    .order("platform", { ascending: true });
+
+  return {
+    error: result.error,
+    socialLinks: (result.data ?? []).map((link) => ({
+      platform: link.platform as SocialPlatform,
+      sortOrder: link.sort_order,
+      url: link.url,
+    })),
+  };
+}
+
 export async function loadSafeProfile(
   supabase: SupabaseServerClient,
   userId: string,
@@ -158,6 +182,7 @@ export async function loadSafeProfile(
     skillsResult,
     interestsResult,
     goalsResult,
+    socialLinksResult,
   ] = await Promise.all([
     supabase
       .from("faculties")
@@ -184,6 +209,7 @@ export async function loadSafeProfile(
       .from("profile_collaboration_goals")
       .select("collaboration_goal_id")
       .eq("user_id", userId),
+    loadProfileSocialLinks(supabase, userId),
   ]);
 
   if (
@@ -191,7 +217,8 @@ export async function loadSafeProfile(
     programResult.error ||
     skillsResult.error ||
     interestsResult.error ||
-    goalsResult.error
+    goalsResult.error ||
+    socialLinksResult.error
   ) {
     return { data: null, error: true };
   }
@@ -235,6 +262,7 @@ export async function loadSafeProfile(
           .map((skill) => skill.skill_id),
         skillNames.namesById,
       ),
+      socialLinks: socialLinksResult.socialLinks,
       systemAvatarKey: profile.system_avatar_key,
       userId: profile.user_id,
       wantedSkills: namesFromMap(
@@ -263,6 +291,7 @@ export async function loadProfileEditData(
     profileSkillsResult,
     profileInterestsResult,
     profileGoalsResult,
+    profileSocialLinksResult,
   ] = await Promise.all([
     supabase
       .from("faculties")
@@ -313,6 +342,7 @@ export async function loadProfileEditData(
       .from("profile_collaboration_goals")
       .select("collaboration_goal_id")
       .eq("user_id", userId),
+    loadProfileSocialLinks(supabase, userId),
   ]);
 
   const loadError = [
@@ -325,6 +355,7 @@ export async function loadProfileEditData(
     profileSkillsResult.error,
     profileInterestsResult.error,
     profileGoalsResult.error,
+    profileSocialLinksResult.error,
   ].some(Boolean);
 
   if (loadError) {
@@ -354,6 +385,7 @@ export async function loadProfileEditData(
       profile: profileResult.data,
       programs: (programsResult.data ?? []) as ProgramOption[],
       skills: (skillsResult.data ?? []) as SkillOption[],
+      socialLinks: profileSocialLinksResult.socialLinks,
       wantedSkillIds: profileSkills
         .filter((skill) => skill.direction === "looking_for")
         .map((skill) => skill.skill_id),
