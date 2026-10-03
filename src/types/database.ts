@@ -345,6 +345,36 @@ export type Database = {
         };
         Relationships: [];
       };
+      profile_social_links: {
+        Row: {
+          created_at: string;
+          id: string;
+          platform: string;
+          sort_order: number;
+          updated_at: string;
+          url: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          platform: string;
+          sort_order?: number;
+          updated_at?: string;
+          url: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          platform?: string;
+          sort_order?: number;
+          updated_at?: string;
+          url?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       profile_skills: {
         Row: {
           created_at: string;
