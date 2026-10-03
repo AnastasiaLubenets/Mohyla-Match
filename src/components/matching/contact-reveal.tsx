@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { showActionToast } from "@/components/matching/action-toast";
 import {
   contactEmailCopiedLabel,
   requestAndCopyProfileEmail,
@@ -36,7 +37,6 @@ export function ContactReveal({
   showIcon?: boolean;
   targetUserId: string;
 }>) {
-  const [copiedName, setCopiedName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
@@ -45,7 +45,6 @@ export function ContactReveal({
       return;
     }
 
-    setCopiedName(null);
     setError(null);
     setIsPending(true);
 
@@ -73,7 +72,7 @@ export function ContactReveal({
     });
 
     if (result.status === "copied") {
-      setCopiedName(result.fullName ?? "");
+      showActionToast({ message: contactEmailCopiedLabel, tone: "success" });
     } else {
       setError(result.error);
     }
@@ -95,15 +94,6 @@ export function ContactReveal({
         {showIcon ? <EnvelopeIcon /> : null}
         {isPending ? "Getting email..." : "Get email"}
       </button>
-
-      {copiedName !== null ? (
-        <div
-          aria-live="polite"
-          className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-950"
-        >
-          {contactEmailCopiedLabel}
-        </div>
-      ) : null}
 
       {error ? <p className="text-sm font-medium text-red-700">{error}</p> : null}
     </div>
