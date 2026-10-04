@@ -1,197 +1,211 @@
 begin;
 
-select plan(5);
+select plan(9);
+
+create temp table expected_faculties (
+  slug text primary key,
+  display_name text not null,
+  sort_order integer not null
+) on commit drop;
+
+insert into expected_faculties (slug, display_name, sort_order)
+values
+  ('faculty-humanities', 'Факультет гуманітарних наук', 10),
+  ('faculty-economics', 'Факультет економічних наук', 20),
+  ('faculty-social-sciences-social-technologies', 'Факультет соціальних наук та соціальних технологій', 30),
+  ('faculty-informatics', 'Факультет інформатики', 40),
+  ('faculty-law', 'Факультет правничих наук', 50),
+  ('faculty-natural-sciences', 'Факультет природничих наук', 60),
+  ('faculty-health-social-work-psychology', 'Факультет охорони здоров’я, соціальної роботи та психології', 70);
+
+create temp table expected_programs (
+  faculty_slug text not null,
+  display_name text not null,
+  sort_order integer not null
+) on commit drop;
+
+insert into expected_programs (faculty_slug, display_name, sort_order)
+values
+  ('faculty-humanities', 'Історія та археологія', 110),
+  ('faculty-humanities', 'Філософія', 120),
+  ('faculty-humanities', 'Культурологія', 130),
+  ('faculty-humanities', 'Філологія', 140),
+  ('faculty-economics', 'Економіка', 210),
+  ('faculty-economics', 'Фінанси, банківська справа та страхування', 220),
+  ('faculty-economics', 'Менеджмент', 230),
+  ('faculty-economics', 'Маркетинг', 240),
+  ('faculty-social-sciences-social-technologies', 'Політологія', 310),
+  ('faculty-social-sciences-social-technologies', 'Соціологія', 320),
+  ('faculty-social-sciences-social-technologies', 'Міжнародні відносини, суспільні комунікації та регіональні студії', 330),
+  ('faculty-social-sciences-social-technologies', 'Журналістика', 340),
+  ('faculty-social-sciences-social-technologies', 'Менеджмент', 350),
+  ('faculty-informatics', 'Прикладна математика', 410),
+  ('faculty-informatics', 'Інженерія програмного забезпечення', 420),
+  ('faculty-informatics', 'Комп''ютерні науки', 430),
+  ('faculty-informatics', 'Системний аналіз', 440),
+  ('faculty-law', 'Право', 510),
+  ('faculty-law', 'Публічне управління та адміністрування', 520),
+  ('faculty-natural-sciences', 'Біологія', 610),
+  ('faculty-natural-sciences', 'Екологія', 620),
+  ('faculty-natural-sciences', 'Хімія', 630),
+  ('faculty-natural-sciences', 'Фізика та астрономія', 640),
+  ('faculty-health-social-work-psychology', 'Психологія', 710),
+  ('faculty-health-social-work-psychology', 'Соціальна робота', 720),
+  ('faculty-health-social-work-psychology', 'Громадське здоров''я', 730),
+  ('faculty-health-social-work-psychology', 'Менеджмент в охороні здоров''я', 740),
+  ('faculty-health-social-work-psychology', 'Медицина', 750);
+
+select results_eq(
+  $$
+    select f.slug, f.display_name, f.sort_order
+    from public.faculties f
+    join expected_faculties ef on ef.slug = f.slug
+    where f.is_active
+    order by f.sort_order
+  $$,
+  $$
+    select slug, display_name, sort_order
+    from expected_faculties
+    order by sort_order
+  $$,
+  'only the 7 approved production faculties are active and ordered'
+);
 
 select is(
   (
     select count(*)::integer
     from public.faculties
     where is_active
-      and slug in (
-        'kma-school-professional-continuing-education',
-        'faculty-economics',
-        'faculty-social-sciences-social-technologies',
-        'faculty-law',
-        'faculty-humanities',
-        'faculty-international-relations-governance',
-        'faculty-natural-sciences',
-        'faculty-informatics',
-        'faculty-health-social-work-psychology',
-        'liberal-arts-studies-center'
+      and (
+        slug in (
+          'kma-school-professional-continuing-education',
+          'faculty-international-relations-governance',
+          'liberal-arts-studies-center',
+          'kmbs',
+          'kyiv-mohyla-business-school'
+        )
+        or display_name in (
+          'Києво-Могилянська Бізнес-Школа (kmbs)',
+          'Факультет «Києво-Могилянська школа професійної та неперервної освіти»',
+          'Києво-Могилянська школа професійної та неперервної освіти'
+        )
       )
-  ),
-  10,
-  'all production NaUKMA faculties are active'
-);
-
-select is(
-  (
-    select count(*)::integer
-    from public.academic_programs ap
-    join public.faculties f on f.id = ap.faculty_id
-    where ap.is_active
-      and f.slug in (
-        'kma-school-professional-continuing-education',
-        'faculty-economics',
-        'faculty-social-sciences-social-technologies',
-        'faculty-law',
-        'faculty-humanities',
-        'faculty-international-relations-governance',
-        'faculty-natural-sciences',
-        'faculty-informatics',
-        'faculty-health-social-work-psychology',
-        'liberal-arts-studies-center'
-      )
-  ),
-  67,
-  'all production NaUKMA academic programs are active'
-);
-
-select results_eq(
-  $$
-    select f.slug, count(ap.id)::integer
-    from public.faculties f
-    join public.academic_programs ap
-      on ap.faculty_id = f.id
-      and ap.is_active
-    where f.slug in (
-      'kma-school-professional-continuing-education',
-      'faculty-economics',
-      'faculty-social-sciences-social-technologies',
-      'faculty-law',
-      'faculty-humanities',
-      'faculty-international-relations-governance',
-      'faculty-natural-sciences',
-      'faculty-informatics',
-      'faculty-health-social-work-psychology',
-      'liberal-arts-studies-center'
-    )
-    group by f.slug
-    order by f.slug
-  $$,
-  $$
-    values
-      ('faculty-economics'::text, 9),
-      ('faculty-health-social-work-psychology'::text, 7),
-      ('faculty-humanities'::text, 14),
-      ('faculty-informatics'::text, 9),
-      ('faculty-international-relations-governance'::text, 5),
-      ('faculty-law'::text, 2),
-      ('faculty-natural-sciences'::text, 8),
-      ('faculty-social-sciences-social-technologies'::text, 8),
-      ('kma-school-professional-continuing-education'::text, 4),
-      ('liberal-arts-studies-center'::text, 1)
-  $$,
-  'active program counts match each production faculty'
-);
-
-select results_eq(
-  $$
-    select f.slug, ap.slug
-    from public.academic_programs ap
-    join public.faculties f on f.id = ap.faculty_id
-    where ap.is_active
-      and f.slug in (
-        'kma-school-professional-continuing-education',
-        'faculty-economics',
-        'faculty-social-sciences-social-technologies',
-        'faculty-law',
-        'faculty-humanities',
-        'faculty-international-relations-governance',
-        'faculty-natural-sciences',
-        'faculty-informatics',
-        'faculty-health-social-work-psychology',
-        'liberal-arts-studies-center'
-      )
-    order by f.sort_order, ap.sort_order, ap.slug
-  $$,
-  $$
-    values
-      ('kma-school-professional-continuing-education'::text, 'political-leadership-economic-diplomacy'::text),
-      ('kma-school-professional-continuing-education'::text, 'master-economic-diplomacy-gr-policies'::text),
-      ('kma-school-professional-continuing-education'::text, 'master-city-governance-policy'::text),
-      ('kma-school-professional-continuing-education'::text, 'master-education-management'::text),
-      ('faculty-economics'::text, 'economics'::text),
-      ('faculty-economics'::text, 'finance-banking-insurance'::text),
-      ('faculty-economics'::text, 'management'::text),
-      ('faculty-economics'::text, 'marketing'::text),
-      ('faculty-economics'::text, 'master-economics'::text),
-      ('faculty-economics'::text, 'master-international-business'::text),
-      ('faculty-economics'::text, 'master-finance-banking-insurance'::text),
-      ('faculty-economics'::text, 'master-business-development-management-consulting'::text),
-      ('faculty-economics'::text, 'master-marketing'::text),
-      ('faculty-social-sciences-social-technologies'::text, 'political-science'::text),
-      ('faculty-social-sciences-social-technologies'::text, 'sociology'::text),
-      ('faculty-social-sciences-social-technologies'::text, 'public-relations'::text),
-      ('faculty-social-sciences-social-technologies'::text, 'master-anticorruption-studies'::text),
-      ('faculty-social-sciences-social-technologies'::text, 'master-political-science'::text),
-      ('faculty-social-sciences-social-technologies'::text, 'master-sociology'::text),
-      ('faculty-social-sciences-social-technologies'::text, 'master-journalism'::text),
-      ('faculty-social-sciences-social-technologies'::text, 'master-public-relations'::text),
-      ('faculty-law'::text, 'law'::text),
-      ('faculty-law'::text, 'master-law'::text),
-      ('faculty-humanities'::text, 'history'::text),
-      ('faculty-humanities'::text, 'archaeology'::text),
-      ('faculty-humanities'::text, 'philosophy'::text),
-      ('faculty-humanities'::text, 'english-and-ukrainian-language'::text),
-      ('faculty-humanities'::text, 'language-literature-comparative-studies'::text),
-      ('faculty-humanities'::text, 'cultural-studies'::text),
-      ('faculty-humanities'::text, 'master-judaic-studies'::text),
-      ('faculty-humanities'::text, 'master-history'::text),
-      ('faculty-humanities'::text, 'master-archaeology'::text),
-      ('faculty-humanities'::text, 'master-philosophy'::text),
-      ('faculty-humanities'::text, 'master-ukrainian-comparative-psycholinguistics'::text),
-      ('faculty-humanities'::text, 'master-english-ukrainian-languages-communication'::text),
-      ('faculty-humanities'::text, 'master-literary-theory-history-comparative-studies'::text),
-      ('faculty-humanities'::text, 'master-mohyla-cultural-studies'::text),
-      ('faculty-international-relations-governance'::text, 'international-relations-public-communications-regional-studies'::text),
-      ('faculty-international-relations-governance'::text, 'public-private-governance'::text),
-      ('faculty-international-relations-governance'::text, 'master-international-relations-public-communications-regional-studies'::text),
-      ('faculty-international-relations-governance'::text, 'master-russian-studies-international-security-challenges'::text),
-      ('faculty-international-relations-governance'::text, 'master-public-policy-governance'::text),
-      ('faculty-natural-sciences'::text, 'biology-biotechnology'::text),
-      ('faculty-natural-sciences'::text, 'ecology'::text),
-      ('faculty-natural-sciences'::text, 'chemistry'::text),
-      ('faculty-natural-sciences'::text, 'rocket-aerospace-systems-physics'::text),
-      ('faculty-natural-sciences'::text, 'master-molecular-biology'::text),
-      ('faculty-natural-sciences'::text, 'master-ecology-environmental-protection'::text),
-      ('faculty-natural-sciences'::text, 'master-chemistry'::text),
-      ('faculty-natural-sciences'::text, 'master-physics-aerodynamic-systems-modeling'::text),
-      ('faculty-informatics'::text, 'applied-mathematics'::text),
-      ('faculty-informatics'::text, 'big-data-analytics'::text),
-      ('faculty-informatics'::text, 'software-engineering'::text),
-      ('faculty-informatics'::text, 'computer-science'::text),
-      ('faculty-informatics'::text, 'information-systems-vulnerability-analysis'::text),
-      ('faculty-informatics'::text, 'automation-computer-integrated-technologies-robotics'::text),
-      ('faculty-informatics'::text, 'master-applied-mathematics'::text),
-      ('faculty-informatics'::text, 'master-software-engineering'::text),
-      ('faculty-informatics'::text, 'master-computer-science'::text),
-      ('faculty-health-social-work-psychology'::text, 'psychology'::text),
-      ('faculty-health-social-work-psychology'::text, 'social-work'::text),
-      ('faculty-health-social-work-psychology'::text, 'medicine'::text),
-      ('faculty-health-social-work-psychology'::text, 'master-healthcare-management'::text),
-      ('faculty-health-social-work-psychology'::text, 'master-psychology'::text),
-      ('faculty-health-social-work-psychology'::text, 'master-public-health'::text),
-      ('faculty-health-social-work-psychology'::text, 'master-social-work'::text),
-      ('liberal-arts-studies-center'::text, 'mohyla-trivium-liberal-arts-sciences'::text)
-  $$,
-  'production programs belong to their expected faculties'
-);
-
-select is(
-  (
-    select count(*)::integer
-    from public.faculties
-    where slug like 'development-%'
-      and is_active
-  ) + (
-    select count(*)::integer
-    from public.academic_programs
-    where slug like 'development-%'
-      and is_active
   ),
   0,
-  'development-reference faculty and program rows are inactive'
+  'excluded non-product academic units are not active/selectable'
+);
+
+select results_eq(
+  $$
+    select f.slug, ap.display_name, ap.sort_order
+    from public.academic_programs ap
+    join public.faculties f on f.id = ap.faculty_id
+    join expected_faculties ef on ef.slug = f.slug
+    where ap.is_active
+    order by f.sort_order, ap.sort_order
+  $$,
+  $$
+    select faculty_slug, display_name, sort_order
+    from expected_programs
+    order by (
+      select ef.sort_order from expected_faculties ef where ef.slug = faculty_slug
+    ), sort_order
+  $$,
+  'active production academic programs match the approved faculty-specialty mapping'
+);
+
+select is(
+  (
+    select count(*)::integer
+    from public.academic_programs ap
+    join public.faculties f on f.id = ap.faculty_id
+    join expected_faculties ef on ef.slug = f.slug
+    where ap.is_active
+  ),
+  28,
+  'there are exactly 28 approved active faculty-specialty rows'
+);
+
+select is_empty(
+  $$
+    select f.slug, lower(trim(ap.display_name)), count(*)
+    from public.academic_programs ap
+    join public.faculties f on f.id = ap.faculty_id
+    join expected_faculties ef on ef.slug = f.slug
+    where ap.is_active
+    group by f.slug, lower(trim(ap.display_name))
+    having count(*) > 1
+  $$,
+  'there are no duplicate active specialties within the same faculty'
+);
+
+select results_eq(
+  $$
+    select ap.display_name
+    from public.academic_programs ap
+    join public.faculties f on f.id = ap.faculty_id
+    where ap.is_active
+      and f.slug = 'faculty-economics'
+    order by ap.sort_order
+  $$,
+  $$
+    values
+      ('Економіка'::text),
+      ('Фінанси, банківська справа та страхування'::text),
+      ('Менеджмент'::text),
+      ('Маркетинг'::text)
+  $$,
+  'Faculty of Economics exposes exactly the approved deduplicated programs'
+);
+
+select results_eq(
+  $$
+    select ap.display_name
+    from public.academic_programs ap
+    join public.faculties f on f.id = ap.faculty_id
+    where ap.is_active
+      and f.slug = 'faculty-informatics'
+    order by ap.sort_order
+  $$,
+  $$
+    values
+      ('Прикладна математика'::text),
+      ('Інженерія програмного забезпечення'::text),
+      ('Комп''ютерні науки'::text),
+      ('Системний аналіз'::text)
+  $$,
+  'Faculty of Informatics exposes exactly the approved deduplicated programs'
+);
+
+select is_empty(
+  $$
+    select ap.slug
+    from public.academic_programs ap
+    where ap.is_active
+      and ap.slug in (
+        'master-economics',
+        'master-finance-banking-insurance',
+        'master-marketing',
+        'master-computer-science',
+        'political-leadership-economic-diplomacy',
+        'master-economic-diplomacy-gr-policies',
+        'mohyla-trivium-liberal-arts-sciences',
+        'public-private-governance'
+      )
+  $$,
+  'legacy master/extra production program rows are not active'
+);
+
+select is_empty(
+  $$
+    select ape.academic_program_id
+    from public.academic_program_expertise ape
+    join public.academic_programs ap on ap.id = ape.academic_program_id
+    where not ap.is_active
+      and ap.slug not like 'phase%'
+      and ap.slug not like 'development-%'
+  $$,
+  'academic program expertise mappings were remapped away from inactive duplicate rows'
 );
 
 select * from finish();

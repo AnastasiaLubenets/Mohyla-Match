@@ -86,8 +86,6 @@ function searchableText(profile: FacultyDiscoveryProfile) {
       program.facultyName,
       program.name,
       program.slug,
-      program.specialtyCode,
-      program.studyLevel,
     ]),
     ...profile.expertise.flatMap((expertise) => [
       expertise.category,

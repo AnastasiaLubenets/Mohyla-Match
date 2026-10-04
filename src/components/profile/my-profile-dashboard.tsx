@@ -544,12 +544,7 @@ export function MyAccountCard({
 }
 
 function facultyProgramLabels(profile: SafeProfile) {
-  return profile.academicPrograms.map((program) => {
-    const level = program.studyLevel === "master" ? "Master" : "Bachelor";
-    const specialty = program.specialtyCode ? `${program.specialtyCode} · ` : "";
-
-    return `${specialty}${program.name} (${level})`;
-  });
+  return profile.academicPrograms.map((program) => program.name);
 }
 
 function FacultyProfileDashboard({

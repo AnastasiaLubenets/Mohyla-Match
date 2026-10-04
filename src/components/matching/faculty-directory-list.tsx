@@ -96,13 +96,6 @@ function FacultyRow({
         </div>
         <p className="mt-1 text-sm font-semibold text-blue-800">
           {primaryProgram?.name ?? profile.primaryAcademicProgramName}
-          {primaryProgram?.studyLevel ? (
-            <>
-              {" "}
-              <span aria-hidden="true">•</span>{" "}
-              {primaryProgram.studyLevel === "master" ? "Master" : "Bachelor"}
-            </>
-          ) : null}
         </p>
         <p className="mt-0.5 text-sm font-medium text-blue-700/80">
           {profile.facultyName}
