@@ -444,7 +444,7 @@ async function loadOnboardingTaxonomy() {
     await service
       .from("academic_programs")
       .select("id,faculty_id,avatar_variant_key")
-      .eq("slug", "history")
+      .eq("slug", "history-archaeology")
       .single(),
     "load other faculty program",
   );
