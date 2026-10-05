@@ -56,7 +56,11 @@ function ProfileStatusMessage({
 }
 
 function profileSource(value?: string) {
-  return value === "saved" ? "saved" : "discover";
+  if (value === "faculty" || value === "saved") {
+    return value;
+  }
+
+  return "discover";
 }
 
 export default async function StudentProfilePage({
@@ -77,8 +81,18 @@ export default async function StudentProfilePage({
 
   const source = profileSource(firstParam(pageParams.from));
   const status = firstParam(pageParams.status);
-  const backHref = source === "saved" ? "/saved" : "/app";
-  const backLabel = source === "saved" ? "Back to saved" : "Back to discover";
+  const backHref =
+    source === "saved"
+      ? "/saved"
+      : source === "faculty"
+        ? "/app/faculty"
+        : "/app";
+  const backLabel =
+    source === "saved"
+      ? "Back to saved"
+      : source === "faculty"
+        ? "Back to faculty"
+        : "Back to discover";
   const returnTo = `/profiles/${userId}?from=${source}`;
   const supabase = await createSupabaseServerClient();
   const [profileResult, statusResult, currentProfileResult] = await Promise.all([
@@ -99,7 +113,13 @@ export default async function StudentProfilePage({
 
   return (
     <AppChrome
-      active={source === "saved" ? "saved" : "discover"}
+      active={
+        source === "saved"
+          ? "saved"
+          : source === "faculty"
+            ? "faculty"
+            : "discover"
+      }
       currentProfile={currentProfile}
       toast={saveStatusToast(status)}
     >

@@ -74,8 +74,7 @@ export function FacultyFilterForm({
   }
 
   return (
-    <form action="/app" className="mt-4 space-y-3" ref={formRef}>
-      <input name="audience" type="hidden" value="faculty" />
+    <form action="/app/faculty" className="mt-4 space-y-3" ref={formRef}>
       {draftFilters.searchQuery ? (
         <input name="q" type="hidden" value={draftFilters.searchQuery} />
       ) : null}

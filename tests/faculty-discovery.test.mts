@@ -10,10 +10,6 @@ import {
   filterFacultyDiscoveryProfiles,
   hasActiveFacultyDiscoveryFilters,
 } from "../src/lib/matching/faculty-discovery-filters.ts";
-import {
-  createDiscoveryAudience,
-  discoveryAudienceHref,
-} from "../src/lib/matching/discovery-view.ts";
 
 const root = process.cwd();
 const migration = readFileSync(
@@ -131,24 +127,67 @@ test("faculty filter options are deduplicated and empty filters are inactive", (
   ]);
 });
 
-test("discovery audience links preserve filters without mixing student view state into faculty", () => {
-  const query = {
-    goal: "build-an-mvp",
-    program: ["Computer Science", "Economics"],
-    q: "research",
-    view: "all",
-  };
+test("faculty discovery has its own sidebar route and keeps student discover separate", () => {
+  const appPage = readFileSync(join(root, "src/app/app/page.tsx"), "utf8");
+  const facultyPage = readFileSync(
+    join(root, "src/app/app/faculty/page.tsx"),
+    "utf8",
+  );
+  const sidebar = readFileSync(
+    join(root, "src/components/matching/app-chrome.tsx"),
+    "utf8",
+  );
+  const facultyFilterForm = readFileSync(
+    join(root, "src/components/matching/faculty-filter-form.tsx"),
+    "utf8",
+  );
+  const facultyDirectoryList = readFileSync(
+    join(root, "src/components/matching/faculty-directory-list.tsx"),
+    "utf8",
+  );
+  const onboardingServer = readFileSync(
+    join(root, "src/lib/onboarding/server.ts"),
+    "utf8",
+  );
+  const profilePage = readFileSync(
+    join(root, "src/app/profiles/[userId]/page.tsx"),
+    "utf8",
+  );
 
-  assert.equal(createDiscoveryAudience("faculty"), "faculty");
-  assert.equal(createDiscoveryAudience(undefined), "students");
-  assert.equal(
-    discoveryAudienceHref(query, "faculty"),
-    "/app?audience=faculty&goal=build-an-mvp&program=Computer+Science&program=Economics&q=research",
+  assert.match(appPage, /<AppSidebar active="discover"/);
+  assert.match(appPage, /<DiscoveryViewTabs/);
+  assert.match(appPage, /Recommended/);
+  assert.match(appPage, /All students/);
+  assert.doesNotMatch(appPage, /loadFacultyDiscoveryProfiles/);
+  assert.doesNotMatch(appPage, /FacultyDirectoryList/);
+  assert.doesNotMatch(appPage, /FacultyFilterForm/);
+  assert.doesNotMatch(appPage, /DiscoveryAudienceTabs|audience=faculty/);
+
+  assert.match(facultyPage, /requireAccountState\("\/app\/faculty"/);
+  assert.match(facultyPage, /<AppSidebar active="faculty"/);
+  assert.match(facultyPage, /loadFacultyDiscoveryProfiles\(supabase\)/);
+  assert.match(facultyPage, /<FacultyDirectoryList/);
+  assert.match(facultyPage, /<FacultyFilterForm/);
+  assert.match(facultyPage, /Find the right faculty member\./);
+  assert.match(
+    facultyPage,
+    /Discover Mohyla faculty by expertise, academic field, and research\s+interests\./,
   );
-  assert.equal(
-    discoveryAudienceHref(query, "students"),
-    "/app?audience=students&goal=build-an-mvp&program=Computer+Science&program=Economics&q=research&view=all",
-  );
+  assert.doesNotMatch(facultyPage, /<DiscoveryViewTabs/);
+  assert.doesNotMatch(facultyPage, /Collaboration goal|Year of study|Looking-for skills/);
+
+  assert.match(sidebar, /href="\/app\/faculty"[\s\S]*?label="Faculty"/);
+  assert.match(sidebar, /active=\{active === "faculty"\}/);
+  assert.match(sidebar, /sm:grid-cols-4/);
+
+  assert.match(facultyFilterForm, /<form action="\/app\/faculty"/);
+  assert.doesNotMatch(facultyFilterForm, /name="audience"/);
+  assert.match(facultyDirectoryList, /from=faculty/);
+  assert.match(profilePage, /source === "faculty"\s*\?\s*"\/app\/faculty"/);
+  assert.match(profilePage, /Back to faculty/);
+  assert.match(profilePage, /source === "faculty"\s*\?\s*"faculty"/);
+  assert.match(onboardingServer, /redirectTo\(request, "\/app\/faculty"\)/);
+  assert.doesNotMatch(onboardingServer, /\/app\?audience=faculty/);
 });
 
 test("database migration keeps student and faculty discovery paths role-separated", () => {
