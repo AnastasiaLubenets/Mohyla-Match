@@ -68,6 +68,10 @@ a {
     mask-image: none;
   }
 
+  .landing-hero-section {
+    transform: translateY(-3.125rem);
+  }
+
   .landing-hero-copy {
     transform: translateX(-2rem);
   }
