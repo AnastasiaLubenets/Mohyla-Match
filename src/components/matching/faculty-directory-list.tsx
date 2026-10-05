@@ -60,7 +60,7 @@ function FacultyRow({
 }: Readonly<{
   profile: FacultyDiscoveryProfile;
 }>) {
-  const profileHref = `/profiles/${profile.userId}?from=discover`;
+  const profileHref = `/profiles/${profile.userId}?from=faculty`;
   const preview = bioPreview(profile.bio);
   const primaryProgram =
     profile.academicPrograms.find((program) => program.isPrimary) ??

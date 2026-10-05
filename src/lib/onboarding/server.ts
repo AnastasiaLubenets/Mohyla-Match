@@ -587,7 +587,7 @@ export async function completeFacultyOnboarding(request: NextRequest) {
     );
   }
 
-  return redirectTo(request, "/app?audience=faculty");
+  return redirectTo(request, "/app/faculty");
 }
 
 export async function saveSkillStep(

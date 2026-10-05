@@ -7,7 +7,7 @@ import type { ActionToast } from "@/lib/matching/action-toast";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import type { SafeProfile } from "@/lib/profile/data";
 
-export type NavKey = "discover" | "profile" | "saved";
+export type NavKey = "discover" | "faculty" | "profile" | "saved";
 
 const sidebarLogo = {
   alt: "Mohyla Match — go to Discover",
@@ -67,6 +67,24 @@ function BookmarkIcon() {
       viewBox="0 0 24 24"
     >
       <path d="M19 21 12 16 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z" />
+    </svg>
+  );
+}
+
+function GraduationCapIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <path d="M22 10 12 5 2 10l10 5 10-5Z" />
+      <path d="M6 12v5c3 2 9 2 12 0v-5" />
     </svg>
   );
 }
@@ -165,9 +183,16 @@ export function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
     <aside className="border-b border-blue-100 bg-white/90 px-4 py-4 backdrop-blur xl:flex xl:h-screen xl:min-h-0 xl:flex-col xl:overflow-hidden xl:border-b-0 xl:border-r xl:px-5 xl:py-5 2xl:py-6">
       <SidebarBrandLogo />
 
-      <nav className="mt-5 grid gap-2 sm:grid-cols-3 xl:grid-cols-1 2xl:mt-7">
+      <nav className="mt-5 grid gap-2 sm:grid-cols-4 xl:grid-cols-1 2xl:mt-7">
         <SidebarLink active={active === "discover"} href="/app" label="Discover">
           <CompassIcon />
+        </SidebarLink>
+        <SidebarLink
+          active={active === "faculty"}
+          href="/app/faculty"
+          label="Faculty"
+        >
+          <GraduationCapIcon />
         </SidebarLink>
         <SidebarLink active={active === "saved"} href="/saved" label="Saved">
           <BookmarkIcon />

@@ -25,7 +25,10 @@ test("discovery tab links preserve filters and search but drop transient status"
   assert.equal(
     discoveryViewHref(
       {
+        audience: "faculty",
         error: "action-failed",
+        expertise: "software-engineering",
+        faculty: "Faculty of Informatics",
         goal: ["build-app", "research-project"],
         program: ["Computer Science", "Economics"],
         q: "python",
