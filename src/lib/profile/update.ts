@@ -8,6 +8,11 @@ import {
   validateProfileUpdatePayload,
   type ProfileUpdatePayload,
 } from "@/lib/profile/update-payload";
+import {
+  getCustomAvatarSrc,
+  normalizeProfileAvatarMode,
+  type ProfileAvatarMode,
+} from "@/lib/profile/program-avatar";
 import { normalizeProfileSocialLinks } from "./social-links.ts";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
@@ -99,8 +104,10 @@ function readIdList(formData: FormData, fieldName: string): number[] {
 type FacultyProfileUpdatePayload = Readonly<{
   additionalAcademicProgramIds: number[];
   allowDirectContact: boolean;
+  avatarMode: ProfileAvatarMode;
   availability: string | null;
   bio: string | null;
+  customAvatarKey: string | null;
   expertiseIds: number[];
   fullName: string;
   primaryAcademicProgramId: number;
@@ -151,6 +158,63 @@ function readSocialLinks(formData: FormData): ProfileUpdatePayload["socialLinks"
   })).filter((link) => link.platform.trim() || link.url.trim());
 }
 
+function readAvatarPreference(formData: FormData): {
+  avatarMode: ProfileAvatarMode;
+  customAvatarKey: string | null;
+} {
+  const avatarMode = normalizeProfileAvatarMode(
+    readOptionalString(formData, "avatarMode"),
+  );
+  const customAvatarKey =
+    avatarMode === "custom"
+      ? readOptionalString(formData, "customAvatarKey")
+      : null;
+
+  return { avatarMode, customAvatarKey };
+}
+
+function validateAvatarPreference(
+  avatarMode: ProfileAvatarMode,
+  customAvatarKey: string | null,
+): ProfileUpdateSaveResult {
+  if (avatarMode === "custom" && !getCustomAvatarSrc(customAvatarKey)) {
+    return { error: "Choose an avatar.", ok: false };
+  }
+
+  return { ok: true };
+}
+
+async function saveAvatarPreference(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  avatarMode: ProfileAvatarMode,
+  customAvatarKey: string | null,
+): Promise<ProfileUpdateSaveResult> {
+  const validation = validateAvatarPreference(avatarMode, customAvatarKey);
+
+  if (!validation.ok) {
+    return validation;
+  }
+
+  const result = await supabase
+    .from("profiles")
+    .update({
+      avatar_mode: avatarMode,
+      custom_avatar_key: avatarMode === "custom" ? customAvatarKey : null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", userId);
+
+  if (result.error) {
+    return {
+      error: "We could not save your avatar preference. Try again.",
+      ok: false,
+    };
+  }
+
+  return { ok: true };
+}
+
 export async function saveProfileUpdate(
   supabase: SupabaseClient<Database>,
   payload: ProfileUpdatePayload,
@@ -159,6 +223,15 @@ export async function saveProfileUpdate(
 
   if (!validation.ok) {
     return validation;
+  }
+
+  const avatarValidation = validateAvatarPreference(
+    payload.avatarMode,
+    payload.customAvatarKey,
+  );
+
+  if (!avatarValidation.ok) {
+    return avatarValidation;
   }
 
   const normalizedSocialLinks = normalizeProfileSocialLinks(payload.socialLinks);
@@ -196,6 +269,17 @@ export async function saveProfileUpdate(
       error: "We could not save your profile. Check your selections.",
       ok: false,
     };
+  }
+
+  const avatarResult = await saveAvatarPreference(
+    supabase,
+    userId,
+    payload.avatarMode,
+    payload.customAvatarKey,
+  );
+
+  if (!avatarResult.ok) {
+    return avatarResult;
   }
 
   const deleteResult = await supabase
@@ -241,6 +325,25 @@ async function saveFacultyProfileUpdate(
     return validation;
   }
 
+  const avatarValidation = validateAvatarPreference(
+    payload.avatarMode,
+    payload.customAvatarKey,
+  );
+
+  if (!avatarValidation.ok) {
+    return avatarValidation;
+  }
+
+  const userResult = await supabase.auth.getUser();
+  const userId = userResult.data.user?.id ?? null;
+
+  if (userResult.error || !userId) {
+    return {
+      error: "We could not save your faculty profile. Sign in and try again.",
+      ok: false,
+    };
+  }
+
   const result = await supabase.rpc("update_faculty_profile", {
     additional_academic_program_ids: payload.additionalAcademicProgramIds,
     expertise_ids: payload.expertiseIds,
@@ -259,6 +362,17 @@ async function saveFacultyProfileUpdate(
     };
   }
 
+  const avatarResult = await saveAvatarPreference(
+    supabase,
+    userId,
+    payload.avatarMode,
+    payload.customAvatarKey,
+  );
+
+  if (!avatarResult.ok) {
+    return avatarResult;
+  }
+
   return { ok: true };
 }
 
@@ -271,14 +385,17 @@ export async function updateMyProfile(request: NextRequest) {
   }
 
   if (formData.get("profileRole") === "faculty") {
+    const avatarPreference = readAvatarPreference(formData);
     const facultyPayload: FacultyProfileUpdatePayload = {
       additionalAcademicProgramIds: readIdList(
         formData,
         "additionalAcademicProgramId",
       ),
       allowDirectContact: formData.get("allowDirectContact") === "on",
+      avatarMode: avatarPreference.avatarMode,
       availability: readOptionalString(formData, "availability"),
       bio: readOptionalString(formData, "bio"),
+      customAvatarKey: avatarPreference.customAvatarKey,
       expertiseIds: readIdList(formData, "expertiseId"),
       fullName: readRequiredString(formData, "fullName") ?? "",
       primaryAcademicProgramId:
@@ -300,6 +417,7 @@ export async function updateMyProfile(request: NextRequest) {
   const payload: ProfileUpdatePayload = {
     academicProgramId: readRequiredInteger(formData, "academicProgramId") ?? 0,
     allowDirectContact: formData.get("allowDirectContact") === "on",
+    ...readAvatarPreference(formData),
     availability: readOptionalString(formData, "availability"),
     bio: readOptionalString(formData, "bio"),
     collaborationGoalIds: readIdList(formData, "collaborationGoalId"),

@@ -2,13 +2,16 @@ import {
   normalizeProfileSocialLinks,
   type ProfileSocialLinkInput,
 } from "./social-links.ts";
+import type { ProfileAvatarMode } from "@/lib/profile/program-avatar";
 
 export type ProfileUpdatePayload = Readonly<{
   academicProgramId: number;
   allowDirectContact: boolean;
+  avatarMode: ProfileAvatarMode;
   availability: string | null;
   bio: string | null;
   collaborationGoalIds: number[];
+  customAvatarKey: string | null;
   facultyId: number;
   fullName: string;
   interestIds: number[];

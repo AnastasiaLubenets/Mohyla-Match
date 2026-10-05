@@ -74,6 +74,9 @@ export function ProfileDetails({
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
           <SystemAvatar
             availability={profile.availability}
+            avatarMode={profile.avatarMode}
+            avatarVariantKey={profile.academicProgramAvatarVariantKey}
+            customAvatarKey={profile.customAvatarKey}
             facultyName={profile.facultyName}
             fullName={profile.fullName}
             programName={profile.academicProgramName}

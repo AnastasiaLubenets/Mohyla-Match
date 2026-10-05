@@ -5,6 +5,7 @@ import { ProfileEditForm } from "@/components/profile/profile-edit-form";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import { requireAccountState } from "@/lib/auth/guards";
 import { loadProfileEditData } from "@/lib/profile/data";
+import type { ProfileAvatarMode } from "@/lib/profile/program-avatar";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -40,9 +41,21 @@ function SearchIcon() {
 }
 
 function EditorTopBar({
+  academicProgramName,
+  availability,
+  avatarMode,
+  avatarVariantKey,
+  customAvatarKey,
+  facultyName,
   fullName,
   systemAvatarKey,
 }: Readonly<{
+  academicProgramName: string | null;
+  availability: string | null;
+  avatarMode: ProfileAvatarMode;
+  avatarVariantKey: string | null;
+  customAvatarKey: string | null;
+  facultyName: string | null;
   fullName: string;
   systemAvatarKey: string;
 }>) {
@@ -93,7 +106,13 @@ function EditorTopBar({
             href="/profile"
           >
             <SystemAvatar
+              availability={availability}
+              avatarMode={avatarMode}
+              avatarVariantKey={avatarVariantKey}
+              customAvatarKey={customAvatarKey}
+              facultyName={facultyName}
               fullName={fullName}
+              programName={academicProgramName}
               size="sm"
               systemAvatarKey={systemAvatarKey}
             />
@@ -139,16 +158,29 @@ export default async function EditProfilePage({ searchParams }: PageProps) {
     notFound();
   }
 
+  const editData = profileData.data;
   const error = firstParam(params.error);
+  const topBarProgram = editData.programs.find(
+    (program) => program.id === editData.profile.academic_program_id,
+  );
+  const topBarFaculty = editData.faculties.find(
+    (faculty) => faculty.id === editData.profile.faculty_id,
+  );
 
   return (
     <main className="min-h-screen bg-[#eef6fb] text-blue-950 lg:flex lg:h-screen lg:flex-col lg:overflow-hidden">
       <EditorTopBar
-        fullName={profileData.data.profile.full_name}
-        systemAvatarKey={profileData.data.profile.system_avatar_key}
+        academicProgramName={topBarProgram?.display_name ?? null}
+        availability={editData.profile.availability}
+        avatarMode={editData.profile.avatar_mode}
+        avatarVariantKey={topBarProgram?.avatar_variant_key ?? null}
+        customAvatarKey={editData.profile.custom_avatar_key}
+        facultyName={topBarFaculty?.display_name ?? null}
+        fullName={editData.profile.full_name}
+        systemAvatarKey={editData.profile.system_avatar_key}
       />
       <section className="scrollbar-hidden mx-auto w-full max-w-[96rem] px-4 py-6 sm:px-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:py-8">
-        <ProfileEditForm data={profileData.data} error={error} />
+        <ProfileEditForm data={editData} error={error} />
       </section>
     </main>
   );

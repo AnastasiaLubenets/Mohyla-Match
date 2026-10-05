@@ -4,6 +4,10 @@ import {
   buildSupportedYearOptions,
   type DiscoveryFilterOptions,
 } from "@/lib/matching/discovery-filters";
+import {
+  normalizeProfileAvatarMode,
+  type ProfileAvatarMode,
+} from "@/lib/profile/program-avatar";
 import type { Database, Json } from "@/types/database";
 
 type SupabaseServerClient = SupabaseClient<Database>;
@@ -40,8 +44,10 @@ export type FacultyExpertiseItem = Readonly<{
 
 export type FacultyDiscoveryProfile = Readonly<{
   academicPrograms: FacultyProgramItem[];
+  avatarMode: ProfileAvatarMode;
   availability: string | null;
   bio: string | null;
+  customAvatarKey: string | null;
   expertise: FacultyExpertiseItem[];
   facultyName: string;
   fullName: string;
@@ -54,10 +60,12 @@ export type FacultyDiscoveryProfile = Readonly<{
 
 export type DiscoveryCandidate = Readonly<{
   academicProgramName: string;
+  avatarMode: ProfileAvatarMode;
   availability: string | null;
   bio: string | null;
   collaborationGoals: MatchingItem[];
   compatibilityScore: number;
+  customAvatarKey: string | null;
   facultyName: string;
   fullName: string;
   interests: MatchingItem[];
@@ -75,10 +83,12 @@ export type DiscoveryCandidate = Readonly<{
 
 export type MatchSummary = Readonly<{
   academicProgramName: string;
+  avatarMode: ProfileAvatarMode;
   availability: string | null;
   bio: string | null;
   canDirectContact: boolean;
   collaborationGoals: MatchingItem[];
+  customAvatarKey: string | null;
   facultyName: string;
   fullName: string;
   interests: MatchingItem[];
@@ -93,10 +103,12 @@ export type MatchSummary = Readonly<{
 
 export type SavedProfileSummary = Readonly<{
   academicProgramName: string;
+  avatarMode: ProfileAvatarMode;
   availability: string | null;
   bio: string | null;
   canDirectContact: boolean;
   collaborationGoals: MatchingItem[];
+  customAvatarKey: string | null;
   facultyName: string;
   fullName: string;
   interests: MatchingItem[];
@@ -120,6 +132,16 @@ type LoadResult<T> = Readonly<{
   data: T | null;
   error: boolean;
 }>;
+
+type AvatarPreference = Readonly<{
+  avatarMode: ProfileAvatarMode;
+  customAvatarKey: string | null;
+}>;
+
+const defaultAvatarPreference: AvatarPreference = {
+  avatarMode: "program",
+  customAvatarKey: null,
+};
 
 function uniqueFilterOptions(options: { label: string; value: string }[]) {
   return [...new Map(options.map((option) => [option.value, option])).values()];
@@ -252,6 +274,42 @@ function parseFacultyExpertiseItems(value: Json): FacultyExpertiseItem[] {
     .filter((item): item is FacultyExpertiseItem => Boolean(item));
 }
 
+async function loadAvatarPreferences(
+  supabase: SupabaseServerClient,
+  userIds: readonly string[],
+): Promise<{
+  error: boolean;
+  preferencesByUserId: Map<string, AvatarPreference>;
+}> {
+  const uniqueUserIds = [...new Set(userIds)];
+
+  if (uniqueUserIds.length === 0) {
+    return { error: false, preferencesByUserId: new Map() };
+  }
+
+  const result = await supabase
+    .from("profiles")
+    .select("user_id,avatar_mode,custom_avatar_key")
+    .in("user_id", uniqueUserIds);
+
+  if (result.error) {
+    return { error: true, preferencesByUserId: new Map() };
+  }
+
+  return {
+    error: false,
+    preferencesByUserId: new Map(
+      (result.data ?? []).map((profile) => [
+        profile.user_id,
+        {
+          avatarMode: normalizeProfileAvatarMode(profile.avatar_mode),
+          customAvatarKey: profile.custom_avatar_key,
+        },
+      ]),
+    ),
+  };
+}
+
 export async function loadDiscoveryCandidates(
   supabase: SupabaseServerClient,
   limit = 12,
@@ -264,8 +322,23 @@ export async function loadDiscoveryCandidates(
     return { data: null, error: true };
   }
 
+  const rows = result.data ?? [];
+  const avatarPreferences = await loadAvatarPreferences(
+    supabase,
+    rows.map((candidate) => candidate.user_id),
+  );
+
+  if (avatarPreferences.error) {
+    return { data: null, error: true };
+  }
+
   return {
-    data: (result.data ?? []).map(mapDiscoveryCandidate),
+    data: rows.map((candidate) =>
+      mapDiscoveryCandidate(
+        candidate,
+        avatarPreferences.preferencesByUserId.get(candidate.user_id),
+      ),
+    ),
     error: false,
   };
 }
@@ -275,13 +348,16 @@ type DiscoveryCandidateRow =
 
 function mapDiscoveryCandidate(
   candidate: DiscoveryCandidateRow,
+  avatarPreference: AvatarPreference = defaultAvatarPreference,
 ): DiscoveryCandidate {
   return {
     academicProgramName: candidate.academic_program_name,
+    avatarMode: avatarPreference.avatarMode,
     availability: candidate.availability,
     bio: candidate.bio,
     collaborationGoals: parseNamedItems(candidate.collaboration_goals),
     compatibilityScore: candidate.compatibility_score,
+    customAvatarKey: avatarPreference.customAvatarKey,
     facultyName: candidate.faculty_name,
     fullName: candidate.full_name,
     interests: parseNamedItems(candidate.interests),
@@ -312,8 +388,23 @@ export async function loadAllDiscoveryProfiles(
     return { data: null, error: true };
   }
 
+  const rows = result.data ?? [];
+  const avatarPreferences = await loadAvatarPreferences(
+    supabase,
+    rows.map((profile) => profile.user_id),
+  );
+
+  if (avatarPreferences.error) {
+    return { data: null, error: true };
+  }
+
   return {
-    data: (result.data ?? []).map(mapDiscoveryCandidate),
+    data: rows.map((profile) =>
+      mapDiscoveryCandidate(
+        profile,
+        avatarPreferences.preferencesByUserId.get(profile.user_id),
+      ),
+    ),
     error: false,
   };
 }
@@ -323,11 +414,14 @@ type FacultyDiscoveryRow =
 
 function mapFacultyDiscoveryProfile(
   profile: FacultyDiscoveryRow,
+  avatarPreference: AvatarPreference = defaultAvatarPreference,
 ): FacultyDiscoveryProfile {
   return {
     academicPrograms: parseFacultyProgramItems(profile.academic_programs),
+    avatarMode: avatarPreference.avatarMode,
     availability: profile.availability,
     bio: profile.bio,
+    customAvatarKey: avatarPreference.customAvatarKey,
     expertise: parseFacultyExpertiseItems(profile.expertise),
     facultyName: profile.faculty_name,
     fullName: profile.full_name,
@@ -351,8 +445,23 @@ export async function loadFacultyDiscoveryProfiles(
     return { data: null, error: true };
   }
 
+  const rows = result.data ?? [];
+  const avatarPreferences = await loadAvatarPreferences(
+    supabase,
+    rows.map((profile) => profile.user_id),
+  );
+
+  if (avatarPreferences.error) {
+    return { data: null, error: true };
+  }
+
   return {
-    data: (result.data ?? []).map(mapFacultyDiscoveryProfile),
+    data: rows.map((profile) =>
+      mapFacultyDiscoveryProfile(
+        profile,
+        avatarPreferences.preferencesByUserId.get(profile.user_id),
+      ),
+    ),
     error: false,
   };
 }
@@ -433,24 +542,42 @@ export async function loadMyMatches(
     return { data: null, error: true };
   }
 
+  const rows = result.data ?? [];
+  const avatarPreferences = await loadAvatarPreferences(
+    supabase,
+    rows.map((match) => match.user_id),
+  );
+
+  if (avatarPreferences.error) {
+    return { data: null, error: true };
+  }
+
   return {
-    data: (result.data ?? []).map((match) => ({
-      academicProgramName: match.academic_program_name,
-      availability: match.availability,
-      bio: match.bio,
-      canDirectContact: match.can_direct_contact,
-      collaborationGoals: parseNamedItems(match.collaboration_goals),
-      facultyName: match.faculty_name,
-      fullName: match.full_name,
-      interests: parseNamedItems(match.interests),
-      lookingForSkills: parseSkillItems(match.looking_for_skills),
-      matchId: match.match_id,
-      matchedAt: match.matched_at,
-      offeredSkills: parseSkillItems(match.offered_skills),
-      systemAvatarKey: match.system_avatar_key,
-      userId: match.user_id,
-      yearOfStudy: match.year_of_study,
-    })),
+    data: rows.map((match) => {
+      const avatarPreference =
+        avatarPreferences.preferencesByUserId.get(match.user_id) ??
+        defaultAvatarPreference;
+
+      return {
+        academicProgramName: match.academic_program_name,
+        avatarMode: avatarPreference.avatarMode,
+        availability: match.availability,
+        bio: match.bio,
+        canDirectContact: match.can_direct_contact,
+        collaborationGoals: parseNamedItems(match.collaboration_goals),
+        customAvatarKey: avatarPreference.customAvatarKey,
+        facultyName: match.faculty_name,
+        fullName: match.full_name,
+        interests: parseNamedItems(match.interests),
+        lookingForSkills: parseSkillItems(match.looking_for_skills),
+        matchId: match.match_id,
+        matchedAt: match.matched_at,
+        offeredSkills: parseSkillItems(match.offered_skills),
+        systemAvatarKey: match.system_avatar_key,
+        userId: match.user_id,
+        yearOfStudy: match.year_of_study,
+      };
+    }),
     error: false,
   };
 }
@@ -467,23 +594,41 @@ export async function loadSavedProfiles(
     return { data: null, error: true };
   }
 
+  const rows = result.data ?? [];
+  const avatarPreferences = await loadAvatarPreferences(
+    supabase,
+    rows.map((profile) => profile.user_id),
+  );
+
+  if (avatarPreferences.error) {
+    return { data: null, error: true };
+  }
+
   return {
-    data: (result.data ?? []).map((profile) => ({
-      academicProgramName: profile.academic_program_name,
-      availability: profile.availability,
-      bio: profile.bio,
-      canDirectContact: profile.can_direct_contact,
-      collaborationGoals: parseNamedItems(profile.collaboration_goals),
-      facultyName: profile.faculty_name,
-      fullName: profile.full_name,
-      interests: parseNamedItems(profile.interests),
-      lookingForSkills: parseSkillItems(profile.looking_for_skills),
-      offeredSkills: parseSkillItems(profile.offered_skills),
-      savedAt: profile.saved_at,
-      systemAvatarKey: profile.system_avatar_key,
-      userId: profile.user_id,
-      yearOfStudy: profile.year_of_study,
-    })),
+    data: rows.map((profile) => {
+      const avatarPreference =
+        avatarPreferences.preferencesByUserId.get(profile.user_id) ??
+        defaultAvatarPreference;
+
+      return {
+        academicProgramName: profile.academic_program_name,
+        avatarMode: avatarPreference.avatarMode,
+        availability: profile.availability,
+        bio: profile.bio,
+        canDirectContact: profile.can_direct_contact,
+        collaborationGoals: parseNamedItems(profile.collaboration_goals),
+        customAvatarKey: avatarPreference.customAvatarKey,
+        facultyName: profile.faculty_name,
+        fullName: profile.full_name,
+        interests: parseNamedItems(profile.interests),
+        lookingForSkills: parseSkillItems(profile.looking_for_skills),
+        offeredSkills: parseSkillItems(profile.offered_skills),
+        savedAt: profile.saved_at,
+        systemAvatarKey: profile.system_avatar_key,
+        userId: profile.user_id,
+        yearOfStudy: profile.year_of_study,
+      };
+    }),
     error: false,
   };
 }

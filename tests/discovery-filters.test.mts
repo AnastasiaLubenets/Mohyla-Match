@@ -16,12 +16,14 @@ function candidate(
 ): DiscoveryCandidate {
   return {
     academicProgramName: "Computer Science",
+    avatarMode: "program",
     availability: "Open to weekend projects",
     bio: "Building products for education.",
     collaborationGoals: [
       { id: 1, name: "Build an MVP", slug: "build-an-mvp" },
     ],
     compatibilityScore: 88,
+    customAvatarKey: null,
     facultyName: "Faculty of Informatics",
     fullName: "Maria K.",
     interests: [{ id: 1, name: "Education", slug: "education" }],

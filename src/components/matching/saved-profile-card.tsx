@@ -140,6 +140,8 @@ export function SavedProfileCard({
         >
           <SystemAvatar
             availability={profile.availability}
+            avatarMode={profile.avatarMode}
+            customAvatarKey={profile.customAvatarKey}
             facultyName={profile.facultyName}
             fullName={profile.fullName}
             programName={profile.academicProgramName}

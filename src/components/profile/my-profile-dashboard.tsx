@@ -565,6 +565,9 @@ function FacultyProfileDashboard({
         <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)_14rem] lg:items-start">
           <SystemAvatar
             availability={profile.availability}
+            avatarMode={profile.avatarMode}
+            avatarVariantKey={profile.academicProgramAvatarVariantKey}
+            customAvatarKey={profile.customAvatarKey}
             facultyName={profile.facultyName}
             fullName={profile.fullName}
             programName={profile.academicProgramName}
@@ -828,6 +831,9 @@ function StudentProfileDashboard({
         <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)_14rem] lg:items-start">
           <SystemAvatar
             availability={state.availability}
+            avatarMode={profile.avatarMode}
+            avatarVariantKey={profile.academicProgramAvatarVariantKey}
+            customAvatarKey={profile.customAvatarKey}
             facultyName={profile.facultyName}
             fullName={profile.fullName}
             programName={profile.academicProgramName}

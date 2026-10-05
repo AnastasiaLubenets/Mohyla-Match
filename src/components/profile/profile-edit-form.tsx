@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 
@@ -10,6 +11,12 @@ import {
   TaxonomyMultiSelect,
   type TaxonomyPickerOption,
 } from "@/components/profile/taxonomy-multi-select";
+import {
+  customAvatarOptions,
+  getCustomAvatarSrc,
+  normalizeProfileAvatarMode,
+  type ProfileAvatarMode,
+} from "@/lib/profile/program-avatar";
 import type { EditProfileData } from "@/lib/profile/data";
 import {
   formatSocialUrl,
@@ -29,6 +36,26 @@ type DraftSocialLink = Readonly<{
   platform: SocialPlatform;
   url: string;
 }>;
+
+const defaultCustomAvatarKey = customAvatarOptions[0]?.key ?? "avatar-01";
+
+function UserIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <path d="M20 21a8 8 0 0 0-16 0" />
+      <circle cx="12" cy="8" r="4" />
+    </svg>
+  );
+}
 
 function BarsIcon() {
   return (
@@ -62,6 +89,23 @@ function LinkIcon() {
     >
       <path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1" />
       <path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.1-1.1" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2.5"
+      viewBox="0 0 24 24"
+    >
+      <path d="m20 6-11 11-5-5" />
     </svg>
   );
 }
@@ -179,6 +223,210 @@ function programOptions(
     }));
 }
 
+function AvatarModeOption({
+  checked,
+  children,
+  label,
+  onChange,
+  value,
+}: Readonly<{
+  checked: boolean;
+  children: ReactNode;
+  label: string;
+  onChange: (value: ProfileAvatarMode) => void;
+  value: ProfileAvatarMode;
+}>) {
+  return (
+    <label
+      className={
+        checked
+          ? "flex cursor-pointer gap-4 rounded-lg border border-blue-300 bg-blue-50/70 p-4 ring-2 ring-blue-200"
+          : "flex cursor-pointer gap-4 rounded-lg border border-blue-100 bg-white p-4 transition hover:border-blue-200 hover:bg-blue-50/40"
+      }
+    >
+      <input
+        checked={checked}
+        className="mt-1 h-4 w-4 accent-blue-800"
+        name="avatarMode"
+        onChange={() => onChange(value)}
+        type="radio"
+        value={value}
+      />
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-bold text-blue-950">{label}</span>
+        <span className="mt-3 block">{children}</span>
+      </span>
+    </label>
+  );
+}
+
+function AvatarPickerSection({
+  availability,
+  avatarMode,
+  avatarVariantKey,
+  customAvatarKey,
+  facultyName,
+  fullName,
+  onAvatarModeChange,
+  onCustomAvatarKeyChange,
+  programName,
+  systemAvatarKey,
+}: Readonly<{
+  availability: string | null;
+  avatarMode: ProfileAvatarMode;
+  avatarVariantKey?: string | null;
+  customAvatarKey: string;
+  facultyName?: string | null;
+  fullName: string;
+  onAvatarModeChange: (mode: ProfileAvatarMode) => void;
+  onCustomAvatarKeyChange: (key: string) => void;
+  programName?: string | null;
+  systemAvatarKey: string;
+}>) {
+  return (
+    <section className="rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
+      <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)]">
+        <div>
+          <p className="text-sm font-bold text-blue-900">Avatar preview</p>
+          <div className="mt-3">
+            <SystemAvatar
+              availability={availability}
+              avatarMode={avatarMode}
+              avatarVariantKey={avatarVariantKey}
+              customAvatarKey={avatarMode === "custom" ? customAvatarKey : null}
+              facultyName={facultyName}
+              fullName={fullName}
+              programName={programName}
+              size="xl"
+              systemAvatarKey={systemAvatarKey}
+            />
+          </div>
+        </div>
+
+        <div className="min-w-0">
+          <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
+            <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
+              <UserIcon />
+            </span>
+            Avatar
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-blue-800/75">
+            Choose the avatar style shown across Discover, Saved and profiles.
+          </p>
+          <input
+            name="customAvatarKey"
+            type="hidden"
+            value={avatarMode === "custom" ? customAvatarKey : ""}
+          />
+
+          <div className="mt-4 grid gap-3 lg:grid-cols-3">
+            <AvatarModeOption
+              checked={avatarMode === "default"}
+              label="Default"
+              onChange={onAvatarModeChange}
+              value="default"
+            >
+              <SystemAvatar
+                availability={availability}
+                avatarMode="default"
+                facultyName={facultyName}
+                fullName={fullName}
+                programName={programName}
+                size="sm"
+                systemAvatarKey={systemAvatarKey}
+              />
+            </AvatarModeOption>
+
+            <AvatarModeOption
+              checked={avatarMode === "program"}
+              label="Academic program"
+              onChange={onAvatarModeChange}
+              value="program"
+            >
+              <div className="flex items-center gap-3">
+                <SystemAvatar
+                  availability={availability}
+                  avatarMode="program"
+                  avatarVariantKey={avatarVariantKey}
+                  facultyName={facultyName}
+                  fullName={fullName}
+                  programName={programName}
+                  size="sm"
+                  systemAvatarKey={systemAvatarKey}
+                />
+                <span className="min-w-0 text-xs font-semibold leading-5 text-blue-700">
+                  {programName ?? "Current program"}
+                </span>
+              </div>
+            </AvatarModeOption>
+
+            <AvatarModeOption
+              checked={avatarMode === "custom"}
+              label="Choose an avatar"
+              onChange={onAvatarModeChange}
+              value="custom"
+            >
+              <SystemAvatar
+                availability={availability}
+                avatarMode="custom"
+                customAvatarKey={customAvatarKey}
+                facultyName={facultyName}
+                fullName={fullName}
+                programName={programName}
+                size="sm"
+                systemAvatarKey={systemAvatarKey}
+              />
+            </AvatarModeOption>
+          </div>
+
+          <div
+            aria-label="Choose an avatar"
+            className="mt-4 grid grid-cols-5 gap-2 sm:grid-cols-8 lg:grid-cols-10"
+            role="group"
+          >
+            {customAvatarOptions.map((avatar, index) => {
+              const selected =
+                avatarMode === "custom" && avatar.key === customAvatarKey;
+
+              return (
+                <button
+                  aria-label={`Choose avatar ${index + 1}`}
+                  aria-pressed={selected}
+                  className={
+                    selected
+                      ? "relative aspect-square overflow-hidden rounded-[1.25rem] ring-2 ring-blue-700 ring-offset-2 ring-offset-white"
+                      : "relative aspect-square overflow-hidden rounded-[1.25rem] ring-1 ring-blue-100 transition hover:ring-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                  }
+                  key={avatar.key}
+                  onClick={() => {
+                    onAvatarModeChange("custom");
+                    onCustomAvatarKeyChange(avatar.key);
+                  }}
+                  type="button"
+                >
+                  <Image
+                    alt=""
+                    aria-hidden="true"
+                    className="h-full w-full object-cover"
+                    fill
+                    sizes="(min-width: 1024px) 4.25rem, 20vw"
+                    src={avatar.src}
+                  />
+                  {selected ? (
+                    <span className="absolute right-1 top-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-800 text-white">
+                      <CheckIcon />
+                    </span>
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function FacultyProfileEditForm({
   data,
   error,
@@ -218,6 +466,14 @@ function FacultyProfileEditForm({
   );
   const selectedFaculty = data.faculties.find(
     (faculty) => faculty.id === selectedFacultyId,
+  );
+  const [avatarMode, setAvatarMode] = useState(() =>
+    normalizeProfileAvatarMode(data.profile.avatar_mode),
+  );
+  const [customAvatarKey, setCustomAvatarKey] = useState(
+    getCustomAvatarSrc(data.profile.custom_avatar_key)
+      ? (data.profile.custom_avatar_key ?? defaultCustomAvatarKey)
+      : defaultCustomAvatarKey,
   );
   const availablePrograms = useMemo(
     () =>
@@ -317,132 +573,135 @@ function FacultyProfileEditForm({
         </div>
       ) : null}
 
+      <AvatarPickerSection
+        availability={data.profile.availability}
+        avatarMode={avatarMode}
+        avatarVariantKey={selectedProgram?.avatar_variant_key}
+        customAvatarKey={customAvatarKey}
+        facultyName={selectedFaculty?.display_name}
+        fullName={data.profile.full_name}
+        onAvatarModeChange={setAvatarMode}
+        onCustomAvatarKeyChange={setCustomAvatarKey}
+        programName={selectedProgram?.display_name}
+        systemAvatarKey={data.profile.system_avatar_key}
+      />
+
       <section className="rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
-        <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)]">
-          <SystemAvatar
-            availability={data.profile.availability}
-            avatarVariantKey={selectedProgram?.avatar_variant_key}
-            fullName={data.profile.full_name}
-            size="xl"
-            systemAvatarKey={data.profile.system_avatar_key}
-          />
+        <div className="grid gap-4 lg:grid-cols-2">
+          <label className="block">
+            <span className="text-sm font-bold text-blue-900">
+              Full name <span className="text-red-600">*</span>
+            </span>
+            <input
+              className={fieldClassName()}
+              defaultValue={data.profile.full_name}
+              maxLength={120}
+              minLength={2}
+              name="fullName"
+              required
+              type="text"
+            />
+          </label>
 
-          <div className="grid gap-4 lg:grid-cols-2">
-            <label className="block">
-              <span className="text-sm font-bold text-blue-900">
-                Full name <span className="text-red-600">*</span>
-              </span>
-              <input
-                className={fieldClassName()}
-                defaultValue={data.profile.full_name}
-                maxLength={120}
-                minLength={2}
-                name="fullName"
-                required
-                type="text"
-              />
-            </label>
-
-            <div className="rounded-md border border-blue-100 bg-blue-50/60 px-4 py-3">
-              <p className="text-sm font-bold text-blue-950">
-                Verification status
-              </p>
-              <p className="mt-1 text-sm font-semibold text-blue-700">
-                {data.profile.faculty_verification_status === "verified"
-                  ? "Verified"
-                  : "Unverified"}
-              </p>
-            </div>
-
-            <label className="block">
-              <span className="text-sm font-bold text-blue-900">
-                Faculty <span className="text-red-600">*</span>
-              </span>
-              <select
-                className={fieldClassName()}
-                name="facultyId"
-                onChange={(event) => handleFacultyChange(event.target.value)}
-                required
-                value={selectedFacultyId}
-              >
-                {data.faculties.map((faculty) => (
-                  <option key={faculty.id} value={faculty.id}>
-                    {faculty.display_name}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="block">
-              <span className="text-sm font-bold text-blue-900">
-                Primary academic program <span className="text-red-600">*</span>
-              </span>
-              <select
-                className={fieldClassName()}
-                disabled={availablePrograms.length === 0}
-                name="academicProgramId"
-                onChange={(event) =>
-                  handlePrimaryProgramChange(event.target.value)
-                }
-                required
-                value={selectedProgramId}
-              >
-                {availablePrograms.map((program) => (
-                  <option key={program.id} value={program.id}>
-                    {program.display_name}
-                  </option>
-                ))}
-              </select>
-              <span className="mt-1 block text-xs font-semibold text-blue-500">
-                {selectedFaculty?.display_name ?? "NaUKMA"}
-              </span>
-            </label>
-
-            <label className="block">
-              <span className="text-sm font-bold text-blue-900">
-                Availability
-              </span>
-              <input
-                className={fieldClassName()}
-                defaultValue={data.profile.availability ?? ""}
-                maxLength={160}
-                name="availability"
-                placeholder='e.g. office hours, "by appointment", online'
-                type="text"
-              />
-            </label>
-
-            <label className="flex items-start gap-3 rounded-md border border-blue-100 bg-blue-50/60 px-4 py-3">
-              <input
-                className="mt-1 h-4 w-4 accent-blue-800"
-                defaultChecked={data.profile.allow_direct_contact}
-                name="allowDirectContact"
-                type="checkbox"
-              />
-              <span>
-                <span className="block text-sm font-bold text-blue-950">
-                  Allow direct email contact
-                </span>
-                <span className="mt-1 block text-sm leading-6 text-blue-800/75">
-                  Email remains hidden unless a user explicitly requests it.
-                </span>
-              </span>
-            </label>
-
-            <label className="block lg:col-span-2">
-              <span className="text-sm font-bold text-blue-900">Bio</span>
-              <textarea
-                className="mt-2 min-h-28 w-full resize-y rounded-md border border-blue-200 bg-white px-4 py-3 text-sm font-medium leading-6 text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400"
-                maxLength={500}
-                name="bio"
-                onChange={(event) => setBioValue(event.target.value)}
-                value={bioValue}
-              />
-              <span className="mt-1 block text-right text-xs font-semibold text-blue-500">
-                {bioValue.length}/500
-              </span>
-            </label>
+          <div className="rounded-md border border-blue-100 bg-blue-50/60 px-4 py-3">
+            <p className="text-sm font-bold text-blue-950">
+              Verification status
+            </p>
+            <p className="mt-1 text-sm font-semibold text-blue-700">
+              {data.profile.faculty_verification_status === "verified"
+                ? "Verified"
+                : "Unverified"}
+            </p>
           </div>
+
+          <label className="block">
+            <span className="text-sm font-bold text-blue-900">
+              Faculty <span className="text-red-600">*</span>
+            </span>
+            <select
+              className={fieldClassName()}
+              name="facultyId"
+              onChange={(event) => handleFacultyChange(event.target.value)}
+              required
+              value={selectedFacultyId}
+            >
+              {data.faculties.map((faculty) => (
+                <option key={faculty.id} value={faculty.id}>
+                  {faculty.display_name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block">
+            <span className="text-sm font-bold text-blue-900">
+              Primary academic program <span className="text-red-600">*</span>
+            </span>
+            <select
+              className={fieldClassName()}
+              disabled={availablePrograms.length === 0}
+              name="academicProgramId"
+              onChange={(event) =>
+                handlePrimaryProgramChange(event.target.value)
+              }
+              required
+              value={selectedProgramId}
+            >
+              {availablePrograms.map((program) => (
+                <option key={program.id} value={program.id}>
+                  {program.display_name}
+                </option>
+              ))}
+            </select>
+            <span className="mt-1 block text-xs font-semibold text-blue-500">
+              {selectedFaculty?.display_name ?? "NaUKMA"}
+            </span>
+          </label>
+
+          <label className="block">
+            <span className="text-sm font-bold text-blue-900">
+              Availability
+            </span>
+            <input
+              className={fieldClassName()}
+              defaultValue={data.profile.availability ?? ""}
+              maxLength={160}
+              name="availability"
+              placeholder='e.g. office hours, "by appointment", online'
+              type="text"
+            />
+          </label>
+
+          <label className="flex items-start gap-3 rounded-md border border-blue-100 bg-blue-50/60 px-4 py-3">
+            <input
+              className="mt-1 h-4 w-4 accent-blue-800"
+              defaultChecked={data.profile.allow_direct_contact}
+              name="allowDirectContact"
+              type="checkbox"
+            />
+            <span>
+              <span className="block text-sm font-bold text-blue-950">
+                Allow direct email contact
+              </span>
+              <span className="mt-1 block text-sm leading-6 text-blue-800/75">
+                Email remains hidden unless a user explicitly requests it.
+              </span>
+            </span>
+          </label>
+
+          <label className="block lg:col-span-2">
+            <span className="text-sm font-bold text-blue-900">Bio</span>
+            <textarea
+              className="mt-2 min-h-28 w-full resize-y rounded-md border border-blue-200 bg-white px-4 py-3 text-sm font-medium leading-6 text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400"
+              maxLength={500}
+              name="bio"
+              onChange={(event) => setBioValue(event.target.value)}
+              value={bioValue}
+            />
+            <span className="mt-1 block text-right text-xs font-semibold text-blue-500">
+              {bioValue.length}/500
+            </span>
+          </label>
         </div>
       </section>
 
@@ -534,6 +793,14 @@ function StudentProfileEditForm({
   );
   const [bioValue, setBioValue] = useState(data.profile.bio ?? "");
   const [clientError, setClientError] = useState<string | null>(null);
+  const [avatarMode, setAvatarMode] = useState(() =>
+    normalizeProfileAvatarMode(data.profile.avatar_mode),
+  );
+  const [customAvatarKey, setCustomAvatarKey] = useState(
+    getCustomAvatarSrc(data.profile.custom_avatar_key)
+      ? (data.profile.custom_avatar_key ?? defaultCustomAvatarKey)
+      : defaultCustomAvatarKey,
+  );
   const availablePrograms = useMemo(
     () =>
       data.programs.filter(
@@ -651,137 +918,143 @@ function StudentProfileEditForm({
         </div>
       ) : null}
 
+      <AvatarPickerSection
+        availability={data.profile.availability}
+        avatarMode={avatarMode}
+        avatarVariantKey={selectedProgram?.avatar_variant_key}
+        customAvatarKey={customAvatarKey}
+        facultyName={
+          data.faculties.find((faculty) => faculty.id === selectedFacultyId)
+            ?.display_name
+        }
+        fullName={data.profile.full_name}
+        onAvatarModeChange={setAvatarMode}
+        onCustomAvatarKeyChange={setCustomAvatarKey}
+        programName={selectedProgram?.display_name}
+        systemAvatarKey={data.profile.system_avatar_key}
+      />
+
       <section className="rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
-        <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)]">
-          <SystemAvatar
-            availability={data.profile.availability}
-            avatarVariantKey={selectedProgram?.avatar_variant_key}
-            fullName={data.profile.full_name}
-            size="xl"
-            systemAvatarKey={data.profile.system_avatar_key}
-          />
+        <div className="grid gap-4 lg:grid-cols-3">
+          <label className="block">
+            <span className="text-sm font-bold text-blue-900">
+              Full name <span className="text-red-600">*</span>
+            </span>
+            <input
+              className={fieldClassName()}
+              defaultValue={data.profile.full_name}
+              maxLength={120}
+              minLength={2}
+              name="fullName"
+              required
+              type="text"
+            />
+          </label>
 
-          <div className="grid gap-4 lg:grid-cols-3">
-            <label className="block">
-              <span className="text-sm font-bold text-blue-900">
-                Full name <span className="text-red-600">*</span>
-              </span>
-              <input
-                className={fieldClassName()}
-                defaultValue={data.profile.full_name}
-                maxLength={120}
-                minLength={2}
-                name="fullName"
-                required
-                type="text"
-              />
-            </label>
+          <label className="block">
+            <span className="text-sm font-bold text-blue-900">
+              Faculty <span className="text-red-600">*</span>
+            </span>
+            <select
+              className={fieldClassName()}
+              name="facultyId"
+              onChange={(event) => handleFacultyChange(event.target.value)}
+              required
+              value={selectedFacultyId}
+            >
+              {data.faculties.map((faculty) => (
+                <option key={faculty.id} value={faculty.id}>
+                  {faculty.display_name}
+                </option>
+              ))}
+            </select>
+          </label>
 
-            <label className="block">
-              <span className="text-sm font-bold text-blue-900">
-                Faculty <span className="text-red-600">*</span>
-              </span>
-              <select
-                className={fieldClassName()}
-                name="facultyId"
-                onChange={(event) => handleFacultyChange(event.target.value)}
-                required
-                value={selectedFacultyId}
-              >
-                {data.faculties.map((faculty) => (
-                  <option key={faculty.id} value={faculty.id}>
-                    {faculty.display_name}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <label className="block">
+            <span className="text-sm font-bold text-blue-900">
+              Academic program <span className="text-red-600">*</span>
+            </span>
+            <select
+              className={fieldClassName()}
+              disabled={availablePrograms.length === 0}
+              name="academicProgramId"
+              onChange={(event) =>
+                setSelectedProgramId(Number(event.target.value))
+              }
+              required
+              value={selectedProgramId}
+            >
+              {availablePrograms.map((program) => (
+                <option key={program.id} value={program.id}>
+                  {program.display_name}
+                </option>
+              ))}
+            </select>
+          </label>
 
-            <label className="block">
-              <span className="text-sm font-bold text-blue-900">
-                Academic program <span className="text-red-600">*</span>
-              </span>
-              <select
-                className={fieldClassName()}
-                disabled={availablePrograms.length === 0}
-                name="academicProgramId"
-                onChange={(event) =>
-                  setSelectedProgramId(Number(event.target.value))
-                }
-                required
-                value={selectedProgramId}
-              >
-                {availablePrograms.map((program) => (
-                  <option key={program.id} value={program.id}>
-                    {program.display_name}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <label className="block">
+            <span className="text-sm font-bold text-blue-900">
+              Year of study <span className="text-red-600">*</span>
+            </span>
+            <select
+              className={fieldClassName()}
+              defaultValue={data.profile.year_of_study ?? ""}
+              name="yearOfStudy"
+              required
+            >
+              {[1, 2, 3, 4, 5, 6].map((year) => (
+                <option key={year} value={year}>
+                  {yearLabel(year)}
+                </option>
+              ))}
+            </select>
+          </label>
 
-            <label className="block">
-              <span className="text-sm font-bold text-blue-900">
-                Year of study <span className="text-red-600">*</span>
-              </span>
-              <select
-                className={fieldClassName()}
-                defaultValue={data.profile.year_of_study ?? ""}
-                name="yearOfStudy"
-                required
-              >
-                {[1, 2, 3, 4, 5, 6].map((year) => (
-                  <option key={year} value={year}>
-                    {yearLabel(year)}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <label className="block lg:col-span-2">
+            <span className="text-sm font-bold text-blue-900">
+              Availability
+            </span>
+            <input
+              className={fieldClassName()}
+              defaultValue={data.profile.availability ?? ""}
+              maxLength={160}
+              name="availability"
+              placeholder='e.g. hours per week, "evenings", or a short note'
+              type="text"
+            />
+          </label>
 
-            <label className="block lg:col-span-2">
-              <span className="text-sm font-bold text-blue-900">
-                Availability
-              </span>
-              <input
-                className={fieldClassName()}
-                defaultValue={data.profile.availability ?? ""}
-                maxLength={160}
-                name="availability"
-                placeholder='e.g. hours per week, "evenings", or a short note'
-                type="text"
-              />
-            </label>
+          <label className="block lg:col-span-3">
+            <span className="text-sm font-bold text-blue-900">Bio</span>
+            <textarea
+              className="mt-2 min-h-28 w-full resize-y rounded-md border border-blue-200 bg-white px-4 py-3 text-sm font-medium leading-6 text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400"
+              maxLength={500}
+              name="bio"
+              onChange={(event) => setBioValue(event.target.value)}
+              value={bioValue}
+            />
+            <span className="mt-1 block text-right text-xs font-semibold text-blue-500">
+              {bioValue.length}/500
+            </span>
+          </label>
 
-            <label className="block lg:col-span-3">
-              <span className="text-sm font-bold text-blue-900">Bio</span>
-              <textarea
-                className="mt-2 min-h-28 w-full resize-y rounded-md border border-blue-200 bg-white px-4 py-3 text-sm font-medium leading-6 text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400"
-                maxLength={500}
-                name="bio"
-                onChange={(event) => setBioValue(event.target.value)}
-                value={bioValue}
-              />
-              <span className="mt-1 block text-right text-xs font-semibold text-blue-500">
-                {bioValue.length}/500
+          <label className="flex items-start gap-3 rounded-md border border-blue-100 bg-blue-50/60 px-4 py-3 lg:col-span-3">
+            <input
+              className="mt-1 h-4 w-4 accent-blue-800"
+              defaultChecked={data.profile.allow_direct_contact}
+              name="allowDirectContact"
+              type="checkbox"
+            />
+            <span>
+              <span className="block text-sm font-bold text-blue-950">
+                Allow direct email contact
               </span>
-            </label>
-
-            <label className="flex items-start gap-3 rounded-md border border-blue-100 bg-blue-50/60 px-4 py-3 lg:col-span-3">
-              <input
-                className="mt-1 h-4 w-4 accent-blue-800"
-                defaultChecked={data.profile.allow_direct_contact}
-                name="allowDirectContact"
-                type="checkbox"
-              />
-              <span>
-                <span className="block text-sm font-bold text-blue-950">
-                  Allow direct email contact
-                </span>
-                <span className="mt-1 block text-sm leading-6 text-blue-800/75">
-                  Other Mohyla Match students can request and copy your student
-                  email after an explicit Get email click.
-                </span>
+              <span className="mt-1 block text-sm leading-6 text-blue-800/75">
+                Other Mohyla Match students can request and copy your student
+                email after an explicit Get email click.
               </span>
-            </label>
-          </div>
+            </span>
+          </label>
         </div>
       </section>
 
