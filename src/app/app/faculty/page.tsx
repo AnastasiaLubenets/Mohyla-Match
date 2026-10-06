@@ -97,7 +97,7 @@ function FacultyHiddenFilterInputs({
 function FacultyHero() {
   return (
     <header className="mb-6 text-center">
-      <h1 className="font-serif text-6xl font-bold leading-[0.92] text-blue-950 sm:text-7xl 2xl:text-8xl">
+      <h1 className="font-serif text-[clamp(2.5rem,5vw,3.5rem)] font-bold leading-[0.98] text-blue-950">
         Find the right faculty member.
       </h1>
       <p className="mx-auto mt-5 max-w-3xl text-lg leading-7 text-blue-900/75">
@@ -145,25 +145,6 @@ function FacultyDiscoveryFilterRail({
         </p>
 
         <FacultyFilterForm filters={filters} options={options} />
-      </section>
-
-      <section className="rounded-lg border border-blue-50 bg-[#fffaf0] p-7">
-        <p className="font-serif text-6xl font-bold leading-none text-blue-800">
-          &quot;
-        </p>
-        <p className="mt-1 font-serif text-3xl font-semibold italic leading-[1.02] text-blue-950">
-          Explore expertise across Mohyla programs and academic teams.
-        </p>
-        <div className="mt-6 h-px w-16 bg-blue-300" />
-        <p className="mt-5 text-xs font-bold uppercase tracking-[0.22em] text-blue-500">
-          Faculty
-          <br />
-          Programs
-          <br />
-          Research
-          <br />
-          Expertise
-        </p>
       </section>
     </aside>
   );
