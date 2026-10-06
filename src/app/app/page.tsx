@@ -292,7 +292,7 @@ export default async function AppPage({ searchParams }: PageProps) {
                 className="rounded-lg border border-blue-50 bg-[#fffaf0] bg-cover bg-center bg-no-repeat p-7"
                 style={{
                   backgroundImage:
-                    "url('/branding/mohyla-quote-architecture.png')",
+                    "url('/branding/mohyla-quote-architecture-v2.png')",
                   backgroundPosition: "center bottom",
                 }}
               >

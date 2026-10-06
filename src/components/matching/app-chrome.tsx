@@ -12,13 +12,13 @@ export type NavKey = "discover" | "faculty" | "profile" | "saved";
 const sidebarLogo = {
   alt: "Mohyla Match — go to Discover",
   height: 657,
-  src: "/branding/mohyla-match-logo.png",
+  src: "/branding/mohyla-match-logo-v2.png",
   width: 1920,
 } as const;
 
 const sidebarBuilding = {
   height: 1620,
-  src: "/branding/mohyla-building.png",
+  src: "/branding/mohyla-building-v2.png",
   width: 971,
 } as const;
 
@@ -329,7 +329,7 @@ export function BrandQuoteCard({
     <section
       className="rounded-lg border border-blue-50 bg-[#fffaf0] bg-cover bg-center bg-no-repeat p-7"
       style={{
-        backgroundImage: "url('/branding/mohyla-quote-architecture.png')",
+        backgroundImage: "url('/branding/mohyla-quote-architecture-v2.png')",
         backgroundPosition: "center bottom",
       }}
     >
