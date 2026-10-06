@@ -395,6 +395,9 @@ export function FullStudentProfile({
         <div className="grid gap-6 pr-0 md:grid-cols-[14rem_minmax(0,1fr)] md:pr-24 xl:grid-cols-[15rem_minmax(0,1fr)]">
           <SystemAvatar
             availability={profile.availability}
+            avatarMode={profile.avatarMode}
+            avatarVariantKey={profile.academicProgramAvatarVariantKey}
+            customAvatarKey={profile.customAvatarKey}
             facultyName={profile.facultyName}
             fullName={profile.fullName}
             programName={profile.academicProgramName}

@@ -2,17 +2,20 @@ import Image from "next/image";
 
 import {
   getProgramAvatarContainerClasses,
-  getProgramAvatarSrc,
   programAvatarImageClasses,
+  resolveProfileAvatar,
   systemAvatarRadiusClasses,
   systemAvatarSizeClasses,
+  type ProfileAvatarMode,
   type SystemAvatarRadius,
   type SystemAvatarSize,
 } from "@/lib/profile/program-avatar";
 
 type SystemAvatarProps = Readonly<{
   availability?: string | null;
+  avatarMode?: ProfileAvatarMode | string | null;
   avatarVariantKey?: string | null;
+  customAvatarKey?: string | null;
   facultyName?: string | null;
   fullName: string;
   programName?: string | null;
@@ -50,7 +53,9 @@ function initialsFromName(fullName: string): string {
 
 export function SystemAvatar({
   availability,
+  avatarMode,
   avatarVariantKey,
+  customAvatarKey,
   facultyName,
   fullName,
   programName,
@@ -58,9 +63,14 @@ export function SystemAvatar({
   size = "md",
   systemAvatarKey,
 }: SystemAvatarProps) {
-  const programAvatarSrc = getProgramAvatarSrc(systemAvatarKey, avatarVariantKey);
+  const resolvedAvatar = resolveProfileAvatar({
+    avatarMode,
+    avatarVariantKey,
+    customAvatarKey,
+    systemAvatarKey,
+  });
 
-  if (programAvatarSrc) {
+  if (resolvedAvatar.kind === "image") {
     return (
       <div
         aria-label={`${fullName} system avatar`}
@@ -82,14 +92,22 @@ export function SystemAvatar({
                     ? "(min-width: 640px) 13rem, 100vw"
                     : "(min-width: 640px) 14rem, 100vw"
           }
-          src={programAvatarSrc}
+          src={resolvedAvatar.src}
         />
       </div>
     );
   }
 
   const hash = hashIdentity(
-    [systemAvatarKey, fullName, facultyName, programName, availability]
+    [
+      systemAvatarKey,
+      fullName,
+      facultyName,
+      programName,
+      availability,
+      avatarMode,
+      customAvatarKey,
+    ]
       .filter(Boolean)
       .join("|"),
   );

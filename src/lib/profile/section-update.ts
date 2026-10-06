@@ -75,9 +75,11 @@ export function profileEditDataToPayload(
   return {
     academicProgramId: data.profile.academic_program_id,
     allowDirectContact: data.profile.allow_direct_contact,
+    avatarMode: data.profile.avatar_mode,
     availability: data.profile.availability,
     bio: data.profile.bio,
     collaborationGoalIds: normalizeIdList(data.collaborationGoalIds),
+    customAvatarKey: data.profile.custom_avatar_key,
     facultyId: data.profile.faculty_id,
     fullName: data.profile.full_name,
     interestIds: normalizeIdList(data.interestIds),

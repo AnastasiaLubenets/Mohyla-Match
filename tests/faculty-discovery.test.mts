@@ -35,8 +35,10 @@ function facultyProfile(
         studyLevel: "bachelor",
       },
     ],
+    avatarMode: "program",
     availability: "By appointment",
     bio: "Researches reliable student software systems.",
+    customAvatarKey: null,
     expertise: [
       {
         category: "Computer Science",

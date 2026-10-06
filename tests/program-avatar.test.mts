@@ -4,12 +4,16 @@ import { join } from "node:path";
 import test from "node:test";
 
 import {
+  customAvatarOptions,
   getProgramAvatarContainerClasses,
+  getCustomAvatarSrc,
   getMappedProgramAvatarKey,
   getProgramAvatarSrc,
   mappedProgramAvatarKeys,
   programAvatarContainerClasses,
   programAvatarImageClasses,
+  profileAvatarModes,
+  resolveProfileAvatar,
   systemAvatarRadiusClasses,
   systemAvatarSizeClasses,
 } from "../src/lib/profile/program-avatar.ts";
@@ -77,12 +81,88 @@ test("direct avatar variant key wins for live profile-edit program previews", ()
   );
 });
 
-test("unmapped or legacy program keys fall back safely", () => {
+test("legacy program keys resolve through supplied replacement artwork", () => {
+  assert.equal(
+    getProgramAvatarSrc("faculty-history--program-archaeology"),
+    "/avatars/programs/program-history.png",
+  );
+  assert.equal(
+    getProgramAvatarSrc("faculty-humanities--program-english-and-ukrainian-language"),
+    "/avatars/programs/program-language-literature-comparative-studies.png",
+  );
+  assert.equal(
+    getProgramAvatarSrc("faculty-informatics--program-big-data-analytics"),
+    "/avatars/programs/program-applied-mathematics.png",
+  );
+});
+
+test("unmapped program keys fall back safely", () => {
   assert.equal(getMappedProgramAvatarKey("legacy-geometric-avatar"), null);
   assert.equal(
     getProgramAvatarSrc("faculty-test--program-not-in-production"),
     null,
   );
+});
+
+test("profile avatar resolver supports default, program and custom modes", () => {
+  assert.deepEqual(profileAvatarModes, ["default", "program", "custom"]);
+
+  assert.deepEqual(
+    resolveProfileAvatar({
+      avatarMode: "default",
+      systemAvatarKey: "faculty-economics--program-economics",
+    }),
+    { key: "default", kind: "default", mode: "default", src: null },
+  );
+
+  assert.deepEqual(
+    resolveProfileAvatar({
+      avatarMode: "program",
+      systemAvatarKey: "faculty-economics--program-economics",
+    }),
+    {
+      key: "program-economics",
+      kind: "image",
+      mode: "program",
+      src: "/avatars/programs/program-economics.png",
+    },
+  );
+
+  assert.deepEqual(
+    resolveProfileAvatar({
+      avatarMode: "custom",
+      customAvatarKey: "avatar-01",
+      systemAvatarKey: "faculty-economics--program-economics",
+    }),
+    {
+      key: "avatar-01",
+      kind: "image",
+      mode: "custom",
+      src: "/avatars/custom/avatar-01.png",
+    },
+  );
+
+  assert.deepEqual(
+    resolveProfileAvatar({
+      avatarMode: "custom",
+      customAvatarKey: "missing-avatar",
+      systemAvatarKey: "faculty-economics--program-economics",
+    }),
+    { key: "default", kind: "default", mode: "default", src: null },
+  );
+});
+
+test("all supplied custom avatar options resolve to local PNG assets", () => {
+  assert.equal(customAvatarOptions.length, 30);
+
+  for (const avatar of customAvatarOptions) {
+    assert.equal(getCustomAvatarSrc(avatar.key), avatar.src);
+    assert.equal(
+      existsSync(join(repoRoot, "public", "avatars", "custom", `${avatar.key}.png`)),
+      true,
+      `${avatar.key}.png should exist`,
+    );
+  }
 });
 
 test("all current SystemAvatar sizes remain defined", () => {
@@ -151,6 +231,22 @@ test("mapped program avatars render as clean edge-to-edge image tiles", () => {
   assert.match(programAvatarImageClasses, /\bh-full\b/);
   assert.match(programAvatarImageClasses, /\bw-full\b/);
   assert.match(programAvatarImageClasses, /\bobject-cover\b/);
+});
+
+test("SystemAvatar renders all image-backed avatar modes through one image path", () => {
+  const systemAvatarSource = readFileSync(
+    join(repoRoot, "src/components/profile/system-avatar.tsx"),
+    "utf8",
+  );
+
+  assert.match(systemAvatarSource, /resolveProfileAvatar/);
+  assert.match(systemAvatarSource, /resolvedAvatar\.kind === "image"/);
+  assert.match(systemAvatarSource, /src=\{resolvedAvatar\.src\}/);
+  assert.doesNotMatch(
+    systemAvatarSource,
+    /getProgramAvatarSrc/,
+    "SystemAvatar should not branch program artwork separately from custom artwork",
+  );
 });
 
 test("top-right account avatar can use a smaller radius without changing defaults", () => {
@@ -236,6 +332,34 @@ test("Discover and Saved avatar links stay visually neutral", () => {
       `${sourcePath} should keep clickable avatar wrappers visually neutral`,
     );
   }
+});
+
+test("profile edit form exposes a custom avatar picker without storing image URLs", () => {
+  const source = readFileSync(
+    join(repoRoot, "src/components/profile/profile-edit-form.tsx"),
+    "utf8",
+  );
+
+  assert.match(source, /name="avatarMode"/);
+  assert.match(source, /value="default"/);
+  assert.match(source, /value="program"/);
+  assert.match(source, /value="custom"/);
+  assert.match(source, /name="customAvatarKey"/);
+  assert.match(source, /customAvatarOptions\.map/);
+  assert.match(source, /onAvatarModeChange\("custom"\)/);
+  assert.doesNotMatch(
+    source,
+    /name="customAvatar(?:Url|Src)"/,
+    "profiles should store only stable avatar keys",
+  );
+});
+
+test("profile update path saves avatar mode and custom key columns", () => {
+  const source = readFileSync(join(repoRoot, "src/lib/profile/update.ts"), "utf8");
+
+  assert.match(source, /avatar_mode: avatarMode/);
+  assert.match(source, /custom_avatar_key: avatarMode === "custom"/);
+  assert.match(source, /\.from\("profiles"\)[\s\S]*?\.update\(/);
 });
 
 test("every mapped production program avatar asset exists", () => {

@@ -554,9 +554,11 @@ export type Database = {
           account_role: Database["public"]["Enums"]["account_role"];
           academic_program_id: number;
           allow_direct_contact: boolean;
+          avatar_mode: Database["public"]["Enums"]["profile_avatar_mode"];
           availability: string | null;
           bio: string | null;
           created_at: string;
+          custom_avatar_key: string | null;
           deleted_at: string | null;
           faculty_verification_status: Database["public"]["Enums"]["faculty_verification_status"];
           faculty_id: number;
@@ -572,9 +574,11 @@ export type Database = {
           account_role?: Database["public"]["Enums"]["account_role"];
           academic_program_id: number;
           allow_direct_contact?: boolean;
+          avatar_mode?: Database["public"]["Enums"]["profile_avatar_mode"];
           availability?: string | null;
           bio?: string | null;
           created_at?: string;
+          custom_avatar_key?: string | null;
           deleted_at?: string | null;
           faculty_verification_status?: Database["public"]["Enums"]["faculty_verification_status"];
           faculty_id: number;
@@ -590,9 +594,11 @@ export type Database = {
           account_role?: Database["public"]["Enums"]["account_role"];
           academic_program_id?: number;
           allow_direct_contact?: boolean;
+          avatar_mode?: Database["public"]["Enums"]["profile_avatar_mode"];
           availability?: string | null;
           bio?: string | null;
           created_at?: string;
+          custom_avatar_key?: string | null;
           deleted_at?: string | null;
           faculty_verification_status?: Database["public"]["Enums"]["faculty_verification_status"];
           faculty_id?: number;
@@ -914,6 +920,7 @@ export type Database = {
       faculty_verification_status: "unverified" | "verified";
       interaction_action: "connect" | "save" | "skip";
       match_status: "active" | "blocked" | "closed";
+      profile_avatar_mode: "default" | "program" | "custom";
       profile_status: "active" | "suspended" | "deleted";
       report_status: "open" | "reviewing" | "resolved" | "dismissed";
       skill_direction: "offer" | "looking_for";

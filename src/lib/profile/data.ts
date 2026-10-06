@@ -1,6 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { ProfileSocialLink, SocialPlatform } from "./social-links.ts";
+import {
+  normalizeProfileAvatarMode,
+  type ProfileAvatarMode,
+} from "@/lib/profile/program-avatar";
 import type { Database } from "@/types/database";
 
 type SupabaseServerClient = SupabaseClient<Database>;
@@ -62,13 +66,16 @@ export type SafeFacultyExpertise = Readonly<{
 
 export type SafeProfile = Readonly<{
   accountRole: AccountRole;
+  academicProgramAvatarVariantKey: string | null;
   academicProgramName: string;
   academicPrograms: SafeFacultyProgram[];
   allowDirectContact: boolean;
+  avatarMode: ProfileAvatarMode;
   availability: string | null;
   bio: string | null;
   collaborationGoals: string[];
   createdAt: string;
+  customAvatarKey: string | null;
   expertise: SafeFacultyExpertise[];
   facultyName: string;
   facultyVerificationStatus: FacultyVerificationStatus;
@@ -94,8 +101,10 @@ export type EditProfileData = Readonly<{
     account_role: AccountRole;
     academic_program_id: number;
     allow_direct_contact: boolean;
+    avatar_mode: ProfileAvatarMode;
     availability: string | null;
     bio: string | null;
+    custom_avatar_key: string | null;
     faculty_id: number;
     faculty_verification_status: FacultyVerificationStatus;
     full_name: string;
@@ -345,7 +354,7 @@ export async function loadSafeProfile(
   const profileResult = await supabase
     .from("profiles")
     .select(
-      "user_id,account_role,faculty_verification_status,full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key,allow_direct_contact,created_at",
+      "user_id,account_role,faculty_verification_status,full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key,avatar_mode,custom_avatar_key,allow_direct_contact,created_at",
     )
     .eq("user_id", userId)
     .maybeSingle();
@@ -375,7 +384,7 @@ export async function loadSafeProfile(
       .maybeSingle(),
     supabase
       .from("academic_programs")
-      .select("display_name")
+      .select("display_name,avatar_variant_key")
       .eq("id", profile.academic_program_id)
       .eq("faculty_id", profile.faculty_id)
       .eq("is_active", true)
@@ -445,13 +454,16 @@ export async function loadSafeProfile(
   return {
     data: {
       accountRole: profile.account_role,
+      academicProgramAvatarVariantKey: programResult.data.avatar_variant_key,
       academicProgramName: programResult.data.display_name,
       academicPrograms: facultyPrograms.programs,
       allowDirectContact: profile.allow_direct_contact,
+      avatarMode: normalizeProfileAvatarMode(profile.avatar_mode),
       availability: profile.availability,
       bio: profile.bio,
       collaborationGoals: namesFromMap(goalIds, goalNames.namesById),
       createdAt: profile.created_at,
+      customAvatarKey: profile.custom_avatar_key,
       expertise: facultyExpertise.expertise,
       facultyName: facultyResult.data.display_name,
       facultyVerificationStatus: profile.faculty_verification_status,
@@ -545,7 +557,7 @@ export async function loadProfileEditData(
     supabase
       .from("profiles")
       .select(
-        "account_role,faculty_verification_status,full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key,allow_direct_contact",
+        "account_role,faculty_verification_status,full_name,faculty_id,academic_program_id,year_of_study,bio,availability,system_avatar_key,avatar_mode,custom_avatar_key,allow_direct_contact",
       )
       .eq("user_id", userId)
       .maybeSingle(),
@@ -639,6 +651,9 @@ export async function loadProfileEditData(
         academic_program_id:
           profileAcademicProgramRows.find((program) => program.is_primary)
             ?.academic_program_id ?? primaryProgramId,
+        avatar_mode: normalizeProfileAvatarMode(
+          profileResult.data.avatar_mode,
+        ),
       },
       programs: (programsResult.data ?? []) as ProgramOption[],
       skills: (skillsResult.data ?? []) as SkillOption[],

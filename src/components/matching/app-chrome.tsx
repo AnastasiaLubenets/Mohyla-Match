@@ -269,6 +269,9 @@ function AppTopBar({
             {currentProfile ? (
               <SystemAvatar
                 availability={currentProfile.availability}
+                avatarMode={currentProfile.avatarMode}
+                avatarVariantKey={currentProfile.academicProgramAvatarVariantKey}
+                customAvatarKey={currentProfile.customAvatarKey}
                 facultyName={currentProfile.facultyName}
                 fullName={currentProfile.fullName}
                 programName={currentProfile.academicProgramName}

@@ -212,6 +212,8 @@ export function DiscoveryCard({
           >
             <SystemAvatar
               availability={candidate.availability}
+              avatarMode={candidate.avatarMode}
+              customAvatarKey={candidate.customAvatarKey}
               facultyName={candidate.facultyName}
               fullName={candidate.fullName}
               programName={candidate.academicProgramName}

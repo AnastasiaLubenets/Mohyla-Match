@@ -13,6 +13,8 @@ export function MatchCard({ match }: Readonly<{ match: MatchSummary }>) {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <SystemAvatar
             availability={match.availability}
+            avatarMode={match.avatarMode}
+            customAvatarKey={match.customAvatarKey}
             facultyName={match.facultyName}
             fullName={match.fullName}
             programName={match.academicProgramName}
