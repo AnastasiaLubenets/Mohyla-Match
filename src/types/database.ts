@@ -688,10 +688,6 @@ export type Database = {
         };
         Returns: Database["public"]["Enums"]["account_role"];
       };
-      delete_my_profile: {
-        Args: Record<PropertyKey, never>;
-        Returns: boolean;
-      };
       block_user: {
         Args: {
           target_user_id: string;

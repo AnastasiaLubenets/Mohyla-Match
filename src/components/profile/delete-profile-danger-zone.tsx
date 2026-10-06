@@ -16,7 +16,7 @@ function DeleteProfileSubmitButton({
       disabled={!canDelete || pending}
       type="submit"
     >
-      {pending ? "Deleting..." : "Delete profile permanently"}
+      {pending ? "Deleting account..." : "Delete account"}
     </button>
   );
 }
@@ -32,7 +32,7 @@ export function DeleteProfileDangerZone() {
         <div>
           <h2 className="text-lg font-semibold text-red-950">Danger zone</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-red-900">
-            Permanently delete your Mohyla Match profile and related profile data.
+            Permanently delete your Mohyla Match account and all profile data.
           </p>
         </div>
         <button
@@ -43,7 +43,7 @@ export function DeleteProfileDangerZone() {
           }}
           type="button"
         >
-          Delete profile
+          Delete account
         </button>
       </div>
 
@@ -53,11 +53,10 @@ export function DeleteProfileDangerZone() {
       >
         <form action="/profile/delete" className="space-y-5 p-5 sm:p-6" method="post">
           <div>
-            <h3 className="text-xl font-semibold">Delete your profile?</h3>
+            <h3 className="text-xl font-semibold">Delete your account?</h3>
             <p className="mt-3 leading-7 text-muted">
-              This permanently deletes your Mohyla Match profile and its related
-              data. Your login account and student email will remain, so you can
-              create a new profile again.
+              This permanently deletes your Mohyla Match account and all profile
+              data. This action cannot be undone.
             </p>
           </div>
 

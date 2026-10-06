@@ -28,11 +28,10 @@ export async function getCurrentAccountState(
   supabaseClient?: SupabaseServerClient,
 ): Promise<AuthStateResult> {
   const supabase = supabaseClient ?? (await createSupabaseServerClient());
-  const { data: claimsResult, error: claimsError } =
-    await supabase.auth.getClaims();
-  const userId = claimsResult?.claims?.sub;
+  const { data: userResult, error: userError } = await supabase.auth.getUser();
+  const userId = userResult.user?.id;
 
-  if (claimsError || typeof userId !== "string") {
+  if (userError || typeof userId !== "string") {
     return { state: "anonymous", userId: null };
   }
 
