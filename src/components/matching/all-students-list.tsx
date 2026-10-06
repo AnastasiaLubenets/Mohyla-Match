@@ -3,8 +3,15 @@ import Link from "next/link";
 import { ContactReveal } from "@/components/matching/contact-reveal";
 import { SaveProfileButton } from "@/components/matching/save-profile-button";
 import { TaxonomyChipList } from "@/components/matching/taxonomy-chip-list";
+import { SocialLinksList } from "@/components/profile/profile-social-links";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import type { DiscoveryCandidate } from "@/lib/matching/data";
+import { formatMatchPercentage } from "@/lib/matching/view-model";
+
+const studentBookmarkButtonClassName =
+  "inline-flex h-10 w-10 items-center justify-center border-0 bg-transparent p-0 text-blue-800 shadow-none transition-colors duration-150 hover:bg-transparent hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70";
+
+const studentBookmarkIconClassName = "h-[1.375rem] w-[1.375rem]";
 
 function AllStudentsStatusMessage({
   error,
@@ -106,6 +113,7 @@ function AllStudentRow({
   saved: boolean;
 }>) {
   const profileHref = `/profiles/${candidate.userId}?from=discover`;
+  const matchPercentage = formatMatchPercentage(candidate.compatibilityScore);
   const preview = bioPreview(candidate.bio);
 
   return (
@@ -146,6 +154,11 @@ function AllStudentRow({
         {preview ? (
           <p className="mt-2 text-sm leading-5 text-blue-900/75">{preview}</p>
         ) : null}
+        {candidate.socialLinks.length > 0 ? (
+          <div className="mt-3">
+            <SocialLinksList compact links={candidate.socialLinks} />
+          </div>
+        ) : null}
         <div className="mt-3">
           <TaxonomyChipList
             emptyLabel="No skills listed yet."
@@ -156,13 +169,24 @@ function AllStudentRow({
       </div>
 
       <div className="flex flex-wrap items-center gap-3 sm:col-start-2 lg:col-start-3 lg:flex-nowrap lg:justify-end">
-        <SaveProfileButton
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md text-blue-800 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
-          returnTo={returnTo}
-          saved={saved}
-          targetUserId={candidate.userId}
-          variant="icon"
-        />
+        <div className="flex items-center gap-3">
+          {matchPercentage ? (
+            <span
+              aria-label={`Match score ${matchPercentage}`}
+              className="text-sm font-bold text-blue-800"
+            >
+              {matchPercentage}
+            </span>
+          ) : null}
+          <SaveProfileButton
+            className={studentBookmarkButtonClassName}
+            iconClassName={studentBookmarkIconClassName}
+            returnTo={returnTo}
+            saved={saved}
+            targetUserId={candidate.userId}
+            variant="icon"
+          />
+        </div>
         <ContactReveal
           buttonClassName="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-blue-800 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
           className="w-full sm:w-auto"

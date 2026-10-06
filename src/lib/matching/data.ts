@@ -8,6 +8,10 @@ import {
   normalizeProfileAvatarMode,
   type ProfileAvatarMode,
 } from "@/lib/profile/program-avatar";
+import {
+  isSocialPlatform,
+  type ProfileSocialLink,
+} from "@/lib/profile/social-links";
 import type { Database, Json } from "@/types/database";
 
 type SupabaseServerClient = SupabaseClient<Database>;
@@ -64,7 +68,7 @@ export type DiscoveryCandidate = Readonly<{
   availability: string | null;
   bio: string | null;
   collaborationGoals: MatchingItem[];
-  compatibilityScore: number;
+  compatibilityScore: number | null;
   customAvatarKey: string | null;
   facultyName: string;
   fullName: string;
@@ -76,6 +80,7 @@ export type DiscoveryCandidate = Readonly<{
   scoreBreakdown: Json;
   sharedCollaborationGoals: MatchingItem[];
   sharedInterests: MatchingItem[];
+  socialLinks: ProfileSocialLink[];
   systemAvatarKey: string;
   userId: string;
   yearOfStudy: number;
@@ -310,6 +315,49 @@ async function loadAvatarPreferences(
   };
 }
 
+async function loadCandidateSocialLinks(
+  supabase: SupabaseServerClient,
+  userIds: readonly string[],
+): Promise<{
+  error: boolean;
+  socialLinksByUserId: Map<string, ProfileSocialLink[]>;
+}> {
+  const uniqueUserIds = [...new Set(userIds)];
+
+  if (uniqueUserIds.length === 0) {
+    return { error: false, socialLinksByUserId: new Map() };
+  }
+
+  const result = await supabase
+    .from("profile_social_links")
+    .select("user_id,platform,url,sort_order")
+    .in("user_id", uniqueUserIds)
+    .order("sort_order", { ascending: true })
+    .order("platform", { ascending: true });
+
+  if (result.error) {
+    return { error: true, socialLinksByUserId: new Map() };
+  }
+
+  const socialLinksByUserId = new Map<string, ProfileSocialLink[]>();
+
+  for (const link of result.data ?? []) {
+    if (!isSocialPlatform(link.platform)) {
+      continue;
+    }
+
+    const userSocialLinks = socialLinksByUserId.get(link.user_id) ?? [];
+    userSocialLinks.push({
+      platform: link.platform,
+      sortOrder: link.sort_order,
+      url: link.url,
+    });
+    socialLinksByUserId.set(link.user_id, userSocialLinks);
+  }
+
+  return { error: false, socialLinksByUserId };
+}
+
 export async function loadDiscoveryCandidates(
   supabase: SupabaseServerClient,
   limit = 12,
@@ -323,12 +371,13 @@ export async function loadDiscoveryCandidates(
   }
 
   const rows = result.data ?? [];
-  const avatarPreferences = await loadAvatarPreferences(
-    supabase,
-    rows.map((candidate) => candidate.user_id),
-  );
+  const userIds = rows.map((candidate) => candidate.user_id);
+  const [avatarPreferences, socialLinks] = await Promise.all([
+    loadAvatarPreferences(supabase, userIds),
+    loadCandidateSocialLinks(supabase, userIds),
+  ]);
 
-  if (avatarPreferences.error) {
+  if (avatarPreferences.error || socialLinks.error) {
     return { data: null, error: true };
   }
 
@@ -337,6 +386,8 @@ export async function loadDiscoveryCandidates(
       mapDiscoveryCandidate(
         candidate,
         avatarPreferences.preferencesByUserId.get(candidate.user_id),
+        socialLinks.socialLinksByUserId.get(candidate.user_id),
+        candidate.compatibility_score,
       ),
     ),
     error: false,
@@ -349,6 +400,8 @@ type DiscoveryCandidateRow =
 function mapDiscoveryCandidate(
   candidate: DiscoveryCandidateRow,
   avatarPreference: AvatarPreference = defaultAvatarPreference,
+  socialLinks: ProfileSocialLink[] = [],
+  compatibilityScore: number | null = candidate.compatibility_score,
 ): DiscoveryCandidate {
   return {
     academicProgramName: candidate.academic_program_name,
@@ -356,7 +409,7 @@ function mapDiscoveryCandidate(
     availability: candidate.availability,
     bio: candidate.bio,
     collaborationGoals: parseNamedItems(candidate.collaboration_goals),
-    compatibilityScore: candidate.compatibility_score,
+    compatibilityScore,
     customAvatarKey: avatarPreference.customAvatarKey,
     facultyName: candidate.faculty_name,
     fullName: candidate.full_name,
@@ -370,6 +423,7 @@ function mapDiscoveryCandidate(
       candidate.shared_collaboration_goals,
     ),
     sharedInterests: parseNamedItems(candidate.shared_interests),
+    socialLinks,
     systemAvatarKey: candidate.system_avatar_key,
     userId: candidate.user_id,
     yearOfStudy: candidate.year_of_study,
@@ -389,12 +443,13 @@ export async function loadAllDiscoveryProfiles(
   }
 
   const rows = result.data ?? [];
-  const avatarPreferences = await loadAvatarPreferences(
-    supabase,
-    rows.map((profile) => profile.user_id),
-  );
+  const userIds = rows.map((profile) => profile.user_id);
+  const [avatarPreferences, socialLinks] = await Promise.all([
+    loadAvatarPreferences(supabase, userIds),
+    loadCandidateSocialLinks(supabase, userIds),
+  ]);
 
-  if (avatarPreferences.error) {
+  if (avatarPreferences.error || socialLinks.error) {
     return { data: null, error: true };
   }
 
@@ -403,6 +458,8 @@ export async function loadAllDiscoveryProfiles(
       mapDiscoveryCandidate(
         profile,
         avatarPreferences.preferencesByUserId.get(profile.user_id),
+        socialLinks.socialLinksByUserId.get(profile.user_id),
+        null,
       ),
     ),
     error: false,

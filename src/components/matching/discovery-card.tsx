@@ -6,8 +6,15 @@ import type { ReactNode } from "react";
 import { ContactReveal } from "@/components/matching/contact-reveal";
 import { SaveProfileButton } from "@/components/matching/save-profile-button";
 import { SystemAvatar } from "@/components/profile/system-avatar";
+import { SocialLinksList } from "@/components/profile/profile-social-links";
 import { TaxonomyChipList } from "@/components/matching/taxonomy-chip-list";
 import type { DiscoveryCandidate } from "@/lib/matching/data";
+import { formatMatchPercentage } from "@/lib/matching/view-model";
+
+const studentBookmarkButtonClassName =
+  "inline-flex h-10 w-10 items-center justify-center border-0 bg-transparent p-0 text-blue-800 shadow-none transition-colors duration-150 hover:bg-transparent hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70";
+
+const studentBookmarkIconClassName = "h-[1.375rem] w-[1.375rem]";
 
 function StatusMessage({
   error,
@@ -187,6 +194,7 @@ export function DiscoveryCard({
     candidate.collaborationGoals.length > 0
       ? candidate.collaborationGoals
       : candidate.lookingForSkills;
+  const matchPercentage = formatMatchPercentage(candidate.compatibilityScore);
   const showLookingForCategory = candidate.collaborationGoals.length === 0;
   const canSkip = showSkip && typeof onSkip === "function";
 
@@ -194,17 +202,7 @@ export function DiscoveryCard({
     <>
       <StatusMessage error={error} status={status} />
       <article className="relative rounded-lg border border-blue-100 bg-white p-5 text-blue-950 sm:p-6">
-        <div className="absolute right-5 top-5 z-10 sm:right-6 sm:top-6">
-          <SaveProfileButton
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-blue-800 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
-            returnTo={returnTo}
-            saved={saved}
-            targetUserId={candidate.userId}
-            variant="icon"
-          />
-        </div>
-
-        <header className="grid gap-5 pr-11 md:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)]">
+        <header className="grid gap-5 md:grid-cols-[14rem_minmax(0,1fr)] lg:grid-cols-[14rem_minmax(0,1fr)_auto] xl:grid-cols-[16rem_minmax(0,1fr)_auto]">
           <Link
             aria-label={`Open ${candidate.fullName}'s profile`}
             className="block rounded-[1.25rem] outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
@@ -255,6 +253,38 @@ export function DiscoveryCard({
               View full profile
               <ArrowRightIcon />
             </Link>
+            {candidate.socialLinks.length > 0 ? (
+              <div className="mt-3">
+                <SocialLinksList compact links={candidate.socialLinks} />
+              </div>
+            ) : null}
+          </div>
+
+          <div className="flex min-w-0 flex-col gap-4 md:col-start-2 lg:col-start-3 lg:row-start-1 lg:h-full lg:min-w-[11rem] lg:items-end lg:justify-between">
+            <div className="flex items-center gap-3 self-start md:self-end">
+              {matchPercentage ? (
+                <span
+                  aria-label={`Match score ${matchPercentage}`}
+                  className="text-sm font-bold text-blue-800"
+                >
+                  {matchPercentage}
+                </span>
+              ) : null}
+              <SaveProfileButton
+                className={studentBookmarkButtonClassName}
+                iconClassName={studentBookmarkIconClassName}
+                returnTo={returnTo}
+                saved={saved}
+                targetUserId={candidate.userId}
+                variant="icon"
+              />
+            </div>
+            <ContactReveal
+              buttonClassName="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-blue-800 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+              className="w-full sm:w-auto"
+              showIcon
+              targetUserId={candidate.userId}
+            />
           </div>
         </header>
 
@@ -309,27 +339,19 @@ export function DiscoveryCard({
           </section>
         </div>
 
-        <footer className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-start">
-          <ContactReveal
-            buttonClassName="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-blue-800 px-8 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70 sm:w-64"
-            className="space-y-2 sm:col-start-2"
-            showIcon
-            targetUserId={candidate.userId}
-          />
-          {canSkip ? (
-            <div className="flex justify-center sm:col-start-3 sm:justify-end">
-              <button
-                aria-label={`Skip ${candidate.fullName}`}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
-                onClick={() => onSkip?.(candidate.userId)}
-                type="button"
-              >
-                <span>Skip</span>
-                <ArrowRightIcon />
-              </button>
-            </div>
-          ) : null}
-        </footer>
+        {canSkip ? (
+          <footer className="mt-3 flex justify-end">
+            <button
+              aria-label={`Skip ${candidate.fullName}`}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
+              onClick={() => onSkip?.(candidate.userId)}
+              type="button"
+            >
+              <span>Skip</span>
+              <ArrowRightIcon />
+            </button>
+          </footer>
+        ) : null}
       </article>
     </>
   );
