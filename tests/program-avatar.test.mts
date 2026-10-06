@@ -14,7 +14,7 @@ import {
   programAvatarImageClasses,
   profileAvatarModes,
   resolveProfileAvatar,
-  systemAvatarRadiusClasses,
+  systemAvatarRadiusClass,
   systemAvatarSizeClasses,
 } from "../src/lib/profile/program-avatar.ts";
 
@@ -23,8 +23,11 @@ const repoRoot = process.cwd();
 const systemAvatarPlacementSources = [
   "src/app/app/page.tsx",
   "src/app/profile/edit/page.tsx",
+  "src/components/matching/all-students-list.tsx",
   "src/components/matching/app-chrome.tsx",
   "src/components/matching/discovery-card.tsx",
+  "src/components/matching/discovery-top-bar.tsx",
+  "src/components/matching/faculty-directory-list.tsx",
   "src/components/matching/match-card.tsx",
   "src/components/matching/saved-profile-card.tsx",
   "src/components/profile/profile-details.tsx",
@@ -221,9 +224,7 @@ test("every SystemAvatar size variant preserves a 1:1 aspect ratio", () => {
 test("mapped program avatars render as clean edge-to-edge image tiles", () => {
   assert.match(programAvatarContainerClasses, /\baspect-square\b/);
   assert.match(programAvatarContainerClasses, /\boverflow-hidden\b/);
-  assert.ok(
-    programAvatarContainerClasses.split(/\s+/).includes("rounded-[1.25rem]"),
-  );
+  assert.ok(programAvatarContainerClasses.split(/\s+/).includes(systemAvatarRadiusClass));
   assert.match(programAvatarContainerClasses, /\bp-0\b/);
   assert.doesNotMatch(programAvatarContainerClasses, /\bbg-\S+/);
   assert.doesNotMatch(programAvatarContainerClasses, /\bborder(?:-\S+)?\b/);
@@ -249,47 +250,35 @@ test("SystemAvatar renders all image-backed avatar modes through one image path"
   );
 });
 
-test("top-right account avatar can use a smaller radius without changing defaults", () => {
-  assert.equal(systemAvatarRadiusClasses.default, "rounded-[1.25rem]");
-  assert.equal(systemAvatarRadiusClasses.topbar, "rounded-xl");
+test("all SystemAvatar placements use one shared square avatar radius", () => {
+  assert.equal(systemAvatarRadiusClass, "rounded-[1.25rem]");
   assert.ok(
     getProgramAvatarContainerClasses()
       .split(/\s+/)
-      .includes("rounded-[1.25rem]"),
-  );
-  assert.ok(
-    !getProgramAvatarContainerClasses().split(/\s+/).includes("rounded-xl"),
-  );
-  assert.ok(
-    getProgramAvatarContainerClasses("topbar")
-      .split(/\s+/)
-      .includes("rounded-xl"),
-  );
-  assert.ok(
-    !getProgramAvatarContainerClasses("topbar")
-      .split(/\s+/)
-      .includes("rounded-[1.25rem]"),
+      .includes(systemAvatarRadiusClass),
   );
 
-  const appChromeSource = readFileSync(
-    join(repoRoot, "src/components/matching/app-chrome.tsx"),
+  const programAvatarSource = readFileSync(
+    join(repoRoot, "src/lib/profile/program-avatar.ts"),
     "utf8",
   );
-  assert.match(
-    appChromeSource,
-    /<SystemAvatar[\s\S]*?radius="topbar"[\s\S]*?size="sm"/,
-    "AppTopBar should be the compact account avatar placement",
-  );
+  assert.doesNotMatch(programAvatarSource, /topbar|rounded-xl/);
 
-  for (const sourcePath of systemAvatarPlacementSources.filter(
-    (sourcePath) => sourcePath !== "src/components/matching/app-chrome.tsx",
-  )) {
+  const systemAvatarSource = readFileSync(
+    join(repoRoot, "src/components/profile/system-avatar.tsx"),
+    "utf8",
+  );
+  assert.match(systemAvatarSource, /systemAvatarRadiusClass/);
+  assert.doesNotMatch(systemAvatarSource, /rounded-(?:full|lg|xl)/);
+  assert.doesNotMatch(systemAvatarSource, /radius\??:/);
+
+  for (const sourcePath of systemAvatarPlacementSources) {
     const source = readFileSync(join(repoRoot, sourcePath), "utf8");
 
     assert.doesNotMatch(
       source,
-      /radius="topbar"/,
-      `${sourcePath} should keep the default SystemAvatar radius`,
+      /<SystemAvatar[\s\S]*?radius=/,
+      `${sourcePath} should not override the shared SystemAvatar radius`,
     );
   }
 });
