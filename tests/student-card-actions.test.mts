@@ -175,8 +175,49 @@ test("discover social icons use stored URLs safely and render nothing when empty
   );
   assert.match(
     socialLinksSource,
-    /compact && appearance === "bare"[\s\S]*\? "h-\[1\.375rem\] w-\[1\.375rem\]"[\s\S]*: "h-5 w-5"/,
-    "Bare compact social icons should render at approximately 22px without changing boxed icons",
+    /compact && appearance === "bare"[\s\S]*\? "h-\[1\.625rem\] w-\[1\.625rem\]"[\s\S]*: "h-5 w-5"/,
+    "Bare compact social icons should render at approximately 26px without changing boxed icons",
+  );
+
+  const discoveryCardSource = readRepoFile(
+    "src/components/matching/discovery-card.tsx",
+  );
+  assert.match(
+    discoveryCardSource,
+    /<SocialLinksList[\s\S]*?appearance="bare"[\s\S]*?compact[\s\S]*?links=\{candidate\.socialLinks\}/,
+    "Only the student social-link renderer should opt into the larger bare icon treatment",
+  );
+  assert.doesNotMatch(
+    discoveryCardSource,
+    /function (?:BarsIcon|SparkIcon|TargetIcon)\(\)[\s\S]*?className="h-\[(?:1\.5|1\.625)rem\] w-\[(?:1\.5|1\.625)rem\]"/,
+    "Skills, Academic interests, and Looking for icons should keep their existing size",
+  );
+});
+
+test("sidebar artwork cannot intercept navigation clicks", () => {
+  const appChromeSource = readRepoFile(
+    "src/components/matching/app-chrome.tsx",
+  );
+
+  assert.match(
+    appChromeSource,
+    /function SidebarBuildingArt\(\)[\s\S]*className="pointer-events-none mb-5 -mx-5/,
+    "The decorative sidebar artwork wrapper should not capture pointer events",
+  );
+  assert.match(
+    appChromeSource,
+    /aria-hidden="true"[\s\S]*className="pointer-events-none h-auto w-full max-w-none object-contain object-left-bottom"/,
+    "The decorative sidebar image itself should not capture pointer events",
+  );
+  assert.match(
+    appChromeSource,
+    /<nav className="relative z-10 mt-5 grid gap-2/,
+    "Sidebar navigation should stay layered above decorative artwork",
+  );
+  assert.match(
+    appChromeSource,
+    /<SidebarLink active=\{active === "profile"\} href="\/profile" label="My profile">/,
+    "The My profile link should remain the same navigation target and layout item",
   );
 });
 
