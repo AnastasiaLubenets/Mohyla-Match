@@ -42,6 +42,16 @@ export function clampCompatibilityScore(score: number): number {
   return Math.max(0, Math.min(100, Math.round(score)));
 }
 
+export function formatMatchPercentage(
+  score: number | null | undefined,
+): string | null {
+  if (typeof score !== "number" || !Number.isFinite(score)) {
+    return null;
+  }
+
+  return `${clampCompatibilityScore(score)}%`;
+}
+
 export function compatibilityTone(score: number): "strong" | "good" | "starter" {
   const normalizedScore = clampCompatibilityScore(score);
 

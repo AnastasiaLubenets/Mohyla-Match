@@ -59,7 +59,7 @@ const providerHosts: Record<SocialPlatform, readonly string[] | null> = {
   youtube: ["youtube.com", "youtu.be"],
 };
 
-function isSocialPlatform(value: string): value is SocialPlatform {
+export function isSocialPlatform(value: string): value is SocialPlatform {
   return platformLabels.has(value as SocialPlatform);
 }
 

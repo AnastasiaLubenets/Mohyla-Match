@@ -6,6 +6,7 @@ import {
   clampCompatibilityScore,
   compatibilityTone,
   formatMatchedDate,
+  formatMatchPercentage,
   isDiscoveryAction,
   isReportReason,
 } from "../src/lib/matching/view-model.ts";
@@ -29,6 +30,14 @@ test("compatibility scores are clamped and mapped to display tone", () => {
   assert.equal(compatibilityTone(82), "strong");
   assert.equal(compatibilityTone(52), "good");
   assert.equal(compatibilityTone(18), "starter");
+});
+
+test("match percentage display rounds and clamps real score values", () => {
+  assert.equal(formatMatchPercentage(87.5), "88%");
+  assert.equal(formatMatchPercentage(-4), "0%");
+  assert.equal(formatMatchPercentage(108), "100%");
+  assert.equal(formatMatchPercentage(null), null);
+  assert.equal(formatMatchPercentage(undefined), null);
 });
 
 test("highlight labels describe matching explanations", () => {

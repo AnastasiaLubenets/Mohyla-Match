@@ -48,6 +48,7 @@ function candidate(
     scoreBreakdown: {},
     sharedCollaborationGoals: [],
     sharedInterests: [],
+    socialLinks: [],
     systemAvatarKey: "avatar-1",
     userId: "00000000-0000-4000-8000-000000000001",
     yearOfStudy: 2,
