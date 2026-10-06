@@ -4,10 +4,9 @@ import {
   getProgramAvatarContainerClasses,
   programAvatarImageClasses,
   resolveProfileAvatar,
-  systemAvatarRadiusClasses,
+  systemAvatarRadiusClass,
   systemAvatarSizeClasses,
   type ProfileAvatarMode,
-  type SystemAvatarRadius,
   type SystemAvatarSize,
 } from "@/lib/profile/program-avatar";
 
@@ -19,7 +18,6 @@ type SystemAvatarProps = Readonly<{
   facultyName?: string | null;
   fullName: string;
   programName?: string | null;
-  radius?: SystemAvatarRadius;
   size?: SystemAvatarSize;
   systemAvatarKey: string;
 }>;
@@ -59,7 +57,6 @@ export function SystemAvatar({
   facultyName,
   fullName,
   programName,
-  radius = "default",
   size = "md",
   systemAvatarKey,
 }: SystemAvatarProps) {
@@ -74,7 +71,7 @@ export function SystemAvatar({
     return (
       <div
         aria-label={`${fullName} system avatar`}
-        className={`${getProgramAvatarContainerClasses(radius)} ${systemAvatarSizeClasses[size]}`}
+        className={`${getProgramAvatarContainerClasses()} ${systemAvatarSizeClasses[size]}`}
       >
         <Image
           alt=""
@@ -113,13 +110,11 @@ export function SystemAvatar({
   );
   const palette = palettes[hash % palettes.length];
   const rotation = (hash % 32) - 16;
-  const fallbackRadiusClass =
-    radius === "topbar" ? systemAvatarRadiusClasses.topbar : "rounded-lg";
 
   return (
     <div
       aria-label={`${fullName} system avatar`}
-      className={`relative isolate flex aspect-square shrink-0 items-center justify-center overflow-hidden ${fallbackRadiusClass} border border-border font-semibold shadow-sm ${systemAvatarSizeClasses[size]}`}
+      className={`relative isolate flex aspect-square shrink-0 items-center justify-center overflow-hidden ${systemAvatarRadiusClass} border border-border font-semibold shadow-sm ${systemAvatarSizeClasses[size]}`}
       style={{
         background: palette.background,
         color: palette.foreground,
@@ -127,7 +122,7 @@ export function SystemAvatar({
     >
       <span
         aria-hidden="true"
-        className="absolute -right-5 -top-6 h-16 w-16 rounded-lg opacity-30"
+        className={`absolute -right-5 -top-6 h-16 w-16 ${systemAvatarRadiusClass} opacity-30`}
         style={{
           background: palette.accent,
           transform: `rotate(${rotation}deg)`,
@@ -135,7 +130,7 @@ export function SystemAvatar({
       />
       <span
         aria-hidden="true"
-        className="absolute -bottom-7 -left-5 h-20 w-20 rounded-lg opacity-20"
+        className={`absolute -bottom-7 -left-5 h-20 w-20 ${systemAvatarRadiusClass} opacity-20`}
         style={{
           background: palette.foreground,
           transform: `rotate(${-rotation}deg)`,
