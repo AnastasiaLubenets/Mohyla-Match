@@ -43,6 +43,6 @@ test("sidebar keeps the existing logo and building image containers", () => {
   assert.match(chrome, /className="h-auto w-full object-contain"/);
   assert.match(
     chrome,
-    /className="h-auto w-full max-w-none object-contain object-left-bottom"/,
+    /className="pointer-events-none h-auto w-full max-w-none object-contain object-left-bottom"/,
   );
 });

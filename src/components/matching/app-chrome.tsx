@@ -164,11 +164,11 @@ function SidebarBrandLogo() {
 
 function SidebarBuildingArt() {
   return (
-    <div className="mb-5 -mx-5 min-h-0 2xl:mb-7">
+    <div className="pointer-events-none mb-5 -mx-5 min-h-0 2xl:mb-7">
       <Image
         alt=""
         aria-hidden="true"
-        className="h-auto w-full max-w-none object-contain object-left-bottom"
+        className="pointer-events-none h-auto w-full max-w-none object-contain object-left-bottom"
         height={sidebarBuilding.height}
         sizes="18rem"
         src={sidebarBuilding.src}
@@ -183,7 +183,7 @@ export function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
     <aside className="border-b border-blue-100 bg-white/90 px-4 py-4 backdrop-blur xl:flex xl:h-screen xl:min-h-0 xl:flex-col xl:overflow-hidden xl:border-b-0 xl:border-r xl:px-5 xl:py-5 2xl:py-6">
       <SidebarBrandLogo />
 
-      <nav className="mt-5 grid gap-2 sm:grid-cols-4 xl:grid-cols-1 2xl:mt-7">
+      <nav className="relative z-10 mt-5 grid gap-2 sm:grid-cols-4 xl:grid-cols-1 2xl:mt-7">
         <SidebarLink active={active === "discover"} href="/app" label="Discover">
           <CompassIcon />
         </SidebarLink>

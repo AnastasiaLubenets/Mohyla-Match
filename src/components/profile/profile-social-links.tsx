@@ -174,7 +174,7 @@ export function SocialLinksList({
 
         const iconClassName =
           compact && appearance === "bare"
-            ? "h-[1.375rem] w-[1.375rem]"
+            ? "h-[1.625rem] w-[1.625rem]"
             : "h-5 w-5";
 
         return (
