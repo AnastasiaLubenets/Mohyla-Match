@@ -326,7 +326,13 @@ export function BrandQuoteCard({
   text: string;
 }>) {
   return (
-    <section className="rounded-lg border border-blue-50 bg-[#fffaf0] p-7">
+    <section
+      className="rounded-lg border border-blue-50 bg-[#fffaf0] bg-cover bg-center bg-no-repeat p-7"
+      style={{
+        backgroundImage: "url('/branding/mohyla-quote-architecture.png')",
+        backgroundPosition: "center bottom",
+      }}
+    >
       <p className="font-serif text-6xl font-bold leading-none text-blue-800">
         &quot;
       </p>
