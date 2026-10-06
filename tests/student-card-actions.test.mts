@@ -60,27 +60,27 @@ test("student recommendation card places actions in the upper profile area", () 
   );
   assert.match(
     discoveryCardSource,
-    /aria-label=\{`Match score \$\{matchPercentage\}`\}[\s\S]*?\{matchPercentage\}[\s\S]*?<SaveProfileButton/,
-    "The plain match percentage should appear immediately before the bookmark control",
+    /<MatchPercentageIndicator percentage=\{matchPercentage\} \/>[\s\S]*?<SaveProfileButton/,
+    "The UsersRound match indicator should appear immediately before the bookmark control",
   );
   assert.match(
     discoveryCardSource,
-    /studentBookmarkButtonClassName =\s*"[^"]*border-0[^"]*bg-transparent[^"]*shadow-none[^"]*transition-colors[^"]*duration-150[^"]*hover:bg-transparent/,
+    /studentBookmarkButtonClassName =\s*"[^"]*group[^"]*border-0[^"]*bg-transparent[^"]*shadow-none[^"]*transition-colors[^"]*duration-200[^"]*hover:bg-transparent/,
     "The student bookmark button hit target should stay visually transparent, including on hover",
   );
   assert.match(
     discoveryCardSource,
-    /const studentBookmarkIconClassName = "h-\[1\.375rem\] w-\[1\.375rem\]";/,
+    /studentBookmarkIconClassName =\s*"h-\[1\.375rem\] w-\[1\.375rem\] transition-\[fill,color\] duration-200";/,
     "The visible bookmark icon should be slightly larger than the default 20px icon",
   );
   assert.match(
     discoveryCardSource,
-    /iconClassName=\{studentBookmarkIconClassName\}/,
-    "The student card should apply the larger standalone bookmark icon",
+    /previewFillOnHover/,
+    "Unsaved student card bookmarks should preview the filled state on hover",
   );
   assert.match(
     discoveryCardSource,
-    /<SocialLinksList compact links=\{candidate\.socialLinks\} \/>/,
+    /<SocialLinksList[\s\S]*?appearance="bare"[\s\S]*?compact[\s\S]*?links=\{candidate\.socialLinks\}/,
     "Social icons should render below the profile information only from populated candidate links",
   );
 
@@ -113,17 +113,17 @@ test("all-students rows omit unavailable match percentages and keep one email ac
   );
   assert.match(
     allStudentsSource,
-    /matchPercentage \? \(/,
-    "All-students rows should omit the percentage when no real score is available",
+    /<MatchPercentageIndicator percentage=\{matchPercentage\} \/>/,
+    "All-students rows should share the match indicator while still receiving null for fabricated scores",
   );
   assert.match(
     allStudentsSource,
-    /<SocialLinksList compact links=\{candidate\.socialLinks\} \/>/,
+    /<SocialLinksList[\s\S]*?appearance="bare"[\s\S]*?compact[\s\S]*?links=\{candidate\.socialLinks\}/,
     "All-students rows should reuse the existing compact social-link renderer",
   );
   assert.match(
     allStudentsSource,
-    /studentBookmarkButtonClassName =\s*"[^"]*border-0[^"]*bg-transparent[^"]*shadow-none[^"]*transition-colors[^"]*duration-150[^"]*hover:bg-transparent/,
+    /studentBookmarkButtonClassName =\s*"[^"]*group[^"]*border-0[^"]*bg-transparent[^"]*shadow-none[^"]*transition-colors[^"]*duration-200[^"]*hover:bg-transparent/,
     "All-students bookmark hit targets should keep the same square-free treatment",
   );
   assert.match(
@@ -163,6 +163,16 @@ test("discover social icons use stored URLs safely and render nothing when empty
     /rel="noopener noreferrer"/,
     "Social icons should use safe external-link attributes",
   );
+  assert.match(
+    socialLinksSource,
+    /appearance\?: "bare" \| "boxed";/,
+    "Student Discover can request the social-icon-only presentation without changing the default renderer",
+  );
+  assert.match(
+    socialLinksSource,
+    /compact && appearance === "bare"[\s\S]*?"inline-flex h-9 w-9 items-center justify-center bg-transparent text-blue-800 transition-colors duration-200 hover:bg-transparent hover:text-blue-950/,
+    "Bare compact social icons should not apply a visible border, background, or hover box",
+  );
 });
 
 test("save profile button keeps saved state as a filled icon without requiring a square", () => {
@@ -172,8 +182,8 @@ test("save profile button keeps saved state as a filled icon without requiring a
 
   assert.match(
     saveButtonSource,
-    /fill=\{filled \? "currentColor" : "none"\}/,
-    "Saved state should be communicated by filling the bookmark icon itself",
+    /filled\s*\?\s*"fill-current"[\s\S]*"fill-none group-hover:fill-current"/,
+    "Saved and unsaved-hover states should be communicated by filling the bookmark icon itself",
   );
   assert.match(
     saveButtonSource,
@@ -182,7 +192,39 @@ test("save profile button keeps saved state as a filled icon without requiring a
   );
   assert.match(
     saveButtonSource,
-    /<BookmarkIcon className=\{iconClassName\} filled=\{saved\} \/>/,
+    /previewFillOnHover\?: boolean;/,
+    "Student card bookmarks should opt into fill preview without changing save behavior",
+  );
+  assert.match(
+    saveButtonSource,
+    /<BookmarkIcon[\s\S]*?className=\{iconClassName\}[\s\S]*?filled=\{saved\}[\s\S]*?previewFillOnHover=\{previewFillOnHover\}/,
     "The custom icon size should flow through the existing semantic save button",
+  );
+});
+
+test("match percentage indicator pairs UsersRound with real scores only", () => {
+  const matchIndicatorSource = readRepoFile(
+    "src/components/matching/match-percentage-indicator.tsx",
+  );
+
+  assert.match(
+    matchIndicatorSource,
+    /function UsersRoundIcon/,
+    "The match indicator should include the UsersRound visual",
+  );
+  assert.match(
+    matchIndicatorSource,
+    /className="h-\[1\.0625rem\] w-\[1\.0625rem\]"/,
+    "UsersRound should render at approximately 17px",
+  );
+  assert.match(
+    matchIndicatorSource,
+    /if \(!percentage\) \{\s*return null;/,
+    "UsersRound should not render without a real match percentage",
+  );
+  assert.match(
+    matchIndicatorSource,
+    /aria-label=\{`Match score \$\{percentage\}`\}/,
+    "The match group should keep the existing accessible score label",
   );
 });

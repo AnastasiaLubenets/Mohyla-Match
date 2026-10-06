@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ContactReveal } from "@/components/matching/contact-reveal";
+import { MatchPercentageIndicator } from "@/components/matching/match-percentage-indicator";
 import { SaveProfileButton } from "@/components/matching/save-profile-button";
 import { TaxonomyChipList } from "@/components/matching/taxonomy-chip-list";
 import { SocialLinksList } from "@/components/profile/profile-social-links";
@@ -9,9 +10,10 @@ import type { DiscoveryCandidate } from "@/lib/matching/data";
 import { formatMatchPercentage } from "@/lib/matching/view-model";
 
 const studentBookmarkButtonClassName =
-  "inline-flex h-10 w-10 items-center justify-center border-0 bg-transparent p-0 text-blue-800 shadow-none transition-colors duration-150 hover:bg-transparent hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70";
+  "group inline-flex h-10 w-10 items-center justify-center border-0 bg-transparent p-0 text-blue-800 shadow-none transition-colors duration-200 hover:bg-transparent hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70";
 
-const studentBookmarkIconClassName = "h-[1.375rem] w-[1.375rem]";
+const studentBookmarkIconClassName =
+  "h-[1.375rem] w-[1.375rem] transition-[fill,color] duration-200";
 
 function AllStudentsStatusMessage({
   error,
@@ -156,7 +158,11 @@ function AllStudentRow({
         ) : null}
         {candidate.socialLinks.length > 0 ? (
           <div className="mt-3">
-            <SocialLinksList compact links={candidate.socialLinks} />
+            <SocialLinksList
+              appearance="bare"
+              compact
+              links={candidate.socialLinks}
+            />
           </div>
         ) : null}
         <div className="mt-3">
@@ -169,18 +175,12 @@ function AllStudentRow({
       </div>
 
       <div className="flex flex-wrap items-center gap-3 sm:col-start-2 lg:col-start-3 lg:flex-nowrap lg:justify-end">
-        <div className="flex items-center gap-3">
-          {matchPercentage ? (
-            <span
-              aria-label={`Match score ${matchPercentage}`}
-              className="text-sm font-bold text-blue-800"
-            >
-              {matchPercentage}
-            </span>
-          ) : null}
+        <div className="flex items-center gap-4">
+          <MatchPercentageIndicator percentage={matchPercentage} />
           <SaveProfileButton
             className={studentBookmarkButtonClassName}
             iconClassName={studentBookmarkIconClassName}
+            previewFillOnHover
             returnTo={returnTo}
             saved={saved}
             targetUserId={candidate.userId}

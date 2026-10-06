@@ -5,12 +5,23 @@ import { useFormStatus } from "react-dom";
 function BookmarkIcon({
   className = "h-5 w-5",
   filled,
-}: Readonly<{ className?: string; filled: boolean }>) {
+  previewFillOnHover = false,
+}: Readonly<{
+  className?: string;
+  filled: boolean;
+  previewFillOnHover?: boolean;
+}>) {
+  const fillClassName = filled
+    ? "fill-current"
+    : previewFillOnHover
+      ? "fill-none group-hover:fill-current"
+      : "fill-none";
+
   return (
     <svg
       aria-hidden="true"
-      className={className}
-      fill={filled ? "currentColor" : "none"}
+      className={`${className} ${fillClassName}`}
+      fill="none"
       stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -27,6 +38,7 @@ function SaveSubmitButton({
   iconClassName,
   label,
   pendingLabel,
+  previewFillOnHover,
   saved,
   showLabel,
 }: Readonly<{
@@ -34,6 +46,7 @@ function SaveSubmitButton({
   iconClassName?: string;
   label: string;
   pendingLabel: string;
+  previewFillOnHover?: boolean;
   saved: boolean;
   showLabel: boolean;
 }>) {
@@ -53,7 +66,11 @@ function SaveSubmitButton({
       title={actionLabel}
       type="submit"
     >
-      <BookmarkIcon className={iconClassName} filled={saved} />
+      <BookmarkIcon
+        className={iconClassName}
+        filled={saved}
+        previewFillOnHover={previewFillOnHover}
+      />
       {showLabel ? (
         <span>{pending ? pendingLabel : label}</span>
       ) : (
@@ -68,6 +85,7 @@ export function SaveProfileButton({
   iconClassName,
   label,
   pendingLabel,
+  previewFillOnHover,
   returnTo,
   saved,
   targetUserId,
@@ -77,6 +95,7 @@ export function SaveProfileButton({
   iconClassName?: string;
   label?: string;
   pendingLabel?: string;
+  previewFillOnHover?: boolean;
   returnTo: string;
   saved: boolean;
   targetUserId: string;
@@ -101,6 +120,7 @@ export function SaveProfileButton({
         iconClassName={iconClassName}
         label={label ?? (saved ? "Remove from saved" : "Save profile")}
         pendingLabel={pendingLabel ?? (saved ? "Removing..." : "Saving...")}
+        previewFillOnHover={previewFillOnHover}
         saved={saved}
         showLabel={showLabel}
       />
