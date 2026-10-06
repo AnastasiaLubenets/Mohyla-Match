@@ -173,7 +173,17 @@ test("faculty discovery has its own sidebar route and keeps student discover sep
   assert.match(facultyPage, /Find the right faculty member\./);
   assert.match(
     facultyPage,
+    /text-\[clamp\(2\.5rem,5vw,3\.5rem\)\]/,
+    "Faculty hero heading should stay centered but use a smaller desktop size",
+  );
+  assert.match(
+    facultyPage,
     /Discover Mohyla faculty by expertise, academic field, and research\s+interests\./,
+  );
+  assert.doesNotMatch(
+    facultyPage,
+    /Explore expertise across Mohyla programs and academic teams\.|Programs\s*<br \/>[\s\S]*?Research\s*<br \/>[\s\S]*?Expertise/,
+    "Faculty page should not render the old quote card below filters",
   );
   assert.doesNotMatch(facultyPage, /<DiscoveryViewTabs/);
   assert.doesNotMatch(facultyPage, /Collaboration goal|Year of study|Looking-for skills/);

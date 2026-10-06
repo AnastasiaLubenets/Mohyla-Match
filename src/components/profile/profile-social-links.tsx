@@ -172,6 +172,11 @@ export function SocialLinksList({
               ? "inline-flex h-10 w-10 items-center justify-center rounded-md border border-blue-100 bg-white text-blue-800 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               : "inline-flex min-h-10 items-center gap-2 rounded-md border border-blue-100 bg-white px-3 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500";
 
+        const iconClassName =
+          compact && appearance === "bare"
+            ? "h-[1.375rem] w-[1.375rem]"
+            : "h-5 w-5";
+
         return (
           <li key={link.platform}>
             <a
@@ -182,7 +187,10 @@ export function SocialLinksList({
               target="_blank"
               title={label}
             >
-              <SocialPlatformIcon className="h-5 w-5" platform={link.platform} />
+              <SocialPlatformIcon
+                className={iconClassName}
+                platform={link.platform}
+              />
               {compact ? <span className="sr-only">{label}</span> : <span>{label}</span>}
             </a>
           </li>

@@ -4,7 +4,6 @@ import { ContactReveal } from "@/components/matching/contact-reveal";
 import { MatchPercentageIndicator } from "@/components/matching/match-percentage-indicator";
 import { SaveProfileButton } from "@/components/matching/save-profile-button";
 import { TaxonomyChipList } from "@/components/matching/taxonomy-chip-list";
-import { SocialLinksList } from "@/components/profile/profile-social-links";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import type { DiscoveryCandidate } from "@/lib/matching/data";
 import { formatMatchPercentage } from "@/lib/matching/view-model";
@@ -155,15 +154,6 @@ function AllStudentRow({
         </p>
         {preview ? (
           <p className="mt-2 text-sm leading-5 text-blue-900/75">{preview}</p>
-        ) : null}
-        {candidate.socialLinks.length > 0 ? (
-          <div className="mt-3">
-            <SocialLinksList
-              appearance="bare"
-              compact
-              links={candidate.socialLinks}
-            />
-          </div>
         ) : null}
         <div className="mt-3">
           <TaxonomyChipList

@@ -116,10 +116,10 @@ test("all-students rows omit unavailable match percentages and keep one email ac
     /<MatchPercentageIndicator percentage=\{matchPercentage\} \/>/,
     "All-students rows should share the match indicator while still receiving null for fabricated scores",
   );
-  assert.match(
+  assert.doesNotMatch(
     allStudentsSource,
-    /<SocialLinksList[\s\S]*?appearance="bare"[\s\S]*?compact[\s\S]*?links=\{candidate\.socialLinks\}/,
-    "All-students rows should reuse the existing compact social-link renderer",
+    /SocialLinksList|candidate\.socialLinks/,
+    "All-students rows should not render social network icons in the compact directory list",
   );
   assert.match(
     allStudentsSource,
@@ -172,6 +172,11 @@ test("discover social icons use stored URLs safely and render nothing when empty
     socialLinksSource,
     /compact && appearance === "bare"[\s\S]*?"inline-flex h-9 w-9 items-center justify-center bg-transparent text-blue-800 transition-colors duration-200 hover:bg-transparent hover:text-blue-950/,
     "Bare compact social icons should not apply a visible border, background, or hover box",
+  );
+  assert.match(
+    socialLinksSource,
+    /compact && appearance === "bare"[\s\S]*\? "h-\[1\.375rem\] w-\[1\.375rem\]"[\s\S]*: "h-5 w-5"/,
+    "Bare compact social icons should render at approximately 22px without changing boxed icons",
   );
 });
 
