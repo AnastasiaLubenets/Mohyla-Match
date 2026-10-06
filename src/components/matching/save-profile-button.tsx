@@ -2,11 +2,14 @@
 
 import { useFormStatus } from "react-dom";
 
-function BookmarkIcon({ filled }: Readonly<{ filled: boolean }>) {
+function BookmarkIcon({
+  className = "h-5 w-5",
+  filled,
+}: Readonly<{ className?: string; filled: boolean }>) {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className={className}
       fill={filled ? "currentColor" : "none"}
       stroke="currentColor"
       strokeLinecap="round"
@@ -21,12 +24,14 @@ function BookmarkIcon({ filled }: Readonly<{ filled: boolean }>) {
 
 function SaveSubmitButton({
   className,
+  iconClassName,
   label,
   pendingLabel,
   saved,
   showLabel,
 }: Readonly<{
   className?: string;
+  iconClassName?: string;
   label: string;
   pendingLabel: string;
   saved: boolean;
@@ -48,7 +53,7 @@ function SaveSubmitButton({
       title={actionLabel}
       type="submit"
     >
-      <BookmarkIcon filled={saved} />
+      <BookmarkIcon className={iconClassName} filled={saved} />
       {showLabel ? (
         <span>{pending ? pendingLabel : label}</span>
       ) : (
@@ -60,6 +65,7 @@ function SaveSubmitButton({
 
 export function SaveProfileButton({
   className,
+  iconClassName,
   label,
   pendingLabel,
   returnTo,
@@ -68,6 +74,7 @@ export function SaveProfileButton({
   variant = "button",
 }: Readonly<{
   className?: string;
+  iconClassName?: string;
   label?: string;
   pendingLabel?: string;
   returnTo: string;
@@ -91,6 +98,7 @@ export function SaveProfileButton({
               : "inline-flex h-11 w-11 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-70"
             : undefined)
         }
+        iconClassName={iconClassName}
         label={label ?? (saved ? "Remove from saved" : "Save profile")}
         pendingLabel={pendingLabel ?? (saved ? "Removing..." : "Saving...")}
         saved={saved}

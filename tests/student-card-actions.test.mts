@@ -65,6 +65,21 @@ test("student recommendation card places actions in the upper profile area", () 
   );
   assert.match(
     discoveryCardSource,
+    /studentBookmarkButtonClassName =\s*"[^"]*border-0[^"]*bg-transparent[^"]*shadow-none[^"]*transition-colors[^"]*duration-150[^"]*hover:bg-transparent/,
+    "The student bookmark button hit target should stay visually transparent, including on hover",
+  );
+  assert.match(
+    discoveryCardSource,
+    /const studentBookmarkIconClassName = "h-\[1\.375rem\] w-\[1\.375rem\]";/,
+    "The visible bookmark icon should be slightly larger than the default 20px icon",
+  );
+  assert.match(
+    discoveryCardSource,
+    /iconClassName=\{studentBookmarkIconClassName\}/,
+    "The student card should apply the larger standalone bookmark icon",
+  );
+  assert.match(
+    discoveryCardSource,
     /<SocialLinksList compact links=\{candidate\.socialLinks\} \/>/,
     "Social icons should render below the profile information only from populated candidate links",
   );
@@ -106,6 +121,16 @@ test("all-students rows omit unavailable match percentages and keep one email ac
     /<SocialLinksList compact links=\{candidate\.socialLinks\} \/>/,
     "All-students rows should reuse the existing compact social-link renderer",
   );
+  assert.match(
+    allStudentsSource,
+    /studentBookmarkButtonClassName =\s*"[^"]*border-0[^"]*bg-transparent[^"]*shadow-none[^"]*transition-colors[^"]*duration-150[^"]*hover:bg-transparent/,
+    "All-students bookmark hit targets should keep the same square-free treatment",
+  );
+  assert.match(
+    allStudentsSource,
+    /iconClassName=\{studentBookmarkIconClassName\}/,
+    "All-students rows should apply the same larger standalone bookmark icon",
+  );
   assert.equal(
     countMatches(allStudentsSource, /<ContactReveal/g),
     1,
@@ -137,5 +162,27 @@ test("discover social icons use stored URLs safely and render nothing when empty
     socialLinksSource,
     /rel="noopener noreferrer"/,
     "Social icons should use safe external-link attributes",
+  );
+});
+
+test("save profile button keeps saved state as a filled icon without requiring a square", () => {
+  const saveButtonSource = readRepoFile(
+    "src/components/matching/save-profile-button.tsx",
+  );
+
+  assert.match(
+    saveButtonSource,
+    /fill=\{filled \? "currentColor" : "none"\}/,
+    "Saved state should be communicated by filling the bookmark icon itself",
+  );
+  assert.match(
+    saveButtonSource,
+    /iconClassName\?: string;/,
+    "Student cards should be able to size the icon without changing save behavior",
+  );
+  assert.match(
+    saveButtonSource,
+    /<BookmarkIcon className=\{iconClassName\} filled=\{saved\} \/>/,
+    "The custom icon size should flow through the existing semantic save button",
   );
 });

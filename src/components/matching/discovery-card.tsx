@@ -11,6 +11,11 @@ import { TaxonomyChipList } from "@/components/matching/taxonomy-chip-list";
 import type { DiscoveryCandidate } from "@/lib/matching/data";
 import { formatMatchPercentage } from "@/lib/matching/view-model";
 
+const studentBookmarkButtonClassName =
+  "inline-flex h-10 w-10 items-center justify-center border-0 bg-transparent p-0 text-blue-800 shadow-none transition-colors duration-150 hover:bg-transparent hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70";
+
+const studentBookmarkIconClassName = "h-[1.375rem] w-[1.375rem]";
+
 function StatusMessage({
   error,
   status,
@@ -266,7 +271,8 @@ export function DiscoveryCard({
                 </span>
               ) : null}
               <SaveProfileButton
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-blue-800 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
+                className={studentBookmarkButtonClassName}
+                iconClassName={studentBookmarkIconClassName}
                 returnTo={returnTo}
                 saved={saved}
                 targetUserId={candidate.userId}
