@@ -12,6 +12,7 @@ import {
   mappedProgramAvatarKeys,
   programAvatarContainerClasses,
   programAvatarImageClasses,
+  programAvatarSrcByKey,
   profileAvatarModes,
   resolveProfileAvatar,
   systemAvatarRadiusClass,
@@ -39,17 +40,17 @@ const systemAvatarPlacementSources = [
 test("mapped academic program renders its stable image source", () => {
   assert.equal(
     getProgramAvatarSrc("faculty-economics--program-economics"),
-    "/avatars/programs/program-economics.png",
+    "/avatars/programs/program-economics-v2.png",
   );
   assert.equal(
     getProgramAvatarSrc("faculty-informatics--program-computer-science"),
-    "/avatars/programs/program-computer-science.png",
+    "/avatars/programs/program-computer-science-v2.png",
   );
   assert.equal(
     getProgramAvatarSrc(
       "faculty-informatics--program-applied-mathematics",
     ),
-    "/avatars/programs/program-applied-mathematics.png",
+    "/avatars/programs/program-applied-mathematics-v2.png",
   );
 });
 
@@ -61,7 +62,7 @@ test("two users in the same program resolve to the same artwork", () => {
     "faculty-economics--program-marketing",
   );
 
-  assert.equal(firstUser, "/avatars/programs/program-marketing.png");
+  assert.equal(firstUser, "/avatars/programs/program-marketing-v2.png");
   assert.equal(secondUser, firstUser);
 });
 
@@ -69,8 +70,8 @@ test("changing academic program changes the resolved artwork", () => {
   const before = getProgramAvatarSrc("faculty-economics--program-economics");
   const after = getProgramAvatarSrc("faculty-economics--program-marketing");
 
-  assert.equal(before, "/avatars/programs/program-economics.png");
-  assert.equal(after, "/avatars/programs/program-marketing.png");
+  assert.equal(before, "/avatars/programs/program-economics-v2.png");
+  assert.equal(after, "/avatars/programs/program-marketing-v2.png");
   assert.notEqual(after, before);
 });
 
@@ -80,22 +81,22 @@ test("direct avatar variant key wins for live profile-edit program previews", ()
       "faculty-economics--program-economics",
       "program-computer-science",
     ),
-    "/avatars/programs/program-computer-science.png",
+    "/avatars/programs/program-computer-science-v2.png",
   );
 });
 
 test("legacy program keys resolve through supplied replacement artwork", () => {
   assert.equal(
     getProgramAvatarSrc("faculty-history--program-archaeology"),
-    "/avatars/programs/program-history.png",
+    "/avatars/programs/program-history-v2.png",
   );
   assert.equal(
     getProgramAvatarSrc("faculty-humanities--program-english-and-ukrainian-language"),
-    "/avatars/programs/program-language-literature-comparative-studies.png",
+    "/avatars/programs/program-language-literature-comparative-studies-v2.png",
   );
   assert.equal(
     getProgramAvatarSrc("faculty-informatics--program-big-data-analytics"),
-    "/avatars/programs/program-applied-mathematics.png",
+    "/avatars/programs/program-applied-mathematics-v2.png",
   );
 });
 
@@ -127,7 +128,7 @@ test("profile avatar resolver supports default, program and custom modes", () =>
       key: "program-economics",
       kind: "image",
       mode: "program",
-      src: "/avatars/programs/program-economics.png",
+      src: "/avatars/programs/program-economics-v2.png",
     },
   );
 
@@ -352,11 +353,20 @@ test("profile update path saves avatar mode and custom key columns", () => {
 });
 
 test("every mapped production program avatar asset exists", () => {
+  assert.equal(
+    Object.keys(programAvatarSrcByKey).length,
+    mappedProgramAvatarKeys.length,
+  );
+
   for (const key of mappedProgramAvatarKeys) {
+    const src = programAvatarSrcByKey[key];
+
+    assert.equal(getProgramAvatarSrc(key), src);
+    assert.match(src, /^\/avatars\/programs\/program-[a-z0-9-]+-v2\.png$/);
     assert.equal(
-      existsSync(join(repoRoot, "public", "avatars", "programs", `${key}.png`)),
+      existsSync(join(repoRoot, "public", src.slice(1))),
       true,
-      `${key}.png should exist`,
+      `${src} should exist`,
     );
   }
 });

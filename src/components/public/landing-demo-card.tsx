@@ -2,6 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { ArrowRightIcon } from "@/components/public/public-icons";
+import { getProgramAvatarSrc } from "@/lib/profile/program-avatar";
+
+const demoAvatarSrc =
+  getProgramAvatarSrc("faculty-informatics--program-computer-science") ??
+  "/avatars/programs/program-computer-science-v2.png";
 
 export function LandingDemoCard() {
   return (
@@ -25,7 +30,7 @@ export function LandingDemoCard() {
             alt=""
             fill
             sizes="80px"
-            src="/avatars/programs/program-computer-science.png"
+            src={demoAvatarSrc}
             className="object-cover"
           />
         </div>

@@ -63,6 +63,56 @@ export const mappedProgramAvatarKeys = [
   "program-international-law",
 ] as const;
 
+type MappedProgramAvatarKey = (typeof mappedProgramAvatarKeys)[number];
+
+export const programAvatarSrcByKey = {
+  "program-economics": "/avatars/programs/program-economics-v2.png",
+  "program-marketing": "/avatars/programs/program-marketing-v2.png",
+  "program-management": "/avatars/programs/program-management-v2.png",
+  "program-finance-banking-insurance":
+    "/avatars/programs/program-finance-banking-insurance-v2.png",
+  "program-public-relations":
+    "/avatars/programs/program-public-relations-v2.png",
+  "program-political-science":
+    "/avatars/programs/program-political-science-v2.png",
+  "program-sociology": "/avatars/programs/program-sociology-v2.png",
+  "program-law": "/avatars/programs/program-law-v2.png",
+  "program-history": "/avatars/programs/program-history-v2.png",
+  "program-cultural-studies":
+    "/avatars/programs/program-cultural-studies-v2.png",
+  "program-language-literature-comparative-studies":
+    "/avatars/programs/program-language-literature-comparative-studies-v2.png",
+  "program-philosophy": "/avatars/programs/program-philosophy-v2.png",
+  "program-international-relations-public-communications-regional-studies":
+    "/avatars/programs/program-international-relations-public-communications-regional-studies-v2.png",
+  "program-public-private-governance":
+    "/avatars/programs/program-public-private-governance-v2.png",
+  "program-biology-biotechnology":
+    "/avatars/programs/program-biology-biotechnology-v2.png",
+  "program-ecology": "/avatars/programs/program-ecology-v2.png",
+  "program-rocket-aerospace-systems-physics":
+    "/avatars/programs/program-rocket-aerospace-systems-physics-v2.png",
+  "program-chemistry": "/avatars/programs/program-chemistry-v2.png",
+  "program-software-engineering":
+    "/avatars/programs/program-software-engineering-v2.png",
+  "program-automation-computer-integrated-technologies-robotics":
+    "/avatars/programs/program-automation-computer-integrated-technologies-robotics-v2.png",
+  "program-information-systems-vulnerability-analysis":
+    "/avatars/programs/program-information-systems-vulnerability-analysis-v2.png",
+  "program-computer-science":
+    "/avatars/programs/program-computer-science-v2.png",
+  "program-applied-mathematics":
+    "/avatars/programs/program-applied-mathematics-v2.png",
+  "program-psychology": "/avatars/programs/program-psychology-v2.png",
+  "program-social-work": "/avatars/programs/program-social-work-v2.png",
+  "program-medicine": "/avatars/programs/program-medicine-v2.png",
+  "program-public-health": "/avatars/programs/program-public-health-v2.png",
+  "program-healthcare-management":
+    "/avatars/programs/program-healthcare-management-v2.png",
+  "program-international-law":
+    "/avatars/programs/program-international-law-v2.png",
+} as const satisfies Record<MappedProgramAvatarKey, string>;
+
 const mappedProgramAvatarKeySet = new Set<string>(mappedProgramAvatarKeys);
 
 const legacyProgramAvatarAliases = new Map<string, string>([
@@ -147,7 +197,7 @@ export function getProgramAvatarSrc(
 ): string | null {
   const key = getMappedProgramAvatarKey(systemAvatarKey, avatarVariantKey);
 
-  return key ? `/avatars/programs/${key}.png` : null;
+  return key ? programAvatarSrcByKey[key as MappedProgramAvatarKey] : null;
 }
 
 export function getCustomAvatarSrc(
@@ -221,7 +271,7 @@ export function resolveProfileAvatar({
           key: programAvatarKey,
           kind: "image",
           mode,
-          src: `/avatars/programs/${programAvatarKey}.png`,
+          src: programAvatarSrcByKey[programAvatarKey as MappedProgramAvatarKey],
         }
       : { key: "default", kind: "default", mode: "default", src: null };
   }
