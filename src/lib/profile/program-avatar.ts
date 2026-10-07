@@ -8,7 +8,7 @@ export const systemAvatarSizeClasses = {
 
 export type SystemAvatarSize = keyof typeof systemAvatarSizeClasses;
 
-export const systemAvatarRadiusClass = "rounded-[1.25rem]" as const;
+export const systemAvatarRadiusClass = "rounded-[0.65rem]" as const;
 
 export const profileAvatarModes = ["default", "program", "custom"] as const;
 
