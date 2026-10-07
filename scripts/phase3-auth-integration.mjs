@@ -1997,11 +1997,24 @@ async function runProfileDeletionFlow(cookieJar, userId, userEmail) {
     "rejected account deletion leaves auth account unchanged",
   );
 
-  assertRedirectWithParams(
+  assertRedirect(
     await postForm("/profile/delete", { confirmation: "DELETE" }, cookieJar),
-    "/signup",
-    { status: "account-deleted" },
-    "account deletion redirects out of the authenticated app",
+    "/",
+    "account deletion redirects to the welcome page",
+  );
+  const welcomeBody = await readPageText(
+    await getPath("/", cookieJar),
+    "welcome page after account deletion",
+  );
+  assertTextContains(
+    welcomeBody,
+    "Find your people.",
+    "deleted user sees the original Mohyla Match welcome page",
+  );
+  assertTextContains(
+    welcomeBody,
+    "Join Mohyla Match",
+    "deleted user sees the normal welcome signup CTA",
   );
 
   const deletedAuthUser = await service.auth.admin.getUserById(userId);
@@ -2136,6 +2149,16 @@ async function runProfileDeletionFlow(cookieJar, userId, userEmail) {
     roleSelectionBody,
     "I am a...",
     "repeat signup starts from role selection",
+  );
+  assertTextContains(
+    roleSelectionBody,
+    "Student",
+    "repeat signup asks for the student role again",
+  );
+  assertTextContains(
+    roleSelectionBody,
+    "Faculty",
+    "repeat signup asks for the faculty role again",
   );
 
   const newUserResidualState = await queryLocalJson(

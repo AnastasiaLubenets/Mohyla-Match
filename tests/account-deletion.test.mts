@@ -30,7 +30,9 @@ test("delete account route deletes only the authenticated user from Auth", () =>
   assert.match(action, /context\.supabase\.auth\.signOut\(\{ scope: "local" \}\)/);
   assert.match(action, /name\.startsWith\("sb-"\)/);
   assert.match(action, /response\.cookies\.delete\(name\)/);
-  assert.match(action, /status: "account-deleted"/);
+  assert.match(action, /redirectTo\(request, "\/"\)/);
+  assert.doesNotMatch(action, /account-deleted/);
+  assert.doesNotMatch(action, /pathWithParams\("\/signup"/);
   assert.doesNotMatch(action, /delete_my_profile/);
   assert.doesNotMatch(action, /formData\.get\(["']userId["']\)/);
   assert.doesNotMatch(action, /formData\.get\(["']targetUserId["']\)/);
@@ -39,7 +41,6 @@ test("delete account route deletes only the authenticated user from Auth", () =>
 test("delete account UI requires explicit irreversible confirmation", () => {
   const dangerZone = source("src/components/profile/delete-profile-danger-zone.tsx");
   const profilePage = source("src/app/profile/page.tsx");
-  const signupPage = source("src/app/signup/page.tsx");
 
   assert.match(
     dangerZone,
@@ -49,7 +50,6 @@ test("delete account UI requires explicit irreversible confirmation", () => {
   assert.match(dangerZone, /Deleting account\.\.\./);
   assert.match(dangerZone, /Delete account/);
   assert.match(profilePage, /We could not delete your account/);
-  assert.match(signupPage, /status === "account-deleted"/);
 });
 
 test("old profile-only database deletion API is removed", () => {
@@ -72,4 +72,17 @@ test("account state verifies the Auth user instead of trusting stale claims", ()
 
   assert.match(state, /supabase\.auth\.getUser\(\)/);
   assert.doesNotMatch(state, /supabase\.auth\.getClaims\(\)/);
+});
+
+test("same-email re-registration returns through the normal role-selection flow", () => {
+  const integration = source("scripts/phase3-auth-integration.mjs");
+  const signupPage = source("src/app/signup/page.tsx");
+
+  assert.match(integration, /account deletion redirects to the welcome page/);
+  assert.match(integration, /Find your people\./);
+  assert.match(integration, /repeat signup starts from role selection/);
+  assert.match(integration, /Student/);
+  assert.match(integration, /Faculty/);
+  assert.doesNotMatch(integration, /account-deleted/);
+  assert.doesNotMatch(signupPage, /account-deleted/);
 });
