@@ -168,7 +168,7 @@ export default async function EditProfilePage({ searchParams }: PageProps) {
   );
 
   return (
-    <main className="min-h-screen bg-[#eef6fb] text-blue-950 lg:flex lg:h-screen lg:flex-col lg:overflow-hidden">
+    <main className="min-h-screen bg-[#eef6fb] text-blue-950">
       <EditorTopBar
         academicProgramName={topBarProgram?.display_name ?? null}
         availability={editData.profile.availability}
@@ -179,7 +179,7 @@ export default async function EditProfilePage({ searchParams }: PageProps) {
         fullName={editData.profile.full_name}
         systemAvatarKey={editData.profile.system_avatar_key}
       />
-      <section className="scrollbar-hidden mx-auto w-full max-w-[96rem] px-4 py-6 sm:px-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:py-8">
+      <section className="mx-auto w-full max-w-[96rem] px-4 py-6 sm:px-6 lg:py-8">
         <ProfileEditForm data={editData} error={error} />
       </section>
     </main>

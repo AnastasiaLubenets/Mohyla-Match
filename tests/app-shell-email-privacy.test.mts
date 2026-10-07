@@ -36,19 +36,13 @@ test("hidden scrollbar utility hides the visual scrollbar without disabling scro
 });
 
 test("authenticated app center scroll containers keep overflow-y auto with hidden scrollbars", async () => {
-  const [
-    discoverPage,
-    savedPage,
-    profilePage,
-    studentProfilePage,
-    editProfilePage,
-  ] = await Promise.all([
-    readRepoFile("src/app/app/page.tsx"),
-    readRepoFile("src/app/saved/page.tsx"),
-    readRepoFile("src/app/profile/page.tsx"),
-    readRepoFile("src/app/profiles/[userId]/page.tsx"),
-    readRepoFile("src/app/profile/edit/page.tsx"),
-  ]);
+  const [discoverPage, savedPage, profilePage, studentProfilePage] =
+    await Promise.all([
+      readRepoFile("src/app/app/page.tsx"),
+      readRepoFile("src/app/saved/page.tsx"),
+      readRepoFile("src/app/profile/page.tsx"),
+      readRepoFile("src/app/profiles/[userId]/page.tsx"),
+    ]);
 
   assertHasClassLine(
     discoverPage,
@@ -86,11 +80,26 @@ test("authenticated app center scroll containers keep overflow-y auto with hidde
     ["scrollbar-hidden", "xl:overflow-y-auto", "xl:pr-2"],
     "/profiles/[userId] center container should hide the visual scrollbar.",
   );
+});
+
+test("/profile/edit uses natural document scroll without artificial blank height", async () => {
+  const editProfilePage = await readRepoFile("src/app/profile/edit/page.tsx");
+
   assertHasClassLine(
     editProfilePage,
-    ["scrollbar-hidden", "lg:overflow-y-auto", "lg:flex-1"],
-    "/profile/edit center container should hide the visual scrollbar.",
+    ["min-h-screen", "bg-[#eef6fb]", "text-blue-950"],
+    "/profile/edit should keep the blue page background on the document shell.",
   );
+  assertHasClassLine(
+    editProfilePage,
+    ["mx-auto", "w-full", "max-w-[96rem]", "px-4", "lg:py-8"],
+    "/profile/edit form wrapper should keep the existing content width and padding.",
+  );
+  assert.doesNotMatch(editProfilePage, /lg:h-screen/);
+  assert.doesNotMatch(editProfilePage, /lg:flex-1/);
+  assert.doesNotMatch(editProfilePage, /lg:overflow-hidden/);
+  assert.doesNotMatch(editProfilePage, /lg:overflow-y-auto/);
+  assert.doesNotMatch(editProfilePage, /scrollbar-hidden/);
 });
 
 test("fixed app shell keeps fixed rails and top bar behavior", async () => {
