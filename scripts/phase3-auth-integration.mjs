@@ -1950,7 +1950,7 @@ async function runMatchingFlow(cookieJar, userId, taxonomy) {
 async function runProfileDeletionFlow(cookieJar, userId, userEmail) {
   const profileBody = await readPageText(
     await getPath("/profile", cookieJar),
-    "profile view before profile deletion",
+    "profile view before account deletion",
   );
   assertTextContains(
     profileBody,
@@ -1959,20 +1959,20 @@ async function runProfileDeletionFlow(cookieJar, userId, userEmail) {
   );
   assertTextContains(
     profileBody,
-    "Delete profile",
-    "own profile includes delete profile action",
+    "Delete account",
+    "own profile includes delete account action",
   );
   assertTextContains(
     profileBody,
-    "This permanently deletes your Mohyla Match profile and its related data.",
-    "delete profile confirmation copy is rendered",
+    "This permanently deletes your Mohyla Match account and all profile data. This action cannot be undone.",
+    "delete account confirmation copy is rendered",
   );
 
   assertRedirectWithParams(
     await postForm("/profile/delete", { confirmation: "NOT DELETE" }, cookieJar),
     "/profile",
     { error: "delete-failed" },
-    "profile deletion requires exact confirmation",
+    "account deletion requires exact confirmation",
   );
   const unchangedProfile = await expectNoSupabaseError(
     await service
@@ -1985,14 +1985,29 @@ async function runProfileDeletionFlow(cookieJar, userId, userEmail) {
   assert.equal(
     unchangedProfile.user_id,
     userId,
-    "rejected profile deletion leaves profile unchanged",
+    "rejected account deletion leaves profile unchanged",
+  );
+  const unchangedAuthUser = await expectNoSupabaseError(
+    await service.auth.admin.getUserById(userId),
+    "load auth user after rejected account deletion",
+  );
+  assert.equal(
+    unchangedAuthUser.user?.email,
+    userEmail,
+    "rejected account deletion leaves auth account unchanged",
   );
 
   assertRedirectWithParams(
     await postForm("/profile/delete", { confirmation: "DELETE" }, cookieJar),
-    "/account/setup",
-    { step: "1" },
-    "profile deletion redirects to setup step 1",
+    "/signup",
+    { status: "account-deleted" },
+    "account deletion redirects out of the authenticated app",
+  );
+
+  const deletedAuthUser = await service.auth.admin.getUserById(userId);
+  assert.ok(
+    deletedAuthUser.error || !deletedAuthUser.data.user,
+    "account deletion removes the auth user",
   );
 
   const deletedProfile = await expectNoSupabaseError(
@@ -2005,26 +2020,156 @@ async function runProfileDeletionFlow(cookieJar, userId, userEmail) {
   );
   assert.equal(deletedProfile, null, "profile row is deleted");
 
-  const authUser = await expectNoSupabaseError(
-    await service.auth.admin.getUserById(userId),
-    "load auth user after profile deletion",
+  const deletedUserReferenceCounts = await queryLocalJson(
+    `select jsonb_build_object(
+      'profiles', (select count(*) from public.profiles where user_id = ${sqlUuid(userId, "deleted profile user id")}),
+      'account_roles', (select count(*) from public.account_roles where user_id = ${sqlUuid(userId, "deleted account role user id")}),
+      'user_roles', (select count(*) from public.user_roles where user_id = ${sqlUuid(userId, "deleted user role user id")}),
+      'profile_skills', (select count(*) from public.profile_skills where user_id = ${sqlUuid(userId, "deleted profile skill user id")}),
+      'profile_interests', (select count(*) from public.profile_interests where user_id = ${sqlUuid(userId, "deleted profile interest user id")}),
+      'profile_collaboration_goals', (select count(*) from public.profile_collaboration_goals where user_id = ${sqlUuid(userId, "deleted profile goal user id")}),
+      'profile_academic_programs', (select count(*) from public.profile_academic_programs where user_id = ${sqlUuid(userId, "deleted profile program user id")}),
+      'faculty_expertise', (select count(*) from public.faculty_expertise where user_id = ${sqlUuid(userId, "deleted faculty expertise user id")}),
+      'profile_social_links', (select count(*) from public.profile_social_links where user_id = ${sqlUuid(userId, "deleted social link user id")}),
+      'interactions', (
+        select count(*)
+        from public.interactions
+        where source_user_id = ${sqlUuid(userId, "deleted source user id")}
+           or target_user_id = ${sqlUuid(userId, "deleted target user id")}
+      ),
+      'matches', (
+        select count(*)
+        from public.matches
+        where user_low = ${sqlUuid(userId, "deleted match low user id")}
+           or user_high = ${sqlUuid(userId, "deleted match high user id")}
+      ),
+      'blocks', (
+        select count(*)
+        from public.blocks
+        where blocker_user_id = ${sqlUuid(userId, "deleted blocker user id")}
+           or blocked_user_id = ${sqlUuid(userId, "deleted blocked user id")}
+      ),
+      'reports', (
+        select count(*)
+        from public.reports
+        where reporter_user_id = ${sqlUuid(userId, "deleted reporter user id")}
+           or reported_user_id = ${sqlUuid(userId, "deleted reported user id")}
+      ),
+      'product_event_user_references', (
+        select count(*)
+        from public.product_events
+        where user_id = ${sqlUuid(userId, "deleted event user id")}
+           or subject_user_id = ${sqlUuid(userId, "deleted event subject user id")}
+      ),
+      'admin_action_user_references', (
+        select count(*)
+        from public.admin_actions
+        where admin_user_id = ${sqlUuid(userId, "deleted admin user id")}
+           or target_user_id = ${sqlUuid(userId, "deleted admin target user id")}
+      )
+    )`,
+    "count deleted account owned data",
   );
-  assert.equal(
-    authUser.user?.email,
-    userEmail,
-    "profile deletion keeps the auth account and login email",
+  assert.deepEqual(
+    deletedUserReferenceCounts,
+    {
+      account_roles: 0,
+      admin_action_user_references: 0,
+      blocks: 0,
+      faculty_expertise: 0,
+      interactions: 0,
+      matches: 0,
+      product_event_user_references: 0,
+      profile_academic_programs: 0,
+      profile_collaboration_goals: 0,
+      profile_interests: 0,
+      profile_skills: 0,
+      profile_social_links: 0,
+      profiles: 0,
+      reports: 0,
+      user_roles: 0,
+    },
+    "account deletion removes user-owned rows and references",
   );
 
   assertRedirect(
-    await getPath("/profile", cookieJar),
-    "/account/setup",
-    "deleted profile user is treated as onboarding incomplete",
+    await getPath("/app", cookieJar),
+    "/login",
+    "old session no longer grants app access after account deletion",
   );
 
-  const recreated = await runOnboardingFlow(cookieJar, userId);
+  await clearMailpitMessages();
+  const repeatSignup = await anon.auth.signUp({
+    email: userEmail,
+    password,
+    options: { emailRedirectTo: appUrl("/auth/confirm") },
+  });
+  assert.equal(
+    repeatSignup.error,
+    null,
+    "deleted account email can sign up again",
+  );
+  assert.ok(repeatSignup.data.user?.id, "repeat signup creates a new user");
+  assert.notEqual(
+    repeatSignup.data.user.id,
+    userId,
+    "repeat signup receives a new auth UUID",
+  );
+  usersToDelete.push(repeatSignup.data.user.id);
+
+  const repeatConfirmationMessage = await waitForConfirmationEmail(userEmail);
+  const repeatSignupCookies = new Map();
+  assertRedirect(
+    await getPath(
+      extractConfirmationUrl(repeatConfirmationMessage),
+      repeatSignupCookies,
+    ),
+    "/account/setup",
+    "repeat signup email confirmation route",
+  );
+
+  const roleSelectionBody = await readPageText(
+    await getPath("/account/setup", repeatSignupCookies),
+    "repeat signup setup entry",
+  );
+  assertTextContains(
+    roleSelectionBody,
+    "I am a...",
+    "repeat signup starts from role selection",
+  );
+
+  const newUserResidualState = await queryLocalJson(
+    `select jsonb_build_object(
+      'account_roles', (select count(*) from public.account_roles where user_id = ${sqlUuid(repeatSignup.data.user.id, "repeat signup role user id")}),
+      'profiles', (select count(*) from public.profiles where user_id = ${sqlUuid(repeatSignup.data.user.id, "repeat signup profile user id")}),
+      'profile_social_links', (select count(*) from public.profile_social_links where user_id = ${sqlUuid(repeatSignup.data.user.id, "repeat signup social user id")}),
+      'interactions', (
+        select count(*)
+        from public.interactions
+        where source_user_id = ${sqlUuid(repeatSignup.data.user.id, "repeat signup source user id")}
+           or target_user_id = ${sqlUuid(repeatSignup.data.user.id, "repeat signup target user id")}
+      )
+    )`,
+    "count repeat signup inherited data",
+  );
+  assert.deepEqual(
+    newUserResidualState,
+    {
+      account_roles: 0,
+      interactions: 0,
+      profile_social_links: 0,
+      profiles: 0,
+    },
+    "same email repeat signup inherits no previous app data",
+  );
+
+  const recreated = await runOnboardingFlow(
+    repeatSignupCookies,
+    repeatSignup.data.user.id,
+  );
   await assertAppAccessible(
-    cookieJar,
-    "same authenticated user can access app after recreating profile",
+    repeatSignupCookies,
+    "re-registered user can access app after full onboarding",
   );
 
   return recreated;
@@ -2204,6 +2349,11 @@ async function run() {
     }),
     "/login",
     "anonymous cannot onboard",
+  );
+  assertRedirect(
+    await postForm("/profile/delete", { confirmation: "DELETE" }),
+    "/login",
+    "anonymous cannot delete an account",
   );
 
   const onboardingUser = await createConfirmedUser(
