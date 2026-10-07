@@ -45,13 +45,6 @@ function signupMessage(
     };
   }
 
-  if (status === "account-deleted") {
-    return {
-      tone: "success",
-      text: "Your Mohyla Match account was deleted. You can sign up again from the beginning.",
-    };
-  }
-
   if (error === "domain") {
     return {
       tone: "error",

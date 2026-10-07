@@ -86,10 +86,7 @@ export async function deleteMyAccount(request: NextRequest) {
 
   await context.supabase.auth.signOut({ scope: "local" }).catch(() => undefined);
 
-  const response = redirectTo(
-    request,
-    pathWithParams("/signup", { status: "account-deleted" }),
-  );
+  const response = redirectTo(request, "/");
   clearSupabaseSessionCookies(request, response);
 
   return response;
