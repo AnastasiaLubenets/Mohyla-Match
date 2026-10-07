@@ -15,6 +15,7 @@ import {
   customAvatarOptions,
   getCustomAvatarSrc,
   normalizeProfileAvatarMode,
+  systemAvatarRadiusClass,
   type ProfileAvatarMode,
 } from "@/lib/profile/program-avatar";
 import type { EditProfileData } from "@/lib/profile/data";
@@ -394,8 +395,8 @@ function AvatarPickerSection({
                   aria-pressed={selected}
                   className={
                     selected
-                      ? "relative aspect-square overflow-hidden rounded-[1.25rem] ring-2 ring-blue-700 ring-offset-2 ring-offset-white"
-                      : "relative aspect-square overflow-hidden rounded-[1.25rem] ring-1 ring-blue-100 transition hover:ring-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                      ? `relative aspect-square overflow-hidden ${systemAvatarRadiusClass} ring-2 ring-blue-700 ring-offset-2 ring-offset-white`
+                      : `relative aspect-square overflow-hidden ${systemAvatarRadiusClass} ring-1 ring-blue-100 transition hover:ring-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white`
                   }
                   key={avatar.key}
                   onClick={() => {

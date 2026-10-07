@@ -7,6 +7,7 @@ import { TaxonomyChipList } from "@/components/matching/taxonomy-chip-list";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import type { DiscoveryCandidate } from "@/lib/matching/data";
 import { formatMatchPercentage } from "@/lib/matching/view-model";
+import { systemAvatarRadiusClass } from "@/lib/profile/program-avatar";
 
 const studentBookmarkButtonClassName =
   "group inline-flex h-10 w-10 items-center justify-center border-0 bg-transparent p-0 text-blue-800 shadow-none transition-colors duration-200 hover:bg-transparent hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70";
@@ -121,7 +122,7 @@ function AllStudentRow({
     <article className="grid gap-4 rounded-lg border border-blue-100 bg-white p-4 text-blue-950 sm:grid-cols-[6rem_minmax(0,1fr)] sm:p-5 lg:grid-cols-[6rem_minmax(0,1fr)_auto] lg:items-center">
       <Link
         aria-label={`Open ${candidate.fullName}'s profile`}
-        className="block w-24 rounded-[1.25rem] outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+        className={`block w-24 ${systemAvatarRadiusClass} outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white`}
         href={profileHref}
       >
         <SystemAvatar

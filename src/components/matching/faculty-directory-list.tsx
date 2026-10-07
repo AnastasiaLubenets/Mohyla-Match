@@ -3,6 +3,7 @@ import Link from "next/link";
 import { TaxonomyChipList } from "@/components/matching/taxonomy-chip-list";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import type { FacultyDiscoveryProfile } from "@/lib/matching/data";
+import { systemAvatarRadiusClass } from "@/lib/profile/program-avatar";
 
 function bioPreview(bio: string | null) {
   const cleanBio = bio?.trim();
@@ -70,7 +71,7 @@ function FacultyRow({
     <article className="grid gap-4 rounded-lg border border-blue-100 bg-white p-4 text-blue-950 sm:grid-cols-[6rem_minmax(0,1fr)] sm:p-5 lg:grid-cols-[6rem_minmax(0,1fr)_auto] lg:items-center">
       <Link
         aria-label={`Open ${profile.fullName}'s profile`}
-        className="block w-24 rounded-[1.25rem] outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+        className={`block w-24 ${systemAvatarRadiusClass} outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white`}
         href={profileHref}
       >
         <SystemAvatar

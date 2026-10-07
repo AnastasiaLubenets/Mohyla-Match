@@ -6,6 +6,7 @@ import { SaveProfileButton } from "@/components/matching/save-profile-button";
 import { TaxonomyChipList } from "@/components/matching/taxonomy-chip-list";
 import { SystemAvatar } from "@/components/profile/system-avatar";
 import type { SavedProfileSummary } from "@/lib/matching/data";
+import { systemAvatarRadiusClass } from "@/lib/profile/program-avatar";
 
 function BarsIcon() {
   return (
@@ -135,7 +136,7 @@ export function SavedProfileCard({
       <header className="grid gap-5 pr-11 md:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13rem_minmax(0,1fr)]">
         <Link
           aria-label={`Open ${profile.fullName}'s profile`}
-          className="block rounded-[1.25rem] outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+          className={`block ${systemAvatarRadiusClass} outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white`}
           href={`/profiles/${profile.userId}?from=saved`}
         >
           <SystemAvatar

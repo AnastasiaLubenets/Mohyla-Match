@@ -252,7 +252,7 @@ test("SystemAvatar renders all image-backed avatar modes through one image path"
 });
 
 test("all SystemAvatar placements use one shared square avatar radius", () => {
-  assert.equal(systemAvatarRadiusClass, "rounded-[1.25rem]");
+  assert.equal(systemAvatarRadiusClass, "rounded-[0.65rem]");
   assert.ok(
     getProgramAvatarContainerClasses()
       .split(/\s+/)
@@ -280,6 +280,11 @@ test("all SystemAvatar placements use one shared square avatar radius", () => {
       source,
       /<SystemAvatar[\s\S]*?radius=/,
       `${sourcePath} should not override the shared SystemAvatar radius`,
+    );
+    assert.doesNotMatch(
+      source,
+      /rounded-\[1\.25rem\]/,
+      `${sourcePath} should not hard-code the old avatar radius`,
     );
   }
 });

@@ -11,6 +11,7 @@ import { SocialLinksList } from "@/components/profile/profile-social-links";
 import { TaxonomyChipList } from "@/components/matching/taxonomy-chip-list";
 import type { DiscoveryCandidate } from "@/lib/matching/data";
 import { formatMatchPercentage } from "@/lib/matching/view-model";
+import { systemAvatarRadiusClass } from "@/lib/profile/program-avatar";
 
 const studentBookmarkButtonClassName =
   "group inline-flex h-10 w-10 items-center justify-center border-0 bg-transparent p-0 text-blue-800 shadow-none transition-colors duration-200 hover:bg-transparent hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70";
@@ -207,7 +208,7 @@ export function DiscoveryCard({
         <header className="grid gap-5 md:grid-cols-[14rem_minmax(0,1fr)] lg:grid-cols-[14rem_minmax(0,1fr)_auto] xl:grid-cols-[16rem_minmax(0,1fr)_auto]">
           <Link
             aria-label={`Open ${candidate.fullName}'s profile`}
-            className="block rounded-[1.25rem] outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            className={`block ${systemAvatarRadiusClass} outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white`}
             href={`/profiles/${candidate.userId}?from=discover`}
           >
             <SystemAvatar
