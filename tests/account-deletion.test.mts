@@ -17,7 +17,9 @@ test("account deletion uses a server-only Supabase admin client", () => {
   assert.match(adminClient, /createClient<Database>/);
   assert.match(adminClient, /getSupabaseAdminConfig/);
   assert.match(env, /SUPABASE_SERVICE_ROLE_KEY/);
+  assert.match(env, /SERVICE_ROLE_KEY/);
   assert.doesNotMatch(env, /NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY/);
+  assert.doesNotMatch(env, /NEXT_PUBLIC_SERVICE_ROLE_KEY/);
 });
 
 test("delete account route deletes only the authenticated user from Auth", () => {
