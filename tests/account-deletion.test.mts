@@ -26,16 +26,33 @@ test("delete account route deletes only the authenticated user from Auth", () =>
 
   assert.match(route, /deleteMyAccount/);
   assert.match(action, /supabase\.auth\.getUser\(\)/);
+  assert.match(action, /requireAuthenticatedAccountDelete/);
+  assert.doesNotMatch(action, /requireActiveAccountDelete/);
+  assert.doesNotMatch(action, /getCurrentAccountState/);
   assert.match(action, /adminSupabase\.auth\.admin\.deleteUser\(context\.user\.id\)/);
-  assert.match(action, /context\.supabase\.auth\.signOut\(\{ scope: "local" \}\)/);
+  assert.match(action, /context\.supabase\.auth\s*\.\s*signOut\(\{ scope: "local" \}\)/);
   assert.match(action, /name\.startsWith\("sb-"\)/);
-  assert.match(action, /response\.cookies\.delete\(name\)/);
+  assert.match(action, /response\.cookies\.set\(name, "", \{ maxAge: 0, path: "\/" \}\)/);
   assert.match(action, /redirectTo\(request, "\/"\)/);
   assert.doesNotMatch(action, /account-deleted/);
   assert.doesNotMatch(action, /pathWithParams\("\/signup"/);
   assert.doesNotMatch(action, /delete_my_profile/);
   assert.doesNotMatch(action, /formData\.get\(["']userId["']\)/);
   assert.doesNotMatch(action, /formData\.get\(["']targetUserId["']\)/);
+});
+
+test("delete account failures are handled without a raw production 500", () => {
+  const action = source("src/lib/profile/delete.ts");
+
+  assert.match(action, /try \{/);
+  assert.match(action, /catch \(error\)/);
+  assert.match(action, /logAccountDeleteFailure/);
+  assert.match(action, /return redirectTo\(request, accountDeleteFailurePath\(\)\)/);
+  assert.match(action, /hasSupabaseSessionCookie/);
+  assert.match(action, /accountDeleteSuccessResponse\(request\)/);
+  assert.match(action, /isMissingAuthUserError\(result\.error\)/);
+  assert.match(action, /status === 404/);
+  assert.match(action, /normalizedMessage\.includes\("not found"\)/);
 });
 
 test("delete account UI requires explicit irreversible confirmation", () => {
