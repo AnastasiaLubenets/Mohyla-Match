@@ -1,22 +1,48 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 import "./globals.css";
 
-const geistSans = Geist({
+const geistSans = localFont({
+  src: [
+    { path: "./fonts/geist-100.ttf", weight: "100" },
+    { path: "./fonts/geist-200.ttf", weight: "200" },
+    { path: "./fonts/geist-300.ttf", weight: "300" },
+    { path: "./fonts/geist-400.ttf", weight: "400" },
+    { path: "./fonts/geist-500.ttf", weight: "500" },
+    { path: "./fonts/geist-600.ttf", weight: "600" },
+    { path: "./fonts/geist-700.ttf", weight: "700" },
+    { path: "./fonts/geist-800.ttf", weight: "800" },
+    { path: "./fonts/geist-900.ttf", weight: "900" },
+  ],
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: [
+    { path: "./fonts/geist-mono-100.ttf", weight: "100" },
+    { path: "./fonts/geist-mono-200.ttf", weight: "200" },
+    { path: "./fonts/geist-mono-300.ttf", weight: "300" },
+    { path: "./fonts/geist-mono-400.ttf", weight: "400" },
+    { path: "./fonts/geist-mono-500.ttf", weight: "500" },
+    { path: "./fonts/geist-mono-600.ttf", weight: "600" },
+    { path: "./fonts/geist-mono-700.ttf", weight: "700" },
+    { path: "./fonts/geist-mono-800.ttf", weight: "800" },
+    { path: "./fonts/geist-mono-900.ttf", weight: "900" },
+  ],
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
-const cormorant = Cormorant_Garamond({
+const cormorant = localFont({
+  src: [
+    { path: "./fonts/cormorant-garamond-500.ttf", weight: "500" },
+    { path: "./fonts/cormorant-garamond-600.ttf", weight: "600" },
+    { path: "./fonts/cormorant-garamond-700.ttf", weight: "700" },
+  ],
   variable: "--font-display",
-  subsets: ["cyrillic", "latin"],
-  weight: ["500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
