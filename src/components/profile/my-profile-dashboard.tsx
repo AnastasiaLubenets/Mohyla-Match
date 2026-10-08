@@ -583,11 +583,7 @@ function FacultyProfileDashboard({
               {profile.fullName}
             </h2>
             <p className="mt-3 text-base font-medium text-blue-800">
-              {primaryProgram?.name ?? profile.academicProgramName}{" "}
-              <span aria-hidden="true">•</span>{" "}
-              {profile.facultyVerificationStatus === "verified"
-                ? "Verified faculty"
-                : "Unverified faculty"}
+              {primaryProgram?.name ?? profile.academicProgramName}
             </p>
             <p className="mt-1 text-sm font-medium text-blue-700/80">
               {profile.facultyName}

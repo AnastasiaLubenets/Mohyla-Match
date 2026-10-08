@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { AuthSubmitButton } from "@/components/auth-submit-button";
+import { FacultyVerificationForm } from "@/components/faculty-verification-form";
 import { FacultyProgramsForm } from "@/components/faculty-programs-form";
 import { OnboardingSkillPicker } from "@/components/onboarding-skill-picker";
 import { OnboardingBasicForm } from "@/components/onboarding-basic-form";
@@ -14,6 +15,7 @@ import {
 import { destinationForAccountState } from "@/lib/auth/routing";
 import { normalizeSignupFullName } from "@/lib/auth/signup";
 import { getCurrentAccountState } from "@/lib/auth/state";
+import { facultyVerificationFieldName } from "@/lib/onboarding/faculty-verification";
 import {
   canVisitOnboardingStep,
   getFirstIncompleteOnboardingStep,
@@ -165,6 +167,19 @@ function RoleSelection({ error }: Readonly<{ error?: string }>) {
           </div>
         </div>
       </form>
+    </OnboardingShell>
+  );
+}
+
+function FacultyVerificationStep({ error }: Readonly<{ error?: string }>) {
+  return (
+    <OnboardingShell
+      description="Enter the verification code provided to NaUKMA faculty members to continue registration."
+      error={error}
+      step={1}
+      title="Verify your faculty status"
+    >
+      <FacultyVerificationForm fieldName={facultyVerificationFieldName} />
     </OnboardingShell>
   );
 }
@@ -428,7 +443,7 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
   ] = await Promise.all([
     supabase
       .from("account_roles")
-      .select("account_role")
+      .select("account_role,faculty_verification_status")
       .eq("user_id", accountState.userId)
       .maybeSingle(),
     supabase
@@ -540,6 +555,9 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
   const selectedAccountRole =
     profile?.account_role ??
     ((accountRoleResult.data?.account_role ?? null) as AccountRole | null);
+  const selectedFacultyVerificationStatus =
+    accountRoleResult.data?.faculty_verification_status ??
+    null;
   const suggestedFullName = profile
     ? null
     : normalizeSignupFullName(userResult.data.user?.user_metadata?.full_name);
@@ -583,6 +601,20 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
   const collaborationGoalIds = new Set(
     (profileGoalsResult.data ?? []).map((goal) => goal.collaboration_goal_id),
   );
+  const shouldShowRoleSelection = firstParam(params.role) === "select";
+  const shouldShowFacultyVerification =
+    firstParam(params.verifyFaculty) === "1" ||
+    (selectedAccountRole === "faculty" &&
+      selectedFacultyVerificationStatus !== "verified");
+
+  if (shouldShowRoleSelection) {
+    return <RoleSelection error={firstParam(params.error)} />;
+  }
+
+  if (shouldShowFacultyVerification) {
+    return <FacultyVerificationStep error={firstParam(params.error)} />;
+  }
+
   if (!selectedAccountRole) {
     return <RoleSelection error={firstParam(params.error)} />;
   }

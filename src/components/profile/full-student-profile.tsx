@@ -411,15 +411,6 @@ export function FullStudentProfile({
             </h2>
             <p className="mt-3 text-base font-semibold text-blue-800">
               {programLine}
-              {isFaculty ? (
-                <>
-                  {" "}
-                  <span aria-hidden="true">•</span>{" "}
-                  {profile.facultyVerificationStatus === "verified"
-                    ? "Verified faculty"
-                    : "Unverified faculty"}
-                </>
-              ) : null}
             </p>
             <p className="mt-1 text-sm font-semibold text-blue-700/75">
               {profile.facultyName}
