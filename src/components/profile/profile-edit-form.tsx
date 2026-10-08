@@ -604,17 +604,6 @@ function FacultyProfileEditForm({
             />
           </label>
 
-          <div className="rounded-md border border-blue-100 bg-blue-50/60 px-4 py-3">
-            <p className="text-sm font-bold text-blue-950">
-              Verification status
-            </p>
-            <p className="mt-1 text-sm font-semibold text-blue-700">
-              {data.profile.faculty_verification_status === "verified"
-                ? "Verified"
-                : "Unverified"}
-            </p>
-          </div>
-
           <label className="block">
             <span className="text-sm font-bold text-blue-900">
               Faculty <span className="text-red-600">*</span>

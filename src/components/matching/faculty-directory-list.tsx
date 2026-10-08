@@ -179,21 +179,14 @@ function FacultyRow({
 
         <div className="flex min-w-0 flex-col">
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="font-serif text-2xl font-semibold leading-tight text-blue-950 sm:text-3xl">
-                <Link
-                  className="transition hover:text-blue-800"
-                  href={profileHref}
-                >
-                  {profile.fullName}
-                </Link>
-              </h3>
-              <span className="rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-bold uppercase tracking-[0.12em] text-blue-700">
-                {profile.verificationStatus === "verified"
-                  ? "Verified"
-                  : "Unverified"}
-              </span>
-            </div>
+            <h3 className="font-serif text-2xl font-semibold leading-tight text-blue-950 sm:text-3xl">
+              <Link
+                className="transition hover:text-blue-800"
+                href={profileHref}
+              >
+                {profile.fullName}
+              </Link>
+            </h3>
             <p className="mt-1 text-sm font-semibold text-blue-800">
               {primaryProgram?.name ?? profile.primaryAcademicProgramName}
             </p>

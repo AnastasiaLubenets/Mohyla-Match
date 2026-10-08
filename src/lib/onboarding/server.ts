@@ -4,6 +4,7 @@ import type { NextRequest, NextResponse } from "next/server";
 import { destinationForAccountState } from "@/lib/auth/routing";
 import { getCurrentAccountState } from "@/lib/auth/state";
 import { pathWithParams, redirectTo } from "@/lib/auth/http";
+import { facultyVerificationPath } from "@/lib/onboarding/faculty-verification";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -238,6 +239,10 @@ export async function saveAccountRole(request: NextRequest) {
     return redirectTo(request, onboardingRolePath("Choose student or faculty."));
   }
 
+  if (role === "faculty") {
+    return redirectTo(request, facultyVerificationPath());
+  }
+
   const result = await context.supabase.rpc("save_account_role", {
     selected_role: role,
   });
@@ -249,7 +254,7 @@ export async function saveAccountRole(request: NextRequest) {
     );
   }
 
-  return redirectTo(request, role === "faculty" ? onboardingStepPath(1) : onboardingStepPath(1));
+  return redirectTo(request, onboardingStepPath(1));
 }
 
 async function requireFacultyOnboarding(
@@ -263,7 +268,7 @@ async function requireFacultyOnboarding(
 
   const { data: selectedRole } = await context.supabase
     .from("account_roles")
-    .select("account_role")
+    .select("account_role,faculty_verification_status")
     .eq("user_id", context.userId)
     .maybeSingle();
 
@@ -272,6 +277,15 @@ async function requireFacultyOnboarding(
       response: redirectTo(
         request,
         onboardingRolePath("Choose Faculty before continuing faculty setup."),
+      ),
+    };
+  }
+
+  if (selectedRole.faculty_verification_status !== "verified") {
+    return {
+      response: redirectTo(
+        request,
+        facultyVerificationPath("Verify your faculty status to continue."),
       ),
     };
   }

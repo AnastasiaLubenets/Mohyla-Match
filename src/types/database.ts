@@ -58,18 +58,21 @@ export type Database = {
         Row: {
           account_role: Database["public"]["Enums"]["account_role"];
           created_at: string;
+          faculty_verification_status: Database["public"]["Enums"]["faculty_verification_status"];
           updated_at: string;
           user_id: string;
         };
         Insert: {
           account_role?: Database["public"]["Enums"]["account_role"];
           created_at?: string;
+          faculty_verification_status?: Database["public"]["Enums"]["faculty_verification_status"];
           updated_at?: string;
           user_id: string;
         };
         Update: {
           account_role?: Database["public"]["Enums"]["account_role"];
           created_at?: string;
+          faculty_verification_status?: Database["public"]["Enums"]["faculty_verification_status"];
           updated_at?: string;
           user_id?: string;
         };
@@ -236,6 +239,30 @@ export type Database = {
         Update: {
           created_at?: string;
           expertise_id?: number;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      faculty_verification_attempts: {
+        Row: {
+          created_at: string;
+          id: number;
+          ip_hash: string | null;
+          succeeded: boolean;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          ip_hash?: string | null;
+          succeeded?: boolean;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          ip_hash?: string | null;
+          succeeded?: boolean;
           user_id?: string;
         };
         Relationships: [];

@@ -81,7 +81,6 @@ function searchableText(profile: FacultyDiscoveryProfile) {
     profile.facultyName,
     profile.fullName,
     profile.primaryAcademicProgramName,
-    profile.verificationStatus,
     ...profile.academicPrograms.flatMap((program) => [
       program.facultyName,
       program.name,
