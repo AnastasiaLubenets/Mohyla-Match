@@ -6,6 +6,7 @@ import {
 } from "@/lib/matching/discovery-filters";
 import {
   normalizeProfileAvatarMode,
+  resolveProgramAvatarVariantKey,
   type ProfileAvatarMode,
 } from "@/lib/profile/program-avatar";
 import {
@@ -30,6 +31,7 @@ export type MatchingItem = Readonly<{
 }>;
 
 export type FacultyProgramItem = Readonly<{
+  avatarVariantKey: string | null;
   facultyName: string;
   id: number;
   isPrimary: boolean;
@@ -49,6 +51,7 @@ export type FacultyExpertiseItem = Readonly<{
 export type FacultyDiscoveryProfile = Readonly<{
   academicPrograms: FacultyProgramItem[];
   avatarMode: ProfileAvatarMode;
+  avatarVariantKey: string | null;
   availability: string | null;
   bio: string | null;
   customAvatarKey: string | null;
@@ -230,6 +233,8 @@ function parseFacultyProgramItems(value: Json): FacultyProgramItem[] {
       const facultyName = readString(item.facultyName);
       const studyLevel = readString(item.studyLevel);
       const specialtyCode = readString(item.specialtyCode);
+      const avatarVariantKey =
+        readString(item.avatarVariantKey) ?? readString(item.avatar_variant_key);
 
       if (
         id === null ||
@@ -242,6 +247,7 @@ function parseFacultyProgramItems(value: Json): FacultyProgramItem[] {
       }
 
       return {
+        avatarVariantKey,
         facultyName,
         id,
         isPrimary: item.isPrimary === true,
@@ -358,6 +364,47 @@ async function loadCandidateSocialLinks(
   return { error: false, socialLinksByUserId };
 }
 
+async function loadFacultyProgramAvatarVariants(
+  supabase: SupabaseServerClient,
+  rows: readonly FacultyDiscoveryRow[],
+): Promise<{
+  avatarVariantKeysByProgramId: Map<number, string>;
+  error: boolean;
+}> {
+  const programIds = [
+    ...new Set(
+      rows.flatMap((profile) =>
+        parseFacultyProgramItems(profile.academic_programs).map(
+          (program) => program.id,
+        ),
+      ),
+    ),
+  ];
+
+  if (programIds.length === 0) {
+    return { avatarVariantKeysByProgramId: new Map(), error: false };
+  }
+
+  const result = await supabase
+    .from("academic_programs")
+    .select("id,avatar_variant_key")
+    .in("id", programIds);
+
+  if (result.error) {
+    return { avatarVariantKeysByProgramId: new Map(), error: true };
+  }
+
+  return {
+    avatarVariantKeysByProgramId: new Map(
+      (result.data ?? []).map((program) => [
+        program.id,
+        program.avatar_variant_key,
+      ]),
+    ),
+    error: false,
+  };
+}
+
 export async function loadDiscoveryCandidates(
   supabase: SupabaseServerClient,
   limit = 12,
@@ -472,10 +519,23 @@ type FacultyDiscoveryRow =
 function mapFacultyDiscoveryProfile(
   profile: FacultyDiscoveryRow,
   avatarPreference: AvatarPreference = defaultAvatarPreference,
+  programAvatarVariantsById: ReadonlyMap<number, string> = new Map(),
 ): FacultyDiscoveryProfile {
+  const academicPrograms = parseFacultyProgramItems(profile.academic_programs).map(
+    (program) => ({
+      ...program,
+      avatarVariantKey:
+        program.avatarVariantKey ?? programAvatarVariantsById.get(program.id) ?? null,
+    }),
+  );
+
   return {
-    academicPrograms: parseFacultyProgramItems(profile.academic_programs),
+    academicPrograms,
     avatarMode: avatarPreference.avatarMode,
+    avatarVariantKey: resolveProgramAvatarVariantKey(
+      academicPrograms,
+      profile.system_avatar_key,
+    ),
     availability: profile.availability,
     bio: profile.bio,
     customAvatarKey: avatarPreference.customAvatarKey,
@@ -503,12 +563,15 @@ export async function loadFacultyDiscoveryProfiles(
   }
 
   const rows = result.data ?? [];
-  const avatarPreferences = await loadAvatarPreferences(
-    supabase,
-    rows.map((profile) => profile.user_id),
-  );
+  const [avatarPreferences, programAvatarVariants] = await Promise.all([
+    loadAvatarPreferences(
+      supabase,
+      rows.map((profile) => profile.user_id),
+    ),
+    loadFacultyProgramAvatarVariants(supabase, rows),
+  ]);
 
-  if (avatarPreferences.error) {
+  if (avatarPreferences.error || programAvatarVariants.error) {
     return { data: null, error: true };
   }
 
@@ -517,6 +580,7 @@ export async function loadFacultyDiscoveryProfiles(
       mapFacultyDiscoveryProfile(
         profile,
         avatarPreferences.preferencesByUserId.get(profile.user_id),
+        programAvatarVariants.avatarVariantKeysByProgramId,
       ),
     ),
     error: false,

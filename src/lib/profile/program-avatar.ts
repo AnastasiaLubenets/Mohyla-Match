@@ -225,6 +225,53 @@ export type ProfileAvatarInput = Readonly<{
   systemAvatarKey: string;
 }>;
 
+export type ProgramAvatarCandidate = Readonly<{
+  avatarVariantKey?: string | null;
+  id?: number;
+  isPrimary?: boolean;
+  name?: string;
+  slug?: string;
+}>;
+
+function sortProgramAvatarCandidates(
+  candidates: readonly ProgramAvatarCandidate[],
+): ProgramAvatarCandidate[] {
+  return [...candidates].sort((left, right) => {
+    if (Boolean(left.isPrimary) !== Boolean(right.isPrimary)) {
+      return left.isPrimary ? -1 : 1;
+    }
+
+    return (
+      (left.id ?? Number.MAX_SAFE_INTEGER) -
+        (right.id ?? Number.MAX_SAFE_INTEGER) ||
+      (left.name ?? "").localeCompare(right.name ?? "") ||
+      (left.slug ?? "").localeCompare(right.slug ?? "")
+    );
+  });
+}
+
+export function resolveProgramAvatarVariantKey(
+  candidates: readonly ProgramAvatarCandidate[],
+  systemAvatarKey: string,
+): string | null {
+  for (const candidate of sortProgramAvatarCandidates(candidates)) {
+    if (!candidate.avatarVariantKey) {
+      continue;
+    }
+
+    const mappedKey = getMappedProgramAvatarKey(
+      systemAvatarKey,
+      candidate.avatarVariantKey,
+    );
+
+    if (mappedKey) {
+      return candidate.avatarVariantKey.trim();
+    }
+  }
+
+  return getMappedProgramAvatarKey(systemAvatarKey) ? systemAvatarKey : null;
+}
+
 export type ResolvedProfileAvatar =
   | Readonly<{
       key: string;
