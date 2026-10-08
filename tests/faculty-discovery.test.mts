@@ -26,6 +26,7 @@ function facultyProfile(
   return {
     academicPrograms: [
       {
+        avatarVariantKey: "program-computer-science",
         facultyName: "Faculty of Informatics",
         id: 1,
         isPrimary: true,
@@ -36,6 +37,7 @@ function facultyProfile(
       },
     ],
     avatarMode: "program",
+    avatarVariantKey: "program-computer-science",
     availability: "By appointment",
     bio: "Researches reliable student software systems.",
     customAvatarKey: null,
@@ -64,6 +66,7 @@ test("faculty discovery filters by faculty, program, expertise, interest, and se
     facultyProfile({
       academicPrograms: [
         {
+          avatarVariantKey: "program-economics",
           facultyName: "Faculty of Economics",
           id: 2,
           isPrimary: true,
@@ -147,6 +150,10 @@ test("faculty discovery has its own sidebar route and keeps student discover sep
     join(root, "src/components/matching/faculty-directory-list.tsx"),
     "utf8",
   );
+  const matchingData = readFileSync(
+    join(root, "src/lib/matching/data.ts"),
+    "utf8",
+  );
   const onboardingServer = readFileSync(
     join(root, "src/lib/onboarding/server.ts"),
     "utf8",
@@ -195,6 +202,18 @@ test("faculty discovery has its own sidebar route and keeps student discover sep
   assert.match(facultyFilterForm, /<form action="\/app\/faculty"/);
   assert.doesNotMatch(facultyFilterForm, /name="audience"/);
   assert.match(facultyDirectoryList, /from=faculty/);
+  assert.match(facultyDirectoryList, /avatarVariantKey=\{profile\.avatarVariantKey\}/);
+  assert.match(matchingData, /resolveProgramAvatarVariantKey/);
+  assert.match(matchingData, /loadFacultyProgramAvatarVariants/);
+  assert.match(matchingData, /\.select\("id,avatar_variant_key"\)/);
+  assert.match(facultyDirectoryList, /label="Programs"/);
+  assert.match(facultyDirectoryList, /label="Expertise"/);
+  assert.match(facultyDirectoryList, /w-fit max-w-full self-start/);
+  assert.match(facultyDirectoryList, /\+\{hiddenCount\} more/);
+  assert.doesNotMatch(
+    facultyDirectoryList,
+    /h-\d+[\s\S]{0,80}(?:Expertise|CompactChipList)/,
+  );
   assert.match(profilePage, /source === "faculty"\s*\?\s*"\/app\/faculty"/);
   assert.match(profilePage, /Back to faculty/);
   assert.match(profilePage, /source === "faculty"\s*\?\s*"faculty"/);

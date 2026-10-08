@@ -14,6 +14,7 @@ import {
   programAvatarImageClasses,
   programAvatarSrcByKey,
   profileAvatarModes,
+  resolveProgramAvatarVariantKey,
   resolveProfileAvatar,
   systemAvatarRadiusClass,
   systemAvatarSizeClasses,
@@ -153,6 +154,89 @@ test("profile avatar resolver supports default, program and custom modes", () =>
       systemAvatarKey: "faculty-economics--program-economics",
     }),
     { key: "default", kind: "default", mode: "default", src: null },
+  );
+});
+
+test("faculty program avatar candidates use primary then deterministic valid program", () => {
+  assert.equal(
+    resolveProgramAvatarVariantKey(
+      [
+        {
+          avatarVariantKey: "program-economics",
+          id: 2,
+          isPrimary: false,
+          name: "Economics",
+          slug: "economics",
+        },
+        {
+          avatarVariantKey: "program-computer-science",
+          id: 3,
+          isPrimary: true,
+          name: "Computer Science",
+          slug: "computer-science",
+        },
+      ],
+      "legacy-geometric-avatar",
+    ),
+    "program-computer-science",
+  );
+
+  assert.equal(
+    resolveProgramAvatarVariantKey(
+      [
+        {
+          avatarVariantKey: "program-marketing",
+          id: 8,
+          name: "Marketing",
+          slug: "marketing",
+        },
+        {
+          avatarVariantKey: "program-law",
+          id: 4,
+          name: "Law",
+          slug: "law",
+        },
+      ],
+      "legacy-geometric-avatar",
+    ),
+    "program-law",
+  );
+});
+
+test("faculty program avatar candidates fall back without overriding custom avatars", () => {
+  assert.equal(
+    resolveProgramAvatarVariantKey([], "faculty-economics--program-economics"),
+    "faculty-economics--program-economics",
+  );
+
+  assert.equal(
+    resolveProgramAvatarVariantKey(
+      [
+        {
+          avatarVariantKey: "program-not-in-production",
+          id: 9,
+          name: "Legacy Program",
+          slug: "legacy-program",
+        },
+      ],
+      "legacy-geometric-avatar",
+    ),
+    null,
+  );
+
+  assert.deepEqual(
+    resolveProfileAvatar({
+      avatarMode: "custom",
+      avatarVariantKey: "program-computer-science",
+      customAvatarKey: "avatar-01",
+      systemAvatarKey: "faculty-economics--program-economics",
+    }),
+    {
+      key: "avatar-01",
+      kind: "image",
+      mode: "custom",
+      src: "/avatars/custom/avatar-01.png",
+    },
   );
 });
 
