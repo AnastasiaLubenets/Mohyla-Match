@@ -156,3 +156,16 @@ test("auth shell uses one full-bleed watercolor background without a solid left 
   assert.match(globals, /\.public-auth-shell \.auth-watercolor[\s\S]*mask-image: none/);
   assert.doesNotMatch(globals, /linear-gradient\(\s*90deg,\s*transparent/);
 });
+
+test("root layout uses local fonts instead of Turbopack-sensitive Google font modules", () => {
+  const layout = source("src/app/layout.tsx");
+
+  assert.match(layout, /from "next\/font\/local"/);
+  assert.doesNotMatch(layout, /from "next\/font\/google"/);
+  assert.match(layout, /--font-geist-sans/);
+  assert.match(layout, /--font-geist-mono/);
+  assert.match(layout, /--font-display/);
+  assert.match(layout, /fonts\/geist-400\.ttf/);
+  assert.match(layout, /fonts\/geist-mono-400\.ttf/);
+  assert.match(layout, /fonts\/cormorant-garamond-700\.ttf/);
+});
