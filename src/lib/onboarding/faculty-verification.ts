@@ -28,6 +28,13 @@ type AdminSupabase = SupabaseClient<Database>;
 type VerificationAttemptInsert =
   Database["public"]["Tables"]["faculty_verification_attempts"]["Insert"];
 
+type VerificationFailureStage =
+  | "admin-client"
+  | "prune-attempts"
+  | "rate-limit"
+  | "record-attempt"
+  | "mark-verified";
+
 export function facultyVerificationPath(error?: string): string {
   return pathWithParams("/account/setup", {
     error,
@@ -156,6 +163,32 @@ async function markFacultyVerified(
   }
 }
 
+function logFacultyVerificationFailure(
+  stage: VerificationFailureStage,
+  error: unknown,
+): void {
+  const errorDetails =
+    error && typeof error === "object"
+      ? (error as { code?: unknown; message?: unknown; status?: unknown })
+      : null;
+
+  console.error("Faculty verification failed.", {
+    code:
+      typeof errorDetails?.code === "string" ? errorDetails.code : undefined,
+    message:
+      error instanceof Error
+        ? error.message
+        : typeof errorDetails?.message === "string"
+          ? errorDetails.message
+          : undefined,
+    stage,
+    status:
+      typeof errorDetails?.status === "number"
+        ? errorDetails.status
+        : undefined,
+  });
+}
+
 export async function verifyFacultyCodeAndContinue(request: NextRequest) {
   const formData = await request.formData();
   const submittedCode = formData.get(facultyVerificationFieldName);
@@ -186,12 +219,15 @@ export async function verifyFacultyCodeAndContinue(request: NextRequest) {
 
   const expectedCode = configuredFacultyVerificationCode();
   const ipHash = clientIpHash(request);
+  let failureStage: VerificationFailureStage = "admin-client";
 
   try {
     const adminSupabase = createSupabaseAdminClient();
 
+    failureStage = "prune-attempts";
     await pruneOldAttempts(adminSupabase);
 
+    failureStage = "rate-limit";
     if (await isRateLimited(adminSupabase, userId, ipHash)) {
       await recordVerificationAttempt(adminSupabase, {
         ip_hash: ipHash,
@@ -202,10 +238,15 @@ export async function verifyFacultyCodeAndContinue(request: NextRequest) {
       return redirectTo(request, facultyVerificationPath(genericVerificationError));
     }
 
+    if (!expectedCode) {
+      console.error("Faculty verification code is not configured.");
+    }
+
     const verified = expectedCode
       ? timingSafeCodeMatches(submittedCode, expectedCode)
       : false;
 
+    failureStage = "record-attempt";
     await recordVerificationAttempt(adminSupabase, {
       ip_hash: ipHash,
       succeeded: verified,
@@ -216,8 +257,11 @@ export async function verifyFacultyCodeAndContinue(request: NextRequest) {
       return redirectTo(request, facultyVerificationPath(genericVerificationError));
     }
 
+    failureStage = "mark-verified";
     await markFacultyVerified(adminSupabase, userId);
-  } catch {
+  } catch (error) {
+    logFacultyVerificationFailure(failureStage, error);
+
     return redirectTo(request, facultyVerificationPath(genericVerificationError));
   }
 
