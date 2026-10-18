@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
+import { facultyVerificationCodeMatches } from "../src/lib/onboarding/faculty-verification-code.ts";
+
 const root = process.cwd();
 
 function source(path: string) {
@@ -30,7 +32,8 @@ test("faculty selection goes to shared-code verification while student registrat
   assert.match(onboardingServer, /if \(role === "faculty"\)/);
   assert.match(onboardingServer, /facultyVerificationPath\(\)/);
   assert.match(onboardingServer, /selected_role: role/);
-  assert.match(verificationForm, /type=\{showCode \? "text" : "password"\}/);
+  assert.match(verificationForm, /type="password"/);
+  assert.doesNotMatch(verificationForm, /useState|showCode/);
   assert.match(verificationForm, /Verify &amp; continue/);
   assert.match(verificationForm, /Back to role selection/);
   assert.match(verificationRoute, /verifyFacultyCodeAndContinue/);
@@ -43,7 +46,7 @@ test("faculty verification code is validated only on the server", () => {
   assert.match(helper, /import "server-only"/);
   assert.match(helper, /FACULTY_VERIFICATION_CODE/);
   assert.match(helper, /supabase\.auth\.getUser\(\)/);
-  assert.match(helper, /timingSafeEqual/);
+  assert.match(helper, /facultyVerificationCodeMatches/);
   assert.match(helper, /createSupabaseAdminClient/);
   assert.match(helper, /faculty_verification_attempts/);
   assert.match(helper, /maxUserFailuresPerWindow/);
@@ -52,6 +55,41 @@ test("faculty verification code is validated only on the server", () => {
   assert.doesNotMatch(helper, /NEXT_PUBLIC_FACULTY_VERIFICATION_CODE/);
   assert.doesNotMatch(envExample, /NEXT_PUBLIC_FACULTY_VERIFICATION_CODE/);
   assert.match(envExample, /FACULTY_VERIFICATION_CODE=/);
+  assert.match(helper, /Incorrect verification code/);
+});
+
+test("correct Faculty verification code is accepted", () => {
+  const configuredCode = "Configured-Faculty-Code";
+
+  assert.equal(
+    facultyVerificationCodeMatches(configuredCode, configuredCode),
+    true,
+  );
+});
+
+test("incorrect Faculty verification code is rejected", () => {
+  const configuredCode = "Configured-Faculty-Code";
+
+  assert.equal(
+    facultyVerificationCodeMatches("incorrect-code", configuredCode),
+    false,
+  );
+  assert.equal(
+    facultyVerificationCodeMatches(
+      configuredCode.toLowerCase(),
+      configuredCode,
+    ),
+    false,
+  );
+});
+
+test("successful Faculty verification updates status and continues onboarding", () => {
+  const helper = source("src/lib/onboarding/faculty-verification.ts");
+
+  assert.match(helper, /faculty_verification_status: "verified"/);
+  assert.match(helper, /\.from\("account_roles"\)\.upsert/);
+  assert.match(helper, /\.from\("profiles"\)/);
+  assert.match(helper, /redirectTo\(request, "\/account\/setup\?step=1"\)/);
 });
 
 test("server admin client prefers Supabase secret keys without inheriting browser sessions", () => {
