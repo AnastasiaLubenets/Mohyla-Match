@@ -12,6 +12,9 @@ function source(path: string) {
 const migration = source(
   "supabase/migrations/20261008010854_faculty_shared_code_verification.sql",
 );
+const serviceRoleDetectionMigration = source(
+  "supabase/migrations/20261012093000_faculty_service_role_detection.sql",
+);
 
 test("faculty selection goes to shared-code verification while student registration stays unchanged", () => {
   const setupPage = source("src/app/account/setup/page.tsx");
@@ -45,9 +48,27 @@ test("faculty verification code is validated only on the server", () => {
   assert.match(helper, /faculty_verification_attempts/);
   assert.match(helper, /maxUserFailuresPerWindow/);
   assert.match(helper, /maxIpFailuresPerWindow/);
+  assert.match(helper, /logFacultyVerificationFailure/);
   assert.doesNotMatch(helper, /NEXT_PUBLIC_FACULTY_VERIFICATION_CODE/);
   assert.doesNotMatch(envExample, /NEXT_PUBLIC_FACULTY_VERIFICATION_CODE/);
   assert.match(envExample, /FACULTY_VERIFICATION_CODE=/);
+});
+
+test("server admin client prefers Supabase secret keys without inheriting browser sessions", () => {
+  const env = source("src/lib/config/env.ts");
+  const adminClient = source("src/lib/supabase/admin.ts");
+
+  assert.match(env, /SUPABASE_SECRET_KEY/);
+  assert.match(env, /SUPABASE_SERVICE_ROLE_KEY/);
+  assert.match(
+    env,
+    /process\.env\[supabaseSecretKey\]\?\.trim\(\)[\s\S]*process\.env\[supabaseServiceRoleKey\]\?\.trim\(\)/,
+  );
+  assert.match(adminClient, /createClient<Database>/);
+  assert.match(adminClient, /autoRefreshToken: false/);
+  assert.match(adminClient, /detectSessionInUrl: false/);
+  assert.match(adminClient, /persistSession: false/);
+  assert.doesNotMatch(adminClient, /createSupabaseServerClient|cookies/);
 });
 
 test("database guards prevent browser-side faculty self-verification and direct RPC bypass", () => {
@@ -68,6 +89,19 @@ test("database guards prevent browser-side faculty self-verification and direct 
   );
   assert.match(migration, /revoke all on public\.faculty_verification_attempts from public, anon, authenticated/);
   assert.match(migration, /grant select, insert, delete on public\.faculty_verification_attempts to service_role/);
+});
+
+test("faculty verification service-role guard supports current Supabase API key claims", () => {
+  assert.match(
+    serviceRoleDetectionMigration,
+    /create or replace function private\.is_service_role_request\(\)/,
+  );
+  assert.match(serviceRoleDetectionMigration, /auth\.role\(\)/);
+  assert.match(serviceRoleDetectionMigration, /'service_role'/);
+  assert.doesNotMatch(
+    serviceRoleDetectionMigration,
+    /request\.jwt\.claim\.role/,
+  );
 });
 
 test("unverified faculty accounts are routed to verification before faculty onboarding", () => {
