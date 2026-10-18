@@ -1,7 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
 
 import { AuthSubmitButton } from "@/components/auth-submit-button";
 import {
@@ -17,8 +14,6 @@ type FacultyVerificationFormProps = Readonly<{
 export function FacultyVerificationForm({
   fieldName,
 }: FacultyVerificationFormProps) {
-  const [showCode, setShowCode] = useState(false);
-
   return (
     <form
       action="/account/setup/faculty-verification"
@@ -29,23 +24,14 @@ export function FacultyVerificationForm({
         <span className="text-sm font-bold text-[#132a56]">
           Faculty verification code
         </span>
-        <span className="mt-2 flex rounded-lg border border-[#cddaf0] bg-white focus-within:border-[#245ba2]">
-          <input
-            autoComplete="off"
-            className={`${onboardingFieldClass} mt-0 border-0 bg-transparent focus:border-0`}
-            maxLength={240}
-            name={fieldName}
-            required
-            type={showCode ? "text" : "password"}
-          />
-          <button
-            className="shrink-0 px-4 text-sm font-bold text-[#245ba2] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
-            onClick={() => setShowCode((current) => !current)}
-            type="button"
-          >
-            {showCode ? "Hide" : "Show"}
-          </button>
-        </span>
+        <input
+          autoComplete="off"
+          className={onboardingFieldClass}
+          maxLength={240}
+          name={fieldName}
+          required
+          type="password"
+        />
       </label>
 
       <div className="flex flex-col-reverse gap-3 pt-3 sm:flex-row sm:items-center sm:justify-between">

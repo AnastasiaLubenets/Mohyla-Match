@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createHash, timingSafeEqual } from "node:crypto";
+import { createHash } from "node:crypto";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { NextRequest } from "next/server";
@@ -8,13 +8,16 @@ import type { NextRequest } from "next/server";
 import { destinationForAccountState } from "@/lib/auth/routing";
 import { getCurrentAccountState } from "@/lib/auth/state";
 import { pathWithParams, redirectTo } from "@/lib/auth/http";
+import { facultyVerificationCodeMatches } from "@/lib/onboarding/faculty-verification-code";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
 const facultyVerificationCodeEnv = "FACULTY_VERIFICATION_CODE";
 const facultyVerificationFieldName = "facultyVerificationCode";
-const genericVerificationError = "We could not verify that code. Try again.";
+const incorrectVerificationCodeError = "Incorrect verification code";
+const verificationUnavailableError =
+  "We could not verify Faculty status. Try again.";
 const missingCodeError = "Enter your Faculty verification code.";
 const rateLimitWindowMs = 15 * 60 * 1000;
 const maxUserFailuresPerWindow = 5;
@@ -50,17 +53,6 @@ function configuredFacultyVerificationCode(): string | null {
   }
 
   return code;
-}
-
-function digest(value: string): Buffer {
-  return createHash("sha256").update(value, "utf8").digest();
-}
-
-function timingSafeCodeMatches(submittedCode: string, expectedCode: string): boolean {
-  const submittedDigest = digest(submittedCode.trim());
-  const expectedDigest = digest(expectedCode.trim());
-
-  return timingSafeEqual(submittedDigest, expectedDigest);
 }
 
 function clientIpHash(request: NextRequest): string | null {
@@ -214,10 +206,23 @@ export async function verifyFacultyCodeAndContinue(request: NextRequest) {
   }
 
   if (submittedCode.length > maxCodeLength) {
-    return redirectTo(request, facultyVerificationPath(genericVerificationError));
+    return redirectTo(
+      request,
+      facultyVerificationPath(incorrectVerificationCodeError),
+    );
   }
 
   const expectedCode = configuredFacultyVerificationCode();
+
+  if (!expectedCode) {
+    console.error("Faculty verification code is not configured.");
+
+    return redirectTo(
+      request,
+      facultyVerificationPath(verificationUnavailableError),
+    );
+  }
+
   const ipHash = clientIpHash(request);
   let failureStage: VerificationFailureStage = "admin-client";
 
@@ -235,16 +240,13 @@ export async function verifyFacultyCodeAndContinue(request: NextRequest) {
         user_id: userId,
       });
 
-      return redirectTo(request, facultyVerificationPath(genericVerificationError));
+      return redirectTo(
+        request,
+        facultyVerificationPath(incorrectVerificationCodeError),
+      );
     }
 
-    if (!expectedCode) {
-      console.error("Faculty verification code is not configured.");
-    }
-
-    const verified = expectedCode
-      ? timingSafeCodeMatches(submittedCode, expectedCode)
-      : false;
+    const verified = facultyVerificationCodeMatches(submittedCode, expectedCode);
 
     failureStage = "record-attempt";
     await recordVerificationAttempt(adminSupabase, {
@@ -254,7 +256,10 @@ export async function verifyFacultyCodeAndContinue(request: NextRequest) {
     });
 
     if (!verified) {
-      return redirectTo(request, facultyVerificationPath(genericVerificationError));
+      return redirectTo(
+        request,
+        facultyVerificationPath(incorrectVerificationCodeError),
+      );
     }
 
     failureStage = "mark-verified";
@@ -262,7 +267,10 @@ export async function verifyFacultyCodeAndContinue(request: NextRequest) {
   } catch (error) {
     logFacultyVerificationFailure(failureStage, error);
 
-    return redirectTo(request, facultyVerificationPath(genericVerificationError));
+    return redirectTo(
+      request,
+      facultyVerificationPath(verificationUnavailableError),
+    );
   }
 
   return redirectTo(request, "/account/setup?step=1");
