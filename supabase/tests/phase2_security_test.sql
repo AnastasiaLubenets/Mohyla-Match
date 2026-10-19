@@ -534,24 +534,22 @@ values (
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000001', true);
 
-select results_eq(
+select is_empty(
   $$ select user_id
      from public.profiles
      where user_id = '00000000-0000-4000-8000-000000000003' $$,
-  $$ values ('00000000-0000-4000-8000-000000000003'::uuid) $$,
-  'legacy block row does not hide profile from blocker'
+  'admin-created safety block hides profile from blocker'
 );
 
 reset role;
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000003', true);
 
-select results_eq(
+select is_empty(
   $$ select user_id
      from public.profiles
      where user_id = '00000000-0000-4000-8000-000000000001' $$,
-  $$ values ('00000000-0000-4000-8000-000000000001'::uuid) $$,
-  'legacy block row does not hide profile from target'
+  'admin-created safety block hides profile from target'
 );
 
 reset role;
