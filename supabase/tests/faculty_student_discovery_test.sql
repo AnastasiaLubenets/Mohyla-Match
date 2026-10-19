@@ -162,9 +162,9 @@ on conflict do nothing;
 
 insert into public.profile_interests (user_id, interest_id)
 values
-  ('00000000-0000-4000-8000-000000008701', (select id from public.interests where slug = 'technology')),
-  ('00000000-0000-4000-8000-000000008702', (select id from public.interests where slug = 'technology')),
-  ('00000000-0000-4000-8000-000000008703', (select id from public.interests where slug = 'technology'))
+  ('00000000-0000-4000-8000-000000008701', (select id from public.interests where is_active order by sort_order, id limit 1)),
+  ('00000000-0000-4000-8000-000000008702', (select id from public.interests where is_active order by sort_order, id limit 1)),
+  ('00000000-0000-4000-8000-000000008703', (select id from public.interests where is_active order by sort_order, id limit 1))
 on conflict do nothing;
 
 insert into public.profile_collaboration_goals (user_id, collaboration_goal_id)
@@ -289,7 +289,7 @@ select results_eq(
 
 select results_eq(
   $$ select interests->0->>'slug' from public.get_discovery_candidates(50) where user_id = '00000000-0000-4000-8000-000000008703' $$,
-  $$ values ('technology'::text) $$,
+  $$ select slug from public.interests where is_active order by sort_order, id limit 1 $$,
   'Faculty receives the same Student filter metadata as Student callers'
 );
 
