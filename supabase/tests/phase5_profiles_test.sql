@@ -303,10 +303,9 @@ values (
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000501', true);
 
-select results_eq(
+select is_empty(
   $$ select user_id from public.profiles where user_id = '00000000-0000-4000-8000-000000000506' $$,
-  $$ values ('00000000-0000-4000-8000-000000000506'::uuid) $$,
-  'legacy block row no longer hides an eligible profile'
+  'admin-created safety block hides an eligible profile'
 );
 
 select is_empty(
