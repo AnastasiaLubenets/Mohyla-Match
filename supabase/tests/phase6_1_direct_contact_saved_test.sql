@@ -443,12 +443,11 @@ on conflict do nothing;
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000901', true);
 
-select results_eq(
+select is_empty(
   $$ select user_id
      from public.get_saved_profiles(10)
      where user_id = '00000000-0000-4000-8000-000000000903' $$,
-  $$ values ('00000000-0000-4000-8000-000000000903'::uuid) $$,
-  'legacy block row does not hide saved targets'
+  'admin-created safety block hides saved targets'
 );
 
 select results_eq(

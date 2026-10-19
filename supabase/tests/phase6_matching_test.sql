@@ -401,12 +401,11 @@ values (
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000801', true);
 
-select results_eq(
+select is_empty(
   $$ select user_id
      from public.get_discovery_candidates(10)
      where user_id = '00000000-0000-4000-8000-000000000803' $$,
-  $$ values ('00000000-0000-4000-8000-000000000803'::uuid) $$,
-  'legacy block row does not exclude profile from discovery'
+  'admin-created safety block excludes profile from discovery'
 );
 
 reset role;

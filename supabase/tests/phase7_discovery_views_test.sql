@@ -298,7 +298,7 @@ select throws_ok(
   'authenticated viewer cannot execute deprecated block RPC'
 );
 
-select results_eq(
+select is_empty(
   $$ select user_id
      from public.get_all_discovery_profiles(500)
      where user_id in (
@@ -306,13 +306,10 @@ select results_eq(
        '00000000-0000-4000-8000-000000001204'
      )
      order by user_id $$,
-  $$ values
-       ('00000000-0000-4000-8000-000000001203'::uuid),
-       ('00000000-0000-4000-8000-000000001204'::uuid) $$,
-  'legacy block rows do not exclude profiles from all students'
+  'admin-created safety blocks exclude profiles from all students'
 );
 
-select results_eq(
+select is_empty(
   $$ select user_id
      from public.get_discovery_candidates(20)
      where user_id in (
@@ -320,10 +317,7 @@ select results_eq(
        '00000000-0000-4000-8000-000000001204'
      )
      order by user_id $$,
-  $$ values
-       ('00000000-0000-4000-8000-000000001203'::uuid),
-       ('00000000-0000-4000-8000-000000001204'::uuid) $$,
-  'legacy block rows do not exclude profiles from recommended discovery'
+  'admin-created safety blocks exclude profiles from recommended discovery'
 );
 
 select is_empty(
