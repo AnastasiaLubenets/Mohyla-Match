@@ -1415,14 +1415,10 @@ async function runProfileFlow(
     }),
     "seed legacy profile block",
   );
-  const legacyBlockedProfileBody = await readPageText(
-    await getPath(`/profiles/${legacyBlockedTarget.id}`, cookieJar),
-    "legacy blocked target profile",
-  );
-  assertTextContains(
-    legacyBlockedProfileBody,
-    "Phase Five Legacy Block Target",
-    "legacy block row does not hide target profile",
+  await assertProfileUnavailable(
+    cookieJar,
+    legacyBlockedTarget.id,
+    "admin-created safety block hides target profile",
   );
 
   await assertProfileUnavailable(
