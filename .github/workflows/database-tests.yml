@@ -111,6 +111,7 @@ jobs:
           run_pgtap supabase/tests/production_taxonomy_test.sql "production taxonomy pgTAP tests"
           run_pgtap supabase/tests/production_onboarding_reference_taxonomy_test.sql "onboarding reference taxonomy pgTAP tests"
           run_pgtap supabase/tests/profile_deletion_test.sql "profile deletion pgTAP tests"
+          run_pgtap supabase/tests/faculty_verification_permissions_test.sql "Faculty verification permissions pgTAP tests"
 
       - name: Run Supabase database advisors
         run: supabase db advisors --local --type all --level warn --fail-on error

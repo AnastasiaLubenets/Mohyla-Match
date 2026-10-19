@@ -17,6 +17,9 @@ const migration = source(
 const serviceRoleDetectionMigration = source(
   "supabase/migrations/20261012093000_faculty_service_role_detection.sql",
 );
+const serviceRoleGrantMigration = source(
+  "supabase/migrations/20261018200627_grant_faculty_verification_service_role.sql",
+);
 
 test("faculty selection goes to shared-code verification while student registration stays unchanged", () => {
   const setupPage = source("src/app/account/setup/page.tsx");
@@ -139,6 +142,25 @@ test("faculty verification service-role guard supports current Supabase API key 
   assert.doesNotMatch(
     serviceRoleDetectionMigration,
     /request\.jwt\.claim\.role/,
+  );
+});
+
+test("Faculty verification grants only its required table access to the server role", () => {
+  assert.match(
+    serviceRoleGrantMigration,
+    /grant select, insert, update on public\.account_roles to service_role/,
+  );
+  assert.match(
+    serviceRoleGrantMigration,
+    /grant update \(faculty_verification_status\) on public\.profiles to service_role/,
+  );
+  assert.doesNotMatch(
+    serviceRoleGrantMigration,
+    /\b(?:anon|authenticated)\b/,
+  );
+  assert.doesNotMatch(
+    serviceRoleGrantMigration,
+    /disable row level security|drop policy|drop trigger/i,
   );
 });
 
