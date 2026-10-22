@@ -92,8 +92,8 @@ test("/profile/edit uses natural document scroll without artificial blank height
   );
   assertHasClassLine(
     editProfilePage,
-    ["mx-auto", "w-full", "max-w-[96rem]", "px-4", "lg:py-8"],
-    "/profile/edit form wrapper should keep the existing content width and padding.",
+    ["mx-auto", "w-full", "max-w-[72rem]", "px-4", "lg:py-6"],
+    "/profile/edit form wrapper should use the compact content width and padding.",
   );
   assert.doesNotMatch(editProfilePage, /lg:h-screen/);
   assert.doesNotMatch(editProfilePage, /lg:flex-1/);
@@ -120,7 +120,7 @@ test("sidebar building artwork is full bleed outside padded branding text", asyn
 
   assertHasClassLine(
     chrome,
-    ["mb-5", "-mx-5", "min-h-0", "2xl:mb-7"],
+    ["mb-3", "-mx-4", "min-h-0", "2xl:mb-4"],
     "Sidebar building artwork should compensate for desktop sidebar padding.",
   );
   assertHasClassLine(
@@ -130,7 +130,7 @@ test("sidebar building artwork is full bleed outside padded branding text", asyn
   );
   assert.match(
     chrome,
-    /<SidebarBuildingArt \/>\s*<div className="px-3">/,
+    /<SidebarBuildingArt \/>\s*<div className="px-2\.5">/,
     "Sidebar building artwork should be separated from the padded branding text wrapper.",
   );
   assert.doesNotMatch(

@@ -107,17 +107,17 @@ function FacultyEmptyState({
   totalCount: number;
 }>) {
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-6 sm:p-8">
+    <section className="mm-panel rounded-lg border border-blue-100 bg-white">
       <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
         Faculty
       </p>
-      <h2 className="mt-4 font-serif text-4xl font-semibold leading-tight text-blue-950">
+      <h2 className="mt-3 font-serif text-3xl font-semibold leading-tight text-blue-950">
         {hasActiveFilters || totalCount > 0
           ? "No faculty match these filters."
           : "No faculty profiles are available yet."}
       </h2>
       {hasActiveFilters || totalCount > 0 ? (
-        <p className="mt-4 max-w-2xl leading-7 text-slate-600">
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
           Try clearing filters or changing your search.
         </p>
       ) : null}
@@ -127,11 +127,11 @@ function FacultyEmptyState({
 
 function FacultyLoadError() {
   return (
-    <section className="rounded-lg border border-red-200 bg-red-50 p-6 sm:p-8">
+    <section className="mm-panel rounded-lg border border-red-200 bg-red-50">
       <p className="text-sm font-semibold uppercase tracking-[0.12em] text-red-700">
         Faculty
       </p>
-      <h2 className="mt-4 font-serif text-4xl font-semibold leading-tight text-red-950">
+      <h2 className="mt-3 font-serif text-3xl font-semibold leading-tight text-red-950">
         Could not load faculty profiles. Try again.
       </h2>
     </section>
@@ -157,11 +157,11 @@ function FacultyRow({
   ];
 
   return (
-    <article className="rounded-lg border border-blue-100 bg-white p-4 text-blue-950 sm:p-5">
-      <div className="grid gap-4 sm:grid-cols-[6rem_minmax(0,1fr)]">
+    <article className="mm-panel rounded-lg border border-blue-100 bg-white text-blue-950">
+      <div className="grid gap-3 sm:grid-cols-[4.5rem_minmax(0,1fr)]">
         <Link
           aria-label={`Open ${profile.fullName}'s profile`}
-          className={`block w-24 ${systemAvatarRadiusClass} outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white`}
+          className={`block w-[4.5rem] ${systemAvatarRadiusClass} outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white`}
           href={profileHref}
         >
           <SystemAvatar
@@ -179,7 +179,7 @@ function FacultyRow({
 
         <div className="flex min-w-0 flex-col">
           <div className="min-w-0">
-            <h3 className="font-serif text-2xl font-semibold leading-tight text-blue-950 sm:text-3xl">
+            <h3 className="font-serif text-2xl font-semibold leading-tight text-blue-950">
               <Link
                 className="transition hover:text-blue-800"
                 href={profileHref}
@@ -195,7 +195,7 @@ function FacultyRow({
             </p>
           </div>
 
-          <div className="mt-3 space-y-2.5">
+          <div className="mt-2.5 space-y-2">
             <CompactChipRow
               emptyLabel="No academic programs listed yet."
               items={academicProgramChips}
@@ -210,9 +210,9 @@ function FacultyRow({
             />
           </div>
 
-          <div className="mt-3 flex justify-end">
+          <div className="mt-2.5 flex justify-end">
             <Link
-              className="inline-flex h-10 items-center justify-center rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
+              className="inline-flex h-11 items-center justify-center rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
               href={profileHref}
             >
               View profile

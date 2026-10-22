@@ -8,8 +8,8 @@ type PublicBenefitProps = Readonly<{
 
 export function PublicBenefit({ description, icon, title }: PublicBenefitProps) {
   return (
-    <div className="flex gap-4">
-      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#edf4ff] text-[#1855b5]">
+    <div className="flex gap-3">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#edf4ff] text-[#1855b5]">
         {icon}
       </span>
       <div>
@@ -18,7 +18,7 @@ export function PublicBenefit({ description, icon, title }: PublicBenefitProps) 
         ) : null}
         {description ? (
           <p
-            className={`text-sm leading-6 text-[#5b6683] sm:text-[0.95rem] ${
+            className={`text-xs leading-5 text-[#5b6683] sm:text-sm ${
               title ? "mt-1" : "font-semibold text-[#344268]"
             }`}
           >
@@ -35,7 +35,7 @@ export function PublicBadge({
   icon,
 }: Readonly<{ children: ReactNode; icon: ReactNode }>) {
   return (
-    <p className="inline-flex items-center gap-2 rounded-full bg-[#edf4ff] px-4 py-2 text-sm font-semibold text-[#174ca7]">
+    <p className="inline-flex items-center gap-2 rounded-full bg-[#edf4ff] px-3 py-1.5 text-xs font-semibold text-[#174ca7] sm:text-sm">
       <span className="text-[#1855b5]">{icon}</span>
       {children}
     </p>

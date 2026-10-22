@@ -96,11 +96,11 @@ function FacultyHiddenFilterInputs({
 
 function FacultyHero() {
   return (
-    <header className="mb-6 text-center">
-      <h1 className="font-serif text-[clamp(2.5rem,5vw,3.5rem)] font-bold leading-[0.98] text-blue-950">
+    <header className="mb-4 text-center">
+      <h1 className="font-serif text-4xl font-bold leading-[0.98] text-blue-950 sm:text-[2.75rem]">
         Find the right faculty member.
       </h1>
-      <p className="mx-auto mt-5 max-w-3xl text-lg leading-7 text-blue-900/75">
+      <p className="mx-auto mt-3 max-w-3xl text-base leading-6 text-blue-900/75">
         Discover Mohyla faculty by expertise, academic field, and research
         interests.
       </p>
@@ -122,10 +122,10 @@ function FacultyDiscoveryFilterRail({
   totalCount: number;
 }>) {
   return (
-    <aside className="scrollbar-hidden space-y-4 xl:h-full xl:min-h-0 xl:overflow-y-auto xl:pb-6">
-      <section className="rounded-lg border border-blue-100 bg-white p-5">
+    <aside className="scrollbar-hidden space-y-3 xl:h-full xl:min-h-0 xl:overflow-y-auto xl:pb-4">
+      <section className="mm-panel rounded-lg border border-blue-100 bg-white">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="font-serif text-3xl font-bold leading-none text-blue-950">
+          <h2 className="font-serif text-2xl font-bold leading-none text-blue-950">
             Faculty filters
           </h2>
           <Link
@@ -181,7 +181,7 @@ export default async function FacultyDiscoveryPage({ searchParams }: PageProps) 
 
   return (
     <main className="min-h-screen bg-[#eef6fb] text-blue-950 xl:h-screen xl:overflow-hidden">
-      <div className="grid min-h-screen xl:h-screen xl:min-h-0 xl:grid-cols-[18rem_minmax(0,1fr)]">
+      <div className="mm-app-grid grid min-h-screen xl:h-screen xl:min-h-0">
         <AppSidebar active="faculty" />
         <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">
           <DiscoveryTopBar
@@ -194,7 +194,7 @@ export default async function FacultyDiscoveryPage({ searchParams }: PageProps) 
             searchPlaceholder="Search faculty, expertise or research..."
             searchQuery={filters.searchQuery}
           />
-          <div className="grid gap-6 px-4 py-6 sm:px-6 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1fr)_22rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
+          <div className="mm-app-content mm-workspace-grid grid xl:min-h-0 xl:flex-1 xl:overflow-hidden">
             <section className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto">
               <FacultyHero />
               <FacultyDirectoryList

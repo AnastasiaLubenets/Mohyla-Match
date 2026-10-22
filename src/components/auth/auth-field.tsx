@@ -24,12 +24,12 @@ export function AuthField({
   return (
     <label className="block">
       <span className="sr-only">{label}</span>
-      <span className="flex min-h-14 items-center gap-3 rounded-xl border border-[#d7e2f3] bg-white px-4 text-[#101b55] transition focus-within:border-[#3154b8] focus-within:ring-4 focus-within:ring-[#3154b8]/10">
+      <span className="flex min-h-11 items-center gap-3 rounded-lg border border-[#d7e2f3] bg-white px-3.5 text-[#101b55] transition focus-within:border-[#3154b8] focus-within:ring-4 focus-within:ring-[#3154b8]/10">
         <span className="text-[#56637f]">{icon}</span>
         <input
           aria-describedby={helperId}
           aria-label={label}
-          className="min-w-0 flex-1 bg-transparent text-base font-medium outline-none placeholder:text-[#66728f]"
+          className="min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-[#66728f]"
           name={name}
           type={type}
           {...inputProps}
@@ -38,7 +38,7 @@ export function AuthField({
       </span>
       {helper ? (
         <span
-          className="mt-2 block px-14 text-xs font-medium text-[#6a7590]"
+          className="mt-1.5 block px-12 text-[0.7rem] font-medium text-[#6a7590]"
           id={helperId}
         >
           {helper}

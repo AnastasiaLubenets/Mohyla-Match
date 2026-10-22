@@ -29,7 +29,7 @@ test("public landing is a single-viewport watercolor entry screen", () => {
   assert.match(page, /imageClassName="object-cover object-right-bottom"/);
   assert.match(page, /preserveQuality/);
   assert.match(page, /sizes="100vw"/);
-  assert.match(page, /h-\[calc\(100dvh-6rem\)\]/);
+  assert.match(page, /h-\[calc\(100dvh-4\.5rem\)\]/);
   assert.equal(page.match(/<section/g)?.length, 1);
   assert.doesNotMatch(page, /bottomBenefits/);
   assert.doesNotMatch(page, /PublicBenefit/);
@@ -113,10 +113,10 @@ test("signup and login forms render inside contained auth cards", () => {
   const signupPage = source("src/app/signup/page.tsx");
   const loginPage = source("src/app/login/page.tsx");
 
-  assert.match(signupPage, /<section className="mt-7 rounded-\[1\.35rem\] border border-\[#dce7f7\] bg-white\/92 p-5 shadow-\[0_18px_50px_rgba\(37,76,139,0\.11\)\] backdrop-blur sm:p-7">/);
+  assert.match(signupPage, /<section className="mt-5 rounded-2xl border border-\[#dce7f7\] bg-white\/92 p-5 shadow-\[0_18px_50px_rgba\(37,76,139,0\.11\)\] backdrop-blur">/);
   assert.match(signupPage, /<form action="\/auth\/signup"[\s\S]*Already have an account\?/);
   assert.match(signupPage, /Already have an account\?[\s\S]*<\/section>/);
-  assert.match(loginPage, /<section className="mt-7 rounded-\[1\.35rem\] border border-\[#dce7f7\] bg-white\/92 p-5 shadow-\[0_18px_50px_rgba\(37,76,139,0\.11\)\] backdrop-blur sm:p-7">/);
+  assert.match(loginPage, /<section className="mt-5 rounded-2xl border border-\[#dce7f7\] bg-white\/92 p-5 shadow-\[0_18px_50px_rgba\(37,76,139,0\.11\)\] backdrop-blur">/);
   assert.match(loginPage, /bg-white\/92/);
   assert.match(loginPage, /shadow-\[0_18px_50px_rgba\(37,76,139,0\.11\)\]/);
   assert.match(loginPage, /backdrop-blur/);
@@ -132,11 +132,11 @@ test("auth shell uses one full-bleed watercolor background without a solid left 
   assert.doesNotMatch(shell, /layout="auth"/);
   assert.doesNotMatch(header, /layout\?:|layout =|headerLayoutClasses|auth:|landing:/);
   assert.match(header, /<header className="relative z-20 w-screen">/);
-  assert.match(header, /max-w-\[1800px\]/);
-  assert.match(header, /lg:px-12 xl:px-\[clamp\(5rem,4vw,6rem\)\]/);
+  assert.match(header, /max-w-\[1350px\]/);
+  assert.match(header, /lg:px-9 xl:px-12/);
   assert.match(shell, /lg:items-start/);
   assert.doesNotMatch(shell, /lg:items-center/);
-  assert.match(shell, /max-w-\[43rem\]/);
+  assert.match(shell, /max-w-\[32\.25rem\]/);
   assert.match(shell, /public-auth-shell relative min-h-screen overflow-x-hidden bg-transparent/);
   assert.doesNotMatch(shell, /bg-\[#f8fbff\]/);
   assert.doesNotMatch(shell, /watercolorPlacement/);

@@ -86,7 +86,7 @@ test("student recommendation card places actions in the upper profile area", () 
 
   const contactIndex = discoveryCardSource.indexOf("<ContactReveal");
   const metadataIndex = discoveryCardSource.indexOf(
-    '<div className="mt-5 grid gap-5 border-y',
+    '<div className="mt-4 grid gap-4 border-y',
   );
   const footerIndex = discoveryCardSource.indexOf("<footer");
 
@@ -201,7 +201,7 @@ test("sidebar artwork cannot intercept navigation clicks", () => {
 
   assert.match(
     appChromeSource,
-    /function SidebarBuildingArt\(\)[\s\S]*className="pointer-events-none mb-5 -mx-5/,
+    /function SidebarBuildingArt\(\)[\s\S]*className="pointer-events-none mb-3 -mx-4/,
     "The decorative sidebar artwork wrapper should not capture pointer events",
   );
   assert.match(
@@ -211,7 +211,7 @@ test("sidebar artwork cannot intercept navigation clicks", () => {
   );
   assert.match(
     appChromeSource,
-    /<nav className="relative z-10 mt-5 grid gap-2/,
+    /<nav className="relative z-10 mt-4 grid gap-1\.5/,
     "Sidebar navigation should stay layered above decorative artwork",
   );
   assert.match(

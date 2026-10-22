@@ -49,7 +49,7 @@ test("onboarding header uses the dedicated Mohyla emblem asset", () => {
     onboardingShell,
     /src="\/branding\/mohyla-match-logo\.png"/,
   );
-  assert.match(onboardingShell, /className="h-11 w-auto object-contain"/);
+  assert.match(onboardingShell, /className="h-9 w-auto object-contain"/);
   assert.match(
     onboardingShell,
     /src="\/branding\/mohyla-onboarding-emblem\.png"[\s\S]*unoptimized/,
@@ -70,7 +70,7 @@ test("setup page renders one shared onboarding shell instead of the old plain ca
 
 test("onboarding forms share the redesigned field and action system", () => {
   assert.match(onboardingStyles, /onboardingFieldClass/);
-  assert.match(onboardingStyles, /h-\[3\.125rem\]/);
+  assert.match(onboardingStyles, /h-11/);
   assert.match(onboardingStyles, /focus:ring-\[#3567a8\]\/15/);
   assert.match(onboardingStyles, /onboardingPrimaryButtonClass/);
   assert.match(basicForm, /onboardingFieldClass/);
@@ -94,7 +94,7 @@ test("skill picker keeps categories out of persistent card text", () => {
   assert.match(skillPicker, /aria-describedby=\{tooltipId\}/);
   assert.match(skillPicker, /flex min-w-0 flex-1 items-center gap-3/);
   assert.match(skillPicker, /inline-flex size-6 shrink-0/);
-  assert.match(skillPicker, /min-w-0 break-words leading-snug/);
+  assert.match(skillPicker, /min-w-0 break-words[^\"]*leading-snug/);
   assert.doesNotMatch(skillPicker, /max-w-\[45%\] break-words text-right/);
 });
 

@@ -35,8 +35,8 @@ export function AuthPageShell({
   const shellClassName =
     "public-auth-shell relative min-h-screen overflow-x-hidden bg-transparent text-[#101b55] lg:min-h-[100dvh]";
   const benefitsClassName = benefitsDividers
-    ? "public-auth-inline-benefits mt-8 grid gap-4 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-[#dce7f7]"
-    : "public-auth-inline-benefits mt-8 grid gap-4 sm:grid-cols-3 lg:gap-6";
+    ? "public-auth-inline-benefits mt-6 grid gap-3 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-[#dce7f7]"
+    : "public-auth-inline-benefits mt-6 grid gap-3 sm:grid-cols-3 lg:gap-4";
 
   return (
     <main className={shellClassName}>
@@ -48,21 +48,21 @@ export function AuthPageShell({
         sizes="100vw"
       />
       <PublicHeader active={active} />
-      <section className="relative grid min-h-[calc(100vh-6rem)] w-full gap-8 px-5 pb-10 pt-8 sm:px-8 lg:min-h-[calc(100dvh-6rem)] lg:grid-cols-[minmax(0,43rem)_1fr] lg:items-start lg:px-[clamp(4.5rem,7vw,12rem)] lg:pt-8 xl:pt-10">
-        <div className="relative z-10 min-w-0 max-w-[43rem]">
+      <section className="relative grid min-h-[calc(100vh-4.5rem)] w-full gap-6 px-5 pb-8 pt-6 sm:px-8 lg:min-h-[calc(100dvh-4.5rem)] lg:grid-cols-[minmax(0,32.25rem)_1fr] lg:items-start lg:px-[7vw] lg:pt-6 xl:pt-7">
+        <div className="relative z-10 min-w-0 max-w-[32.25rem]">
           <PublicBadge icon={badgeIcon}>Student collaboration network</PublicBadge>
-          <h1 className="relative mt-8 max-w-3xl font-serif text-5xl font-bold leading-[0.98] tracking-normal text-[#070d35] sm:text-7xl lg:text-[5.3rem]">
+          <h1 className="relative mt-6 max-w-3xl font-serif text-[2.75rem] font-bold leading-[0.98] tracking-normal text-[#070d35] sm:text-6xl lg:text-[4rem]">
             {title}
             <PublicUnderline className="w-[min(100%,28rem)]" />
           </h1>
-          <p className="mt-7 max-w-2xl text-xl leading-8 text-[#56637f] sm:text-2xl">
+          <p className="mt-5 max-w-2xl text-base leading-6 text-[#56637f] sm:text-lg sm:leading-7">
             {subtitle}
           </p>
           {children}
           <div className={benefitsClassName}>
             {benefits.map((benefit) => (
               <div
-                className={benefitsDividers ? "sm:px-6 sm:first:pl-0 sm:last:pr-0" : ""}
+                className={benefitsDividers ? "sm:px-4 sm:first:pl-0 sm:last:pr-0" : ""}
                 key={benefit.description}
               >
                 <PublicBenefit

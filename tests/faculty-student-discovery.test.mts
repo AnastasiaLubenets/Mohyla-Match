@@ -33,7 +33,7 @@ test("Student discovery accepts active Student and Faculty callers while keeping
     );
 
     const callerCte = functionSql.match(
-      /with caller as \(([\s\S]*?)\n  \)(?:,|\n  select)/,
+      /with caller as \(([\s\S]*?)\r?\n  \)(?:,|\r?\n  select)/,
     );
     assert.ok(callerCte, `${functionName} should retain a caller CTE`);
     assert.match(callerCte[1], /private\.is_active_onboarded\(p\.user_id\)/);

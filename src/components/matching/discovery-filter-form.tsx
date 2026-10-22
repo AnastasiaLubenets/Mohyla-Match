@@ -83,7 +83,7 @@ export function DiscoveryFilterForm({
   }
 
   return (
-    <form action="/app" className="mt-4 space-y-3" ref={formRef}>
+    <form action="/app" className="mt-3 space-y-2.5" ref={formRef}>
       <input name="view" type="hidden" value={view} />
       {filters.searchQuery ? (
         <input name="q" type="hidden" value={filters.searchQuery} />
@@ -146,7 +146,7 @@ export function DiscoveryFilterForm({
         selectedValues={filters.interestSlugs}
       />
       <button
-        className="mt-2 inline-flex h-12 w-full items-center justify-center rounded-md bg-blue-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900"
+        className="mt-2 inline-flex h-11 w-full items-center justify-center rounded-md bg-blue-800 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900"
         type="submit"
       >
         Apply filters

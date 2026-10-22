@@ -97,13 +97,13 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
 
   return (
     <AppChrome active="profile" currentProfile={profile}>
-      <div className="grid gap-6 px-4 py-6 sm:px-6 xl:h-full xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_20rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
+      <div className="mm-app-content mm-profile-grid grid xl:h-full xl:min-h-0 xl:overflow-hidden">
         <section className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
-          <header className="mb-5">
-            <h1 className="font-serif text-6xl font-bold leading-none text-blue-950 sm:text-7xl">
+          <header className="mb-4">
+            <h1 className="mm-page-title font-serif font-bold text-blue-950">
               My profile
             </h1>
-            <p className="mt-3 text-xl leading-8 text-blue-900/80 sm:text-2xl">
+            <p className="mm-page-subtitle text-blue-900/80">
               Manage your information and show who you are to the Mohyla Match
               community.
             </p>
@@ -116,7 +116,7 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
           <DeleteProfileDangerZone />
         </section>
 
-        <aside className="space-y-4 xl:h-full xl:min-h-0 xl:overflow-hidden">
+        <aside className="space-y-3 xl:h-full xl:min-h-0 xl:overflow-hidden">
           <ProfileCompletenessCard profile={profile} />
           <MyAccountCard loginEmail={loginEmail} profile={profile} />
         </aside>

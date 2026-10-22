@@ -349,7 +349,7 @@ function ChipList({
     <ul className="flex flex-wrap gap-2">
       {items.map((item) => (
         <li
-          className="rounded-full bg-blue-50 px-3.5 py-1.5 text-sm font-semibold text-blue-800 ring-1 ring-blue-100/80"
+          className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800 ring-1 ring-blue-100/80"
           key={item}
         >
           {item}
@@ -378,9 +378,9 @@ function DashboardCard({
   const otherSectionActive = Boolean(activeSection && activeSection !== section);
 
   return (
-    <section className="rounded-[1.375rem] border border-blue-100 bg-white p-5 sm:p-6">
+    <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
       <div className="flex items-start justify-between gap-4">
-        <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
+        <h2 className="inline-flex items-center gap-2.5 font-serif text-xl font-semibold text-blue-950">
           <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
             {icon}
           </span>
@@ -395,7 +395,7 @@ function DashboardCard({
           {isEditing ? "Editing" : "Edit"}
         </button>
       </div>
-      <div className="mt-4">{children}</div>
+      <div className="mt-3">{children}</div>
     </section>
   );
 }
@@ -455,24 +455,24 @@ export function ProfileCompletenessCard({
   const completion = computeCompletion(items);
 
   return (
-    <section className="rounded-[1.375rem] border border-blue-100 bg-white p-4 2xl:p-5">
-      <h2 className="font-serif text-2xl font-semibold text-blue-950">
+    <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
+      <h2 className="font-serif text-xl font-semibold text-blue-950">
         Profile completeness
       </h2>
-      <div className="mt-4 flex items-center gap-3 2xl:mt-5 2xl:gap-4">
+      <div className="mt-3 flex items-center gap-3">
         <div
           aria-label={`Profile completeness ${completion}%`}
-          className="grid h-20 w-20 shrink-0 place-items-center rounded-full 2xl:h-24 2xl:w-24"
+          className="grid h-16 w-16 shrink-0 place-items-center rounded-full"
           style={{
             background: `conic-gradient(#1d66d2 ${completion}%, #dbeafe ${completion}% 100%)`,
           }}
         >
-          <div className="grid h-14 w-14 place-items-center rounded-full bg-white text-lg font-bold text-blue-800 2xl:h-16 2xl:w-16 2xl:text-xl">
+          <div className="grid h-11 w-11 place-items-center rounded-full bg-white text-base font-bold text-blue-800">
             {completion}%
           </div>
         </div>
         <div>
-          <p className="text-base font-bold text-blue-950 2xl:text-lg">
+          <p className="text-sm font-bold text-blue-950">
             {completion === 100 ? "Ready to shine" : "Almost there"}
           </p>
           <p className="mt-1 text-sm leading-5 text-blue-700/80">
@@ -480,7 +480,7 @@ export function ProfileCompletenessCard({
           </p>
         </div>
       </div>
-      <ul className="mt-4 space-y-2 2xl:mt-5 2xl:space-y-3">
+      <ul className="mt-3 space-y-2">
         {items.map((item) => (
           <li
             className="flex items-center gap-3 text-sm font-semibold text-blue-800"
@@ -511,11 +511,11 @@ export function MyAccountCard({
   profile: SafeProfile;
 }>) {
   return (
-    <section className="rounded-[1.375rem] border border-blue-100 bg-white p-4 2xl:p-5">
-      <h2 className="font-serif text-2xl font-semibold text-blue-950">
+    <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
+      <h2 className="font-serif text-xl font-semibold text-blue-950">
         My account
       </h2>
-      <ul className="mt-4 space-y-3 2xl:mt-5 2xl:space-y-4">
+      <ul className="mt-3 space-y-2.5">
         <AccountFact icon={<GraduationIcon />}>
           <strong className="block text-blue-950">
             {profile.accountRole === "faculty"
@@ -560,9 +560,9 @@ function FacultyProfileDashboard({
   );
 
   return (
-    <div className="space-y-4">
-      <section className="rounded-[1.375rem] border border-blue-100 bg-white p-5 sm:p-6">
-        <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)_14rem] lg:items-start">
+    <div className="space-y-3">
+      <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
+        <div className="grid gap-4 lg:grid-cols-[9.75rem_minmax(0,1fr)_11rem] lg:items-start">
           <SystemAvatar
             availability={profile.availability}
             avatarMode={profile.avatarMode}
@@ -579,28 +579,28 @@ function FacultyProfileDashboard({
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
               Faculty profile
             </p>
-            <h2 className="mt-3 font-serif text-5xl font-semibold leading-none text-blue-950">
+            <h2 className="mt-2 font-serif text-3xl font-semibold leading-none text-blue-950">
               {profile.fullName}
             </h2>
-            <p className="mt-3 text-base font-medium text-blue-800">
+            <p className="mt-2 text-sm font-semibold text-blue-800">
               {primaryProgram?.name ?? profile.academicProgramName}
             </p>
             <p className="mt-1 text-sm font-medium text-blue-700/80">
               {profile.facultyName}
             </p>
             {profile.availability ? (
-              <p className="mt-3 text-sm font-semibold text-blue-700">
+              <p className="mt-2 text-sm font-semibold text-blue-700">
                 {profile.availability}
               </p>
             ) : null}
-            <p className="mt-5 max-w-2xl text-base leading-7 text-blue-900/80">
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-900/80">
               {profile.bio || "No bio yet."}
             </p>
           </div>
 
           <div className="flex flex-col gap-2">
             <Link
-              className="inline-flex h-12 items-center justify-center gap-3 rounded-md border border-blue-200 bg-white px-5 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
+              className="inline-flex h-11 items-center justify-center gap-2.5 rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
               href="/profile/edit"
             >
               <EditIcon />
@@ -614,15 +614,15 @@ function FacultyProfileDashboard({
         </div>
       </section>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-[1.375rem] border border-blue-100 bg-white p-5 sm:p-6">
-          <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
+      <div className="grid gap-3 lg:grid-cols-2">
+        <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
+          <h2 className="inline-flex items-center gap-2.5 font-serif text-xl font-semibold text-blue-950">
             <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
               <GraduationIcon />
             </span>
             Academic programs
           </h2>
-          <div className="mt-4">
+          <div className="mt-3">
             <ChipList
               emptyLabel="No academic programs are visible."
               items={facultyProgramLabels(profile)}
@@ -630,14 +630,14 @@ function FacultyProfileDashboard({
           </div>
         </section>
 
-        <section className="rounded-[1.375rem] border border-blue-100 bg-white p-5 sm:p-6">
-          <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
+        <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
+          <h2 className="inline-flex items-center gap-2.5 font-serif text-xl font-semibold text-blue-950">
             <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
               <BarsIcon />
             </span>
             Expertise
           </h2>
-          <div className="mt-4">
+          <div className="mt-3">
             <ChipList
               emptyLabel="No expertise is visible."
               items={expertiseNames}
@@ -645,14 +645,14 @@ function FacultyProfileDashboard({
           </div>
         </section>
 
-        <section className="rounded-[1.375rem] border border-blue-100 bg-white p-5 sm:p-6">
-          <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
+        <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
+          <h2 className="inline-flex items-center gap-2.5 font-serif text-xl font-semibold text-blue-950">
             <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
               <SparkIcon />
             </span>
             Research interests
           </h2>
-          <div className="mt-4">
+          <div className="mt-3">
             <ChipList
               emptyLabel="No research interests are visible."
               items={profile.interests}
@@ -660,14 +660,14 @@ function FacultyProfileDashboard({
           </div>
         </section>
 
-        <section className="rounded-[1.375rem] border border-blue-100 bg-white p-5 sm:p-6">
-          <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
+        <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
+          <h2 className="inline-flex items-center gap-2.5 font-serif text-xl font-semibold text-blue-950">
             <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
               <CalendarIcon />
             </span>
             Availability
           </h2>
-          <div className="mt-4">
+          <div className="mt-3">
             <ChipList
               emptyLabel="No availability is listed."
               items={profile.availability ? [profile.availability] : []}
@@ -822,9 +822,9 @@ function StudentProfileDashboard({
   }
 
   return (
-    <div className="space-y-4">
-      <section className="rounded-[1.375rem] border border-blue-100 bg-white p-5 sm:p-6">
-        <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)_14rem] lg:items-start">
+    <div className="space-y-3">
+      <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
+        <div className="grid gap-4 lg:grid-cols-[9.75rem_minmax(0,1fr)_11rem] lg:items-start">
           <SystemAvatar
             availability={state.availability}
             avatarMode={profile.avatarMode}
@@ -838,10 +838,10 @@ function StudentProfileDashboard({
           />
 
           <div className="min-w-0">
-            <h2 className="font-serif text-5xl font-semibold leading-none text-blue-950">
+            <h2 className="font-serif text-3xl font-semibold leading-none text-blue-950">
               {profile.fullName}
             </h2>
-            <p className="mt-3 text-base font-medium text-blue-800">
+            <p className="mt-2 text-sm font-semibold text-blue-800">
               {profile.academicProgramName} <span aria-hidden="true">•</span>{" "}
               {yearLabel(profile.yearOfStudy)}
             </p>
@@ -849,20 +849,20 @@ function StudentProfileDashboard({
               {profile.facultyName}
             </p>
             {state.availability ? (
-              <p className="mt-3 text-sm font-semibold text-blue-700">
+              <p className="mt-2 text-sm font-semibold text-blue-700">
                 {state.availability}
               </p>
             ) : null}
             {profile.socialLinks.length > 0 ? (
-              <div className="mt-4">
+              <div className="mt-3">
                 <SocialLinksList compact links={profile.socialLinks} />
               </div>
             ) : null}
-            <p className="mt-5 max-w-2xl text-base leading-7 text-blue-900/80">
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-900/80">
               {state.bio || "No bio yet."}
             </p>
             {heroChips.length > 0 ? (
-              <div className="mt-5">
+              <div className="mt-3">
                 <ChipList emptyLabel="" items={heroChips} />
               </div>
             ) : null}
@@ -870,7 +870,7 @@ function StudentProfileDashboard({
 
           <div className="flex flex-col gap-2">
             <Link
-              className="inline-flex h-12 items-center justify-center gap-3 rounded-md border border-blue-200 bg-white px-5 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
+              className="inline-flex h-11 items-center justify-center gap-2.5 rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
               href="/profile/edit"
             >
               <EditIcon />
@@ -892,7 +892,7 @@ function StudentProfileDashboard({
           {error}
         </div>
       ) : null}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-3 lg:grid-cols-2">
         <DashboardCard
           activeSection={editingSection}
           icon={<UserIcon />}

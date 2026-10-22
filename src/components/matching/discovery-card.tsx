@@ -167,20 +167,20 @@ export function DiscoveryCard({
     return (
       <>
         <StatusMessage error={error} status={status} />
-        <section className="rounded-lg border border-blue-100 bg-white p-6 sm:p-8">
+        <section className="mm-panel rounded-lg border border-blue-100 bg-white">
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
             Discover
           </p>
-          <h1 className="mt-4 font-serif text-4xl font-semibold leading-tight text-blue-950">
+          <h1 className="mt-3 font-serif text-3xl font-semibold leading-tight text-blue-950">
             {emptyTitle}
           </h1>
-          <p className="mt-4 max-w-2xl leading-7 text-slate-600">{emptyDescription}</p>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">{emptyDescription}</p>
           {emptyAction || showProfileAction ? (
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
               {emptyAction}
               {showProfileAction ? (
                 <Link
-                  className="inline-flex h-12 items-center justify-center rounded-full border border-blue-200 px-5 text-sm font-semibold text-blue-900 transition hover:border-blue-400 hover:bg-blue-50"
+                  className="inline-flex h-11 items-center justify-center rounded-full border border-blue-200 px-5 text-sm font-semibold text-blue-900 transition hover:border-blue-400 hover:bg-blue-50"
                   href="/profile"
                 >
                   Update my profile
@@ -204,8 +204,8 @@ export function DiscoveryCard({
   return (
     <>
       <StatusMessage error={error} status={status} />
-      <article className="relative rounded-lg border border-blue-100 bg-white p-5 text-blue-950 sm:p-6">
-        <header className="grid gap-5 md:grid-cols-[14rem_minmax(0,1fr)] lg:grid-cols-[14rem_minmax(0,1fr)_auto] xl:grid-cols-[16rem_minmax(0,1fr)_auto]">
+      <article className="mm-panel relative rounded-lg border border-blue-100 bg-white text-blue-950">
+        <header className="grid gap-4 md:grid-cols-[10.5rem_minmax(0,1fr)] lg:grid-cols-[10.5rem_minmax(0,1fr)_auto] xl:grid-cols-[11.5rem_minmax(0,1fr)_auto]">
           <Link
             aria-label={`Open ${candidate.fullName}'s profile`}
             className={`block ${systemAvatarRadiusClass} outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white`}
@@ -224,7 +224,7 @@ export function DiscoveryCard({
           </Link>
 
           <div className="min-w-0">
-            <h2 className="font-serif text-4xl font-semibold leading-none text-blue-950">
+            <h2 className="font-serif text-3xl font-semibold leading-none text-blue-950">
               <Link
                 className="transition hover:text-blue-800"
                 href={`/profiles/${candidate.userId}?from=discover`}
@@ -232,7 +232,7 @@ export function DiscoveryCard({
                 {candidate.fullName}
               </Link>
             </h2>
-            <p className="mt-3 text-base font-medium text-blue-800">
+            <p className="mt-2 text-sm font-semibold text-blue-800">
               {candidate.academicProgramName} <span aria-hidden="true">•</span>{" "}
               {candidate.yearOfStudy}
               {candidate.yearOfStudy === 1 ? "st" : candidate.yearOfStudy === 2 ? "nd" : candidate.yearOfStudy === 3 ? "rd" : "th"}{" "}
@@ -242,22 +242,22 @@ export function DiscoveryCard({
               {candidate.facultyName}
             </p>
             {candidate.availability ? (
-              <p className="mt-2 text-sm font-medium text-slate-600">
+              <p className="mt-1.5 text-xs font-medium text-slate-600">
                 {candidate.availability}
               </p>
             ) : null}
-            <p className="mt-4 max-w-3xl text-base leading-6 text-blue-900/80">
+            <p className="mt-3 max-w-3xl text-sm leading-5 text-blue-900/80">
               {candidate.bio || "No bio yet."}
             </p>
             <Link
-              className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-blue-800 transition hover:text-blue-950"
+              className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-blue-800 transition hover:text-blue-950"
               href={`/profiles/${candidate.userId}?from=discover`}
             >
               View full profile
               <ArrowRightIcon />
             </Link>
             {candidate.socialLinks.length > 0 ? (
-              <div className="mt-3">
+              <div className="mt-2">
                 <SocialLinksList
                   appearance="bare"
                   compact
@@ -267,7 +267,7 @@ export function DiscoveryCard({
             ) : null}
           </div>
 
-          <div className="flex min-w-0 flex-col gap-4 md:col-start-2 lg:col-start-3 lg:row-start-1 lg:h-full lg:min-w-[11rem] lg:items-end lg:justify-between">
+          <div className="flex min-w-0 flex-col gap-3 md:col-start-2 lg:col-start-3 lg:row-start-1 lg:h-full lg:min-w-[9rem] lg:items-end lg:justify-between">
             <div className="flex items-center gap-4 self-start md:self-end">
               <MatchPercentageIndicator percentage={matchPercentage} />
               <SaveProfileButton
@@ -281,7 +281,7 @@ export function DiscoveryCard({
               />
             </div>
             <ContactReveal
-              buttonClassName="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-blue-800 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+              buttonClassName="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-blue-800 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
               className="w-full sm:w-auto"
               showIcon
               targetUserId={candidate.userId}
@@ -289,8 +289,8 @@ export function DiscoveryCard({
           </div>
         </header>
 
-        <div className="mt-5 grid gap-5 border-y border-blue-100 py-4 md:grid-cols-3 md:gap-0">
-          <section className="flex gap-3 md:pr-5">
+        <div className="mt-4 grid gap-4 border-y border-blue-100 py-3 md:grid-cols-3 md:gap-0">
+          <section className="flex gap-2.5 md:pr-4">
             <SectionIcon>
               <BarsIcon />
             </SectionIcon>
@@ -298,12 +298,12 @@ export function DiscoveryCard({
               <h3 className="text-sm font-bold text-blue-950">
                 Skills
               </h3>
-              <div className="mt-3">
+              <div className="mt-2">
                 <TaxonomyChipList items={candidate.offeredSkills} limit={4} />
               </div>
             </div>
           </section>
-          <section className="flex gap-3 md:border-l md:border-blue-100 md:px-5">
+          <section className="flex gap-2.5 md:border-l md:border-blue-100 md:px-4">
             <SectionIcon>
               <SparkIcon />
             </SectionIcon>
@@ -311,7 +311,7 @@ export function DiscoveryCard({
               <h3 className="text-sm font-bold text-blue-950">
                 Academic interests
               </h3>
-              <div className="mt-3">
+              <div className="mt-2">
                 <TaxonomyChipList
                   emptyLabel="No interests listed yet."
                   items={candidate.interests}
@@ -320,7 +320,7 @@ export function DiscoveryCard({
               </div>
             </div>
           </section>
-          <section className="flex gap-3 md:border-l md:border-blue-100 md:pl-5">
+          <section className="flex gap-2.5 md:border-l md:border-blue-100 md:pl-4">
             <SectionIcon>
               <TargetIcon />
             </SectionIcon>
@@ -328,7 +328,7 @@ export function DiscoveryCard({
               <h3 className="text-sm font-bold text-blue-950">
                 Looking for
               </h3>
-              <div className="mt-3">
+              <div className="mt-2">
                 <TaxonomyChipList
                   emptyLabel="No collaboration goals listed yet."
                   items={lookingForItems}
@@ -341,7 +341,7 @@ export function DiscoveryCard({
         </div>
 
         {canSkip ? (
-          <footer className="mt-3 flex justify-end">
+          <footer className="mt-2 flex justify-end">
             <button
               aria-label={`Skip ${candidate.fullName}`}
               className="inline-flex h-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"

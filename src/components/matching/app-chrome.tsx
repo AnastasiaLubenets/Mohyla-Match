@@ -131,8 +131,8 @@ function SidebarLink({ active = false, children, href, label }: SidebarLinkProps
       aria-current={active ? "page" : undefined}
       className={
         active
-          ? "inline-flex items-center gap-4 rounded-md bg-blue-100/90 px-5 py-4 text-sm font-bold text-blue-950 shadow-sm"
-          : "inline-flex items-center gap-4 rounded-md px-5 py-4 text-sm font-bold text-blue-900 transition hover:bg-blue-50"
+          ? "inline-flex min-h-11 items-center gap-3 rounded-md bg-blue-100/90 px-3.5 py-2.5 text-sm font-bold text-blue-950 shadow-sm"
+          : "inline-flex min-h-11 items-center gap-3 rounded-md px-3.5 py-2.5 text-sm font-bold text-blue-900 transition hover:bg-blue-50"
       }
       href={href}
     >
@@ -146,7 +146,7 @@ function SidebarBrandLogo() {
   return (
     <Link
       aria-label={sidebarLogo.alt}
-      className="block w-[86%] max-w-[15.5rem] transition-opacity hover:opacity-90"
+      className="block w-[86%] max-w-[11.5rem] transition-opacity hover:opacity-90"
       href="/app"
     >
       <Image
@@ -154,7 +154,7 @@ function SidebarBrandLogo() {
         className="h-auto w-full object-contain"
         height={sidebarLogo.height}
         priority
-        sizes="(min-width: 1280px) 15.5rem, 16rem"
+        sizes="(min-width: 1280px) 11.5rem, 16rem"
         src={sidebarLogo.src}
         width={sidebarLogo.width}
       />
@@ -164,13 +164,13 @@ function SidebarBrandLogo() {
 
 function SidebarBuildingArt() {
   return (
-    <div className="pointer-events-none mb-5 -mx-5 min-h-0 2xl:mb-7">
+    <div className="pointer-events-none mb-3 -mx-4 min-h-0 2xl:mb-4">
       <Image
         alt=""
         aria-hidden="true"
         className="pointer-events-none h-auto w-full max-w-none object-contain object-left-bottom"
         height={sidebarBuilding.height}
-        sizes="18rem"
+        sizes="14rem"
         src={sidebarBuilding.src}
         width={sidebarBuilding.width}
       />
@@ -180,10 +180,10 @@ function SidebarBuildingArt() {
 
 export function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
   return (
-    <aside className="border-b border-blue-100 bg-white/90 px-4 py-4 backdrop-blur xl:flex xl:h-screen xl:min-h-0 xl:flex-col xl:overflow-hidden xl:border-b-0 xl:border-r xl:px-5 xl:py-5 2xl:py-6">
+    <aside className="border-b border-blue-100 bg-white/90 px-4 py-3 backdrop-blur xl:flex xl:h-screen xl:min-h-0 xl:flex-col xl:overflow-hidden xl:border-b-0 xl:border-r xl:px-4 xl:py-4">
       <SidebarBrandLogo />
 
-      <nav className="relative z-10 mt-5 grid gap-2 sm:grid-cols-4 xl:grid-cols-1 2xl:mt-7">
+      <nav className="relative z-10 mt-4 grid gap-1.5 sm:grid-cols-4 xl:grid-cols-1">
         <SidebarLink active={active === "discover"} href="/app" label="Discover">
           <CompassIcon />
         </SidebarLink>
@@ -202,11 +202,11 @@ export function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
         </SidebarLink>
       </nav>
 
-      <div className="mt-6 hidden min-h-0 flex-1 flex-col justify-end xl:flex">
-        <div className="mb-5 pb-2 2xl:mb-8">
+      <div className="mt-4 hidden min-h-0 flex-1 flex-col justify-end xl:flex">
+        <div className="mb-4 pb-1">
           <SidebarBuildingArt />
-          <div className="px-3">
-            <p className="font-serif text-[1.42rem] font-semibold uppercase leading-[1.08] text-blue-950 2xl:text-[1.75rem]">
+          <div className="px-2.5">
+            <p className="font-serif text-[1.15rem] font-semibold uppercase leading-[1.12] text-blue-950 2xl:text-[1.3rem]">
               Більше
               <br />
               людей
@@ -215,15 +215,15 @@ export function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
               <br />
               можливостей
             </p>
-            <div className="mt-4 h-px w-16 bg-blue-300 2xl:mt-6" />
-            <p className="mt-4 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-blue-500 2xl:mt-6 2xl:text-xs">
+            <div className="mt-3 h-px w-12 bg-blue-300" />
+            <p className="mt-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-blue-500 2xl:text-[0.68rem]">
               Спільнота
               <br />
               що створює майбутнє
             </p>
           </div>
         </div>
-        <form action="/auth/logout" className="px-3" method="post">
+        <form action="/auth/logout" className="px-2.5" method="post">
           <button
             className="text-sm font-semibold text-slate-500 transition hover:text-blue-900"
             type="submit"
@@ -240,9 +240,9 @@ function AppTopBar({
   currentProfile,
 }: Readonly<{ currentProfile: SafeProfile | null }>) {
   return (
-    <header className="z-30 shrink-0 border-b border-blue-100 bg-white/80 px-4 py-3 backdrop-blur sm:px-6 xl:px-8">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <form action="/app" className="relative w-full lg:max-w-md">
+    <header className="z-30 shrink-0 border-b border-blue-100 bg-white/80 px-4 py-2 backdrop-blur sm:px-5 xl:px-6">
+      <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+        <form action="/app" className="relative w-full lg:max-w-sm">
           <label className="sr-only" htmlFor="global-search">
             Search students, skills or interests
           </label>
@@ -250,7 +250,7 @@ function AppTopBar({
             <SearchIcon />
           </span>
           <input
-            className="h-11 w-full rounded-lg border border-blue-100 bg-blue-50/80 pl-12 pr-5 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
+            className="h-10 w-full rounded-lg border border-blue-100 bg-blue-50/80 pl-11 pr-4 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
             id="global-search"
             name="q"
             placeholder="Search students, skills or interests..."
@@ -263,7 +263,7 @@ function AppTopBar({
 
         <div className="flex items-center justify-between gap-4 lg:justify-end">
           <Link
-            className="inline-flex items-center gap-3 rounded-lg px-2 py-1.5 text-blue-950 transition hover:bg-blue-50"
+            className="inline-flex items-center gap-2.5 rounded-lg px-2 py-1 text-blue-950 transition hover:bg-blue-50"
             href="/profile"
           >
             {currentProfile ? (
@@ -304,7 +304,7 @@ export function AppChrome({
         clearSearchParams={toast ? ["status"] : []}
         initialToast={toast}
       />
-      <div className="grid min-h-screen xl:h-screen xl:min-h-0 xl:grid-cols-[18rem_minmax(0,1fr)]">
+      <div className="mm-app-grid grid min-h-screen xl:h-screen xl:min-h-0">
         <AppSidebar active={active} />
         <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">
           <AppTopBar currentProfile={currentProfile} />
@@ -326,20 +326,20 @@ export function BrandQuoteCard({
 }>) {
   return (
     <section
-      className="rounded-lg border border-blue-50 bg-[#fffaf0] bg-cover bg-center bg-no-repeat p-7"
+      className="mm-panel rounded-lg border border-blue-50 bg-[#fffaf0] bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage: "url('/branding/mohyla-quote-architecture-v2.png')",
         backgroundPosition: "center bottom",
       }}
     >
-      <p className="font-serif text-6xl font-bold leading-none text-blue-800">
+      <p className="font-serif text-4xl font-bold leading-none text-blue-800">
         &quot;
       </p>
-      <p className="mt-1 font-serif text-3xl font-semibold italic leading-[1.02] text-blue-950">
+      <p className="mt-1 font-serif text-2xl font-semibold italic leading-[1.05] text-blue-950">
         {text}
       </p>
-      <div className="mt-6 h-px w-16 bg-blue-300" />
-      <p className="mt-5 text-xs font-bold uppercase tracking-[0.22em] text-blue-500">
+      <div className="mt-4 h-px w-12 bg-blue-300" />
+      <p className="mt-4 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-blue-500">
         {lines.map((line) => (
           <span key={line}>
             {line}

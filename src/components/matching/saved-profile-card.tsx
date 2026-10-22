@@ -98,7 +98,7 @@ function SavedTaxonomyRow({
   title: string;
 }>) {
   return (
-    <section className="grid gap-3 sm:grid-cols-[8.25rem_minmax(0,1fr)] sm:items-start">
+    <section className="grid gap-2.5 sm:grid-cols-[7rem_minmax(0,1fr)] sm:items-start">
       <h3 className="inline-flex items-center gap-3 text-sm font-bold text-blue-950">
         <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
           {icon}
@@ -120,8 +120,8 @@ export function SavedProfileCard({
   const showLookingForCategory = profile.collaborationGoals.length === 0;
 
   return (
-    <article className="relative overflow-hidden rounded-lg border border-blue-100 bg-white p-5 text-blue-950 sm:p-6">
-      <div className="absolute right-5 top-5 z-10 sm:right-6 sm:top-6">
+    <article className="mm-panel relative overflow-hidden rounded-lg border border-blue-100 bg-white text-blue-950">
+      <div className="absolute right-4 top-4 z-10">
         <SaveProfileButton
           className="inline-flex h-9 w-9 items-center justify-center rounded-md text-blue-800 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
           label="Remove from saved"
@@ -133,7 +133,7 @@ export function SavedProfileCard({
         />
       </div>
 
-      <header className="grid gap-5 pr-11 md:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13rem_minmax(0,1fr)]">
+      <header className="grid gap-4 pr-10 md:grid-cols-[9.5rem_minmax(0,1fr)] xl:grid-cols-[10rem_minmax(0,1fr)]">
         <Link
           aria-label={`Open ${profile.fullName}'s profile`}
           className={`block ${systemAvatarRadiusClass} outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white`}
@@ -152,7 +152,7 @@ export function SavedProfileCard({
         </Link>
 
         <div className="min-w-0">
-          <h2 className="font-serif text-4xl font-semibold leading-none text-blue-950">
+          <h2 className="font-serif text-3xl font-semibold leading-none text-blue-950">
             <Link
               className="transition hover:text-blue-800"
               href={`/profiles/${profile.userId}?from=saved`}
@@ -160,7 +160,7 @@ export function SavedProfileCard({
               {profile.fullName}
             </Link>
           </h2>
-          <p className="mt-3 text-base font-medium text-blue-800">
+          <p className="mt-2 text-sm font-semibold text-blue-800">
             {profile.academicProgramName} <span aria-hidden="true">•</span>{" "}
             {yearLabel(profile.yearOfStudy)}
           </p>
@@ -168,15 +168,15 @@ export function SavedProfileCard({
             {profile.facultyName}
           </p>
           {profile.availability ? (
-            <p className="mt-2 text-sm font-medium text-slate-600">
+            <p className="mt-1.5 text-xs font-medium text-slate-600">
               {profile.availability}
             </p>
           ) : null}
-          <p className="mt-3 max-w-3xl text-base leading-6 text-blue-900/80">
+          <p className="mt-2.5 max-w-3xl text-sm leading-5 text-blue-900/80">
             {profile.bio || "No bio yet."}
           </p>
 
-          <div className="mt-4 space-y-3">
+          <div className="mt-3 space-y-2.5">
             <SavedTaxonomyRow icon={<BarsIcon />} title="Skills">
               <TaxonomyChipList items={profile.offeredSkills} limit={4} />
             </SavedTaxonomyRow>
@@ -199,9 +199,9 @@ export function SavedProfileCard({
         </div>
       </header>
 
-      <footer className="mt-5 grid gap-3 border-t border-blue-100 pt-5 sm:grid-cols-2">
+      <footer className="mt-4 grid gap-3 border-t border-blue-100 pt-4 sm:grid-cols-2">
         <Link
-          className="inline-flex h-12 items-center justify-center gap-3 rounded-md border border-blue-200 bg-white px-5 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
+          className="inline-flex h-11 items-center justify-center gap-2.5 rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
           href={`/profiles/${profile.userId}?from=saved`}
         >
           <ExternalIcon />
@@ -209,12 +209,12 @@ export function SavedProfileCard({
         </Link>
         {profile.canDirectContact ? (
           <ContactReveal
-            buttonClassName="inline-flex h-12 w-full items-center justify-center gap-3 rounded-md bg-blue-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+            buttonClassName="inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-md bg-blue-800 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
             showIcon
             targetUserId={profile.userId}
           />
         ) : (
-          <p className="inline-flex min-h-12 items-center justify-center rounded-md border border-blue-100 bg-blue-50 px-5 text-center text-sm font-semibold text-blue-700">
+          <p className="inline-flex min-h-11 items-center justify-center rounded-md border border-blue-100 bg-blue-50 px-4 text-center text-sm font-semibold text-blue-700">
             Email contact is off for this profile.
           </p>
         )}

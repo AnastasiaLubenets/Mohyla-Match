@@ -38,9 +38,9 @@ export function DiscoveryTopBar({
   searchQuery: string;
 }>) {
   return (
-    <header className="z-30 shrink-0 border-b border-blue-100 bg-white/80 px-4 py-3 backdrop-blur sm:px-6 xl:px-8">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <form action={action} className="relative w-full lg:max-w-md">
+    <header className="z-30 shrink-0 border-b border-blue-100 bg-white/80 px-4 py-2 backdrop-blur sm:px-5 xl:px-6">
+      <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+        <form action={action} className="relative w-full lg:max-w-sm">
           <label className="sr-only" htmlFor="discover-search">
             {searchLabel}
           </label>
@@ -48,7 +48,7 @@ export function DiscoveryTopBar({
             <SearchIcon />
           </span>
           <input
-            className="h-11 w-full rounded-lg border border-blue-100 bg-blue-50/80 pl-12 pr-5 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
+            className="h-10 w-full rounded-lg border border-blue-100 bg-blue-50/80 pl-11 pr-4 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
             defaultValue={searchQuery}
             id="discover-search"
             name="q"
@@ -63,7 +63,7 @@ export function DiscoveryTopBar({
 
         <div className="flex items-center justify-between gap-4 lg:justify-end">
           <Link
-            className="inline-flex items-center gap-3 rounded-lg px-2 py-1.5 text-blue-950 transition hover:bg-blue-50"
+            className="inline-flex items-center gap-2.5 rounded-lg px-2 py-1 text-blue-950 transition hover:bg-blue-50"
             href="/profile"
           >
             {currentProfile ? (

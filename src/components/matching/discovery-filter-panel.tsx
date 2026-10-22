@@ -76,9 +76,9 @@ function DiscoveryFilterPanelDraft({
   }
 
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-5">
+    <section className="mm-panel rounded-lg border border-blue-100 bg-white">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="font-serif text-3xl font-bold leading-none text-blue-950">
+        <h2 className="font-serif text-2xl font-bold leading-none text-blue-950">
           Filters
         </h2>
         <button
