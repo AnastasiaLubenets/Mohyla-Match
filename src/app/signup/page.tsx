@@ -118,8 +118,8 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
       subtitle="Become part of the Mohyla student network. Find people, share ideas, and build something together."
       title="Join Mohyla Match"
     >
-      <section className="mt-7 rounded-[1.35rem] border border-[#dce7f7] bg-white/92 p-5 shadow-[0_18px_50px_rgba(37,76,139,0.11)] backdrop-blur sm:p-7">
-        <form action="/auth/signup" className="space-y-5" method="post">
+      <section className="mt-5 rounded-2xl border border-[#dce7f7] bg-white/92 p-5 shadow-[0_18px_50px_rgba(37,76,139,0.11)] backdrop-blur">
+        <form action="/auth/signup" className="space-y-4" method="post">
           <AuthMessage message={message} />
           <AuthField
             helper="Your name as it appears at NaUKMA"
@@ -160,14 +160,14 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
             name="password_confirmation"
           />
           <AuthSubmitButton
-            className="inline-flex h-16 w-full items-center justify-center gap-4 rounded-full bg-[#3154b8] px-8 text-lg font-bold text-white transition hover:bg-[#27469f] disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-full bg-[#3154b8] px-7 text-base font-bold text-white transition hover:bg-[#27469f] disabled:cursor-not-allowed disabled:opacity-70"
             pendingLabel="Creating account..."
           >
             Join Mohyla Match
-            <ArrowRightIcon className="h-6 w-6" />
+            <ArrowRightIcon className="h-5 w-5" />
           </AuthSubmitButton>
         </form>
-        <div className="mt-5 flex items-center gap-5 text-sm font-semibold text-[#344268]">
+        <div className="mt-4 flex items-center gap-4 text-xs font-semibold text-[#344268] sm:text-sm">
           <span className="h-px flex-1 bg-[#dce7f7]" />
           <p>
             Already have an account?{" "}

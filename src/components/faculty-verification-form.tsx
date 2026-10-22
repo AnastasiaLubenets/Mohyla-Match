@@ -17,7 +17,7 @@ export function FacultyVerificationForm({
   return (
     <form
       action="/account/setup/faculty-verification"
-      className="mt-8 space-y-6"
+      className="mt-6 space-y-5"
       method="post"
     >
       <label className="block">
@@ -34,7 +34,7 @@ export function FacultyVerificationForm({
         />
       </label>
 
-      <div className="flex flex-col-reverse gap-3 pt-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
         <Link
           className={onboardingSecondaryButtonClass}
           href="/account/setup?role=select"

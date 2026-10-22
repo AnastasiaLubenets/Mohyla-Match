@@ -80,14 +80,14 @@ export function SystemAvatar({
           fill
           sizes={
             size === "sm"
-              ? "3.5rem"
+              ? "2.75rem"
               : size === "md"
-                ? "6rem"
+                ? "4.5rem"
                 : size === "lg"
-                  ? "8rem"
+                  ? "6rem"
                   : size === "xl"
-                    ? "(min-width: 640px) 13rem, 100vw"
-                    : "(min-width: 640px) 14rem, 100vw"
+                    ? "(min-width: 640px) 9.75rem, 100vw"
+                    : "(min-width: 640px) 11rem, 100vw"
           }
           src={resolvedAvatar.src}
         />

@@ -69,7 +69,7 @@ export function OnboardingBasicForm({
   }
 
   return (
-    <form action="/account/setup/basic" className="mt-8 space-y-5" method="post">
+    <form action="/account/setup/basic" className="mt-6 space-y-4" method="post">
       <label className="block">
         <span className={onboardingLabelClass}>Full name · Required</span>
         <input
@@ -83,7 +83,7 @@ export function OnboardingBasicForm({
         />
       </label>
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
           <span className={onboardingLabelClass}>Faculty · Required</span>
           <select
@@ -162,7 +162,7 @@ export function OnboardingBasicForm({
         />
       </label>
 
-      <div className="flex flex-col-reverse gap-3 pt-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
         <Link
           className={onboardingSecondaryButtonClass}
           href="/"

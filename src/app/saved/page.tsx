@@ -60,35 +60,35 @@ function SavedStatusMessage({
 
 function SavedSummaryCard({ count }: Readonly<{ count: number }>) {
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-5">
-      <div className="inline-flex h-14 w-14 items-center justify-center rounded-lg bg-blue-100 text-blue-800">
+    <section className="mm-panel rounded-lg border border-blue-100 bg-white">
+      <div className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-blue-100 text-blue-800">
         <BookmarkIcon />
       </div>
-      <h2 className="mt-5 font-serif text-2xl font-semibold text-blue-950">
+      <h2 className="mt-4 font-serif text-xl font-semibold text-blue-950">
         Your saved profiles
       </h2>
-      <p className="mt-4 font-serif text-5xl font-semibold leading-none text-blue-950">
+      <p className="mt-3 font-serif text-4xl font-semibold leading-none text-blue-950">
         {count}
       </p>
-      <p className="mt-3 max-w-64 text-base leading-6 text-blue-800/75">
+      <p className="mt-2 max-w-64 text-sm leading-5 text-blue-800/75">
         People you may want to contact later.
       </p>
-      <div className="mt-6 h-px bg-blue-100" />
+      <div className="mt-4 h-px bg-blue-100" />
     </section>
   );
 }
 
 function EmptySavedState() {
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-8">
-      <h2 className="font-serif text-4xl font-semibold text-blue-950">
+    <section className="mm-panel rounded-lg border border-blue-100 bg-white">
+      <h2 className="font-serif text-3xl font-semibold text-blue-950">
         No saved profiles yet
       </h2>
-      <p className="mt-4 max-w-2xl leading-7 text-blue-900/75">
+      <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-900/75">
         Save people you would like to come back to or collaborate with later.
       </p>
       <Link
-        className="mt-6 inline-flex h-12 items-center justify-center rounded-md bg-blue-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900"
+        className="mt-4 inline-flex h-11 items-center justify-center rounded-md bg-blue-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900"
         href="/app"
       >
         Discover students
@@ -144,15 +144,15 @@ export default async function SavedPage({ searchParams }: PageProps) {
       currentProfile={currentProfile}
       toast={saveStatusToast(status)}
     >
-      <div className="grid gap-6 px-4 py-6 sm:px-6 xl:h-full xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_20rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
+      <div className="mm-app-content mm-profile-grid grid xl:h-full xl:min-h-0 xl:overflow-hidden">
         <section className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
           <SavedStatusMessage error={firstParam(params.error)} />
-          <header className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <header className="mb-4 flex flex-col gap-2.5 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h1 className="font-serif text-6xl font-bold leading-none text-blue-950 sm:text-7xl">
+              <h1 className="mm-page-title font-serif font-bold text-blue-950">
                 Saved profiles
               </h1>
-              <p className="mt-3 text-2xl leading-8 text-blue-900">
+              <p className="mm-page-subtitle text-blue-900">
                 People you may want to contact later.
               </p>
             </div>
@@ -163,7 +163,7 @@ export default async function SavedPage({ searchParams }: PageProps) {
           </header>
 
           {savedProfiles.length > 0 ? (
-            <div className="space-y-5">
+            <div className="space-y-3">
               {savedProfiles.map((profile) => (
                 <SavedProfileCard key={profile.userId} profile={profile} />
               ))}
@@ -173,7 +173,7 @@ export default async function SavedPage({ searchParams }: PageProps) {
           )}
         </section>
 
-        <aside className="space-y-4 xl:h-full xl:min-h-0 xl:overflow-hidden">
+        <aside className="space-y-3 xl:h-full xl:min-h-0 xl:overflow-hidden">
           <SavedSummaryCard count={savedProfiles.length} />
           <BrandQuoteCard
             lines={["People", "Ideas", "Community", "Impact"]}

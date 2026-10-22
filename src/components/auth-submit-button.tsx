@@ -11,7 +11,7 @@ type AuthSubmitButtonProps = Readonly<{
 
 export function AuthSubmitButton({
   children,
-  className = "h-12 w-full rounded-full bg-primary px-5 font-semibold text-white transition hover:bg-primary-strong disabled:cursor-not-allowed disabled:opacity-70",
+  className = "h-11 w-full rounded-full bg-primary px-5 text-sm font-semibold text-white transition hover:bg-primary-strong disabled:cursor-not-allowed disabled:opacity-70",
   pendingLabel,
 }: AuthSubmitButtonProps) {
   const { pending } = useFormStatus();

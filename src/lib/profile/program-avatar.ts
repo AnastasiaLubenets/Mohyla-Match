@@ -1,9 +1,9 @@
 export const systemAvatarSizeClasses = {
-  sm: "w-14 text-lg",
-  md: "w-24 text-3xl",
-  lg: "w-32 text-4xl",
-  xl: "w-full text-5xl sm:w-52",
-  discover: "w-full text-5xl",
+  sm: "w-11 text-base",
+  md: "w-[4.5rem] text-2xl",
+  lg: "w-24 text-3xl",
+  xl: "w-full text-4xl sm:w-[9.75rem]",
+  discover: "w-full text-4xl",
 } as const;
 
 export type SystemAvatarSize = keyof typeof systemAvatarSizeClasses;

@@ -97,7 +97,7 @@ function ChoiceCard({
         value={id}
       />
       <label
-        className="flex min-h-12 cursor-pointer items-center gap-3 rounded-full border border-[#cddaf0] bg-white/75 px-4 py-3 text-sm font-bold text-[#102653] transition peer-checked:border-[#a9c6ee] peer-checked:bg-[#edf4ff] peer-checked:text-[#174ca7] peer-checked:[&_.choice-check]:border-[#3567a8] peer-checked:[&_.choice-check]:bg-[#3567a8] peer-checked:[&_.choice-check]:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#245ba2]"
+        className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-full border border-[#cddaf0] bg-white/75 px-3.5 py-2.5 text-sm font-bold text-[#102653] transition peer-checked:border-[#a9c6ee] peer-checked:bg-[#edf4ff] peer-checked:text-[#174ca7] peer-checked:[&_.choice-check]:border-[#3567a8] peer-checked:[&_.choice-check]:bg-[#3567a8] peer-checked:[&_.choice-check]:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#245ba2]"
         htmlFor={inputId}
       >
         <span
@@ -120,8 +120,8 @@ function RoleSelection({ error }: Readonly<{ error?: string }>) {
       step={1}
       title="I am a..."
     >
-      <form action="/account/setup/role" className="mt-8 space-y-6" method="post">
-        <div className="grid gap-4 sm:grid-cols-2">
+      <form action="/account/setup/role" className="mt-6 space-y-5" method="post">
+        <div className="grid gap-3 sm:grid-cols-2">
           {[
             {
               description:
@@ -137,7 +137,7 @@ function RoleSelection({ error }: Readonly<{ error?: string }>) {
             },
           ].map((role) => (
             <label
-              className="group flex cursor-pointer flex-col rounded-[1.125rem] border border-[#cddaf0] bg-white/75 p-5 transition hover:border-[#3567a8] has-[:checked]:border-[#a9c6ee] has-[:checked]:bg-[#edf4ff]"
+              className="group flex cursor-pointer flex-col rounded-xl border border-[#cddaf0] bg-white/75 p-4 transition hover:border-[#3567a8] has-[:checked]:border-[#a9c6ee] has-[:checked]:bg-[#edf4ff]"
               key={role.value}
             >
               <input
@@ -147,10 +147,10 @@ function RoleSelection({ error }: Readonly<{ error?: string }>) {
                 type="radio"
                 value={role.value}
               />
-              <span className="font-serif text-3xl font-bold text-[#07133f]">
+              <span className="font-serif text-2xl font-bold text-[#07133f]">
                 {role.label}
               </span>
-              <span className="mt-3 text-sm leading-6 text-[#66769e]">
+              <span className="mt-2 text-sm leading-5 text-[#66769e]">
                 {role.description}
               </span>
             </label>
@@ -194,7 +194,7 @@ function FormNavigation({
   pendingLabel: string;
 }>) {
   return (
-    <div className="flex flex-col-reverse gap-3 pt-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
       <Link
         className={onboardingSecondaryButtonClass}
         href={backHref}
@@ -266,7 +266,7 @@ function FacultyResearchStep({
   interests: NamedOption[];
 }>) {
   return (
-    <form action="/account/setup/faculty-research" className="mt-8 space-y-7" method="post">
+    <form action="/account/setup/faculty-research" className="mt-6 space-y-5" method="post">
       <fieldset className="space-y-3">
         <legend className="text-sm font-bold text-[#132a56]">
           Research interests · Optional
@@ -314,15 +314,15 @@ function FacultyPreviewStep({
   profile: ProfileValue | null;
 }>) {
   return (
-    <form action="/account/setup/faculty-complete" className="mt-8 space-y-6" method="post">
-      <div className="rounded-[1rem] border border-[#cddaf0] bg-white/65 p-5">
+    <form action="/account/setup/faculty-complete" className="mt-6 space-y-5" method="post">
+      <div className="rounded-xl border border-[#cddaf0] bg-white/65 p-4">
         <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#245ba2]">
           Preview
         </p>
-        <h2 className="mt-3 font-serif text-3xl font-bold text-[#07133f]">
+        <h2 className="mt-2 font-serif text-2xl font-bold text-[#07133f]">
           {profile?.full_name ?? "Faculty profile"}
         </h2>
-        <dl className="mt-5 grid gap-3 text-sm text-[#66769e] sm:grid-cols-3">
+        <dl className="mt-4 grid gap-3 text-sm text-[#66769e] sm:grid-cols-3">
           <div>
             <dt className="font-bold text-[#132a56]">Programs</dt>
             <dd>{programCount}</dd>
@@ -360,7 +360,7 @@ function BuildStep({
   interests: NamedOption[];
 }>) {
   return (
-    <form action="/account/setup/build" className="mt-8 space-y-7" method="post">
+    <form action="/account/setup/build" className="mt-6 space-y-5" method="post">
       <fieldset className="space-y-3">
         <legend className="text-sm font-bold text-[#132a56]">
           Interests · Optional

@@ -106,13 +106,13 @@ function StudentHiddenFilterInputs({
 
 function Hero() {
   return (
-    <header className="mb-6 text-center">
-      <h1 className="font-serif text-6xl font-bold leading-[0.92] text-blue-950 sm:text-7xl 2xl:text-8xl">
+    <header className="mb-4 text-center">
+      <h1 className="mm-display-title font-serif font-bold text-blue-950">
         Find your people.
         <br />
         <span className="font-semibold italic">Build something together.</span>
       </h1>
-      <p className="mx-auto mt-5 max-w-3xl text-lg leading-7 text-blue-900/75">
+      <p className="mx-auto mt-3 max-w-3xl text-base leading-6 text-blue-900/75">
         <span>Con</span>nect with fellow Mohylians for projects, studies,
         research and more.
       </p>
@@ -135,10 +135,10 @@ function DiscoveryViewTabs({
   return (
     <nav
       aria-label="Discovery views"
-      className="mb-5 flex justify-center"
+      className="mb-4 flex justify-center"
     >
       <div
-        className="relative grid w-full max-w-sm grid-cols-2 rounded-lg border border-blue-100 bg-white p-1"
+        className="relative grid w-full max-w-xs grid-cols-2 rounded-lg border border-blue-100 bg-white p-1"
         role="tablist"
       >
         <span
@@ -158,8 +158,8 @@ function DiscoveryViewTabs({
               aria-selected={active}
               className={
                 active
-                  ? "relative z-10 inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-bold text-white"
-                  : "relative z-10 inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-bold text-blue-700 transition hover:text-blue-950"
+                  ? "relative z-10 inline-flex h-10 items-center justify-center rounded-md px-3 text-xs font-bold text-white"
+                  : "relative z-10 inline-flex h-10 items-center justify-center rounded-md px-3 text-xs font-bold text-blue-700 transition hover:text-blue-950"
               }
               href={discoveryViewHref(params, tab.view)}
               key={tab.view}
@@ -233,7 +233,7 @@ export default async function AppPage({ searchParams }: PageProps) {
         clearSearchParams={toast ? ["status"] : []}
         initialToast={toast}
       />
-      <div className="grid min-h-screen xl:h-screen xl:min-h-0 xl:grid-cols-[18rem_minmax(0,1fr)]">
+      <div className="mm-app-grid grid min-h-screen xl:h-screen xl:min-h-0">
         <AppSidebar active="discover" />
         <div className="flex min-w-0 flex-col xl:h-screen xl:min-h-0 xl:overflow-hidden">
           <DiscoveryTopBar
@@ -250,7 +250,7 @@ export default async function AppPage({ searchParams }: PageProps) {
             searchPlaceholder="Search students, skills or interests..."
             searchQuery={filters.searchQuery}
           />
-          <div className="grid gap-6 px-4 py-6 sm:px-6 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1fr)_22rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
+          <div className="mm-app-content mm-workspace-grid grid xl:min-h-0 xl:flex-1 xl:overflow-hidden">
             <section className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto">
               <Hero />
               <DiscoveryViewTabs currentView={view} params={params} />
@@ -280,7 +280,7 @@ export default async function AppPage({ searchParams }: PageProps) {
               )}
             </section>
 
-            <aside className="scrollbar-hidden space-y-4 xl:h-full xl:min-h-0 xl:overflow-y-auto xl:pb-6">
+            <aside className="scrollbar-hidden space-y-3 xl:h-full xl:min-h-0 xl:overflow-y-auto xl:pb-4">
               <DiscoveryFilterPanel
                 filters={filters}
                 options={options}
@@ -289,21 +289,21 @@ export default async function AppPage({ searchParams }: PageProps) {
                 view={view}
               />
               <section
-                className="rounded-lg border border-blue-50 bg-[#fffaf0] bg-cover bg-center bg-no-repeat p-7"
+                className="mm-panel rounded-lg border border-blue-50 bg-[#fffaf0] bg-cover bg-center bg-no-repeat"
                 style={{
                   backgroundImage:
                     "url('/branding/mohyla-quote-architecture-v2.png')",
                   backgroundPosition: "center bottom",
                 }}
               >
-                <p className="font-serif text-6xl font-bold leading-none text-blue-800">
+                <p className="font-serif text-4xl font-bold leading-none text-blue-800">
                   &quot;
                 </p>
-                <p className="mt-1 font-serif text-3xl font-semibold italic leading-[1.02] text-blue-950">
+                <p className="mt-1 font-serif text-2xl font-semibold italic leading-[1.05] text-blue-950">
                   Great things happen when Mohylians find each other.
                 </p>
-                <div className="mt-6 h-px w-16 bg-blue-300" />
-                <p className="mt-5 text-xs font-bold uppercase tracking-[0.22em] text-blue-500">
+                <div className="mt-4 h-px w-12 bg-blue-300" />
+                <p className="mt-4 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-blue-500">
                   Community
                   <br />
                   Ideas

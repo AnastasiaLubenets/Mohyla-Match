@@ -178,14 +178,14 @@ function fieldClassName() {
 
 function PickerCard({ children, icon, title }: PickerCardProps) {
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-5">
-      <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
+    <section className="mm-panel rounded-lg border border-blue-100 bg-white">
+      <h2 className="inline-flex items-center gap-2.5 font-serif text-xl font-semibold text-blue-950">
         <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
           {icon}
         </span>
         {title}
       </h2>
-      <div className="mt-4">{children}</div>
+      <div className="mt-3">{children}</div>
     </section>
   );
 }
@@ -241,8 +241,8 @@ function AvatarModeOption({
     <label
       className={
         checked
-          ? "flex cursor-pointer gap-4 rounded-lg border border-blue-300 bg-blue-50/70 p-4 ring-2 ring-blue-200"
-          : "flex cursor-pointer gap-4 rounded-lg border border-blue-100 bg-white p-4 transition hover:border-blue-200 hover:bg-blue-50/40"
+          ? "flex cursor-pointer gap-3 rounded-lg border border-blue-300 bg-blue-50/70 p-3 ring-2 ring-blue-200"
+          : "flex cursor-pointer gap-3 rounded-lg border border-blue-100 bg-white p-3 transition hover:border-blue-200 hover:bg-blue-50/40"
       }
     >
       <input
@@ -255,7 +255,7 @@ function AvatarModeOption({
       />
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-bold text-blue-950">{label}</span>
-        <span className="mt-3 block">{children}</span>
+        <span className="mt-2 block">{children}</span>
       </span>
     </label>
   );
@@ -285,8 +285,8 @@ function AvatarPickerSection({
   systemAvatarKey: string;
 }>) {
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
-      <div className="grid gap-6 lg:grid-cols-[12rem_minmax(0,1fr)]">
+    <section className="mm-panel rounded-lg border border-blue-100 bg-white">
+      <div className="grid gap-4 lg:grid-cols-[9.75rem_minmax(0,1fr)]">
         <div>
           <p className="text-sm font-bold text-blue-900">Avatar preview</p>
           <div className="mt-3">
@@ -305,7 +305,7 @@ function AvatarPickerSection({
         </div>
 
         <div className="min-w-0">
-          <h2 className="inline-flex items-center gap-3 font-serif text-2xl font-semibold text-blue-950">
+          <h2 className="inline-flex items-center gap-2.5 font-serif text-xl font-semibold text-blue-950">
             <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
               <UserIcon />
             </span>
@@ -320,7 +320,7 @@ function AvatarPickerSection({
             value={avatarMode === "custom" ? customAvatarKey : ""}
           />
 
-          <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          <div className="mt-3 grid gap-2.5 lg:grid-cols-3">
             <AvatarModeOption
               checked={avatarMode === "default"}
               label="Default"
@@ -382,7 +382,7 @@ function AvatarPickerSection({
 
           <div
             aria-label="Choose an avatar"
-            className="mt-4 grid grid-cols-5 gap-2 sm:grid-cols-8 lg:grid-cols-10"
+            className="mt-3 grid grid-cols-5 gap-2 sm:grid-cols-8 lg:grid-cols-10"
             role="group"
           >
             {customAvatarOptions.map((avatar, index) => {
@@ -531,33 +531,33 @@ function FacultyProfileEditForm({
   return (
     <form
       action="/profile/update"
-      className="space-y-5"
+      className="space-y-4"
       id="profile-edit-form"
       method="post"
       onSubmit={handleSubmit}
     >
       <input name="profileRole" type="hidden" value="faculty" />
-      <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.16em] text-blue-600">
             Faculty profile
           </p>
-          <h1 className="mt-3 font-serif text-6xl font-bold leading-none text-blue-950 sm:text-7xl">
+          <h1 className="mm-page-title mt-2 font-serif font-bold text-blue-950">
             Edit profile
           </h1>
-          <p className="mt-3 text-xl leading-8 text-blue-900/80 sm:text-2xl">
+          <p className="mm-page-subtitle text-blue-900/80">
             Update your programs, expertise and research interests.
           </p>
         </div>
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
           <Link
-            className="inline-flex h-12 items-center justify-center rounded-md border border-blue-300 bg-white px-8 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
+            className="inline-flex h-11 items-center justify-center rounded-md border border-blue-300 bg-white px-6 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
             href="/profile"
           >
             Cancel
           </Link>
           <AuthSubmitButton
-            className="inline-flex h-12 items-center justify-center rounded-md bg-blue-800 px-8 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex h-11 items-center justify-center rounded-md bg-blue-800 px-6 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
             pendingLabel="Saving..."
           >
             Save changes
@@ -587,7 +587,7 @@ function FacultyProfileEditForm({
         systemAvatarKey={data.profile.system_avatar_key}
       />
 
-      <section className="rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
+      <section className="mm-panel rounded-lg border border-blue-100 bg-white">
         <div className="grid gap-4 lg:grid-cols-2">
           <label className="block">
             <span className="text-sm font-bold text-blue-900">
@@ -682,7 +682,7 @@ function FacultyProfileEditForm({
           <label className="block lg:col-span-2">
             <span className="text-sm font-bold text-blue-900">Bio</span>
             <textarea
-              className="mt-2 min-h-28 w-full resize-y rounded-md border border-blue-200 bg-white px-4 py-3 text-sm font-medium leading-6 text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400"
+              className="mt-2 min-h-24 w-full resize-y rounded-md border border-blue-200 bg-white px-3.5 py-2.5 text-sm font-medium leading-6 text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400"
               maxLength={500}
               name="bio"
               onChange={(event) => setBioValue(event.target.value)}
@@ -695,7 +695,7 @@ function FacultyProfileEditForm({
         </div>
       </section>
 
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2">
         <PickerCard icon={<GraduationIcon />} title="Additional programs">
           <TaxonomyMultiSelect
             emptyLabel="No additional academic programs selected."
@@ -737,13 +737,13 @@ function FacultyProfileEditForm({
 
       <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
         <Link
-          className="inline-flex h-12 items-center justify-center rounded-md border border-blue-300 bg-white px-8 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
+          className="inline-flex h-11 items-center justify-center rounded-md border border-blue-300 bg-white px-6 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
           href="/profile"
         >
           Cancel
         </Link>
         <AuthSubmitButton
-          className="inline-flex h-12 items-center justify-center rounded-md bg-blue-800 px-8 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex h-11 items-center justify-center rounded-md bg-blue-800 px-6 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
           pendingLabel="Saving..."
         >
           Save changes
@@ -868,30 +868,30 @@ function StudentProfileEditForm({
   return (
     <form
       action="/profile/update"
-      className="space-y-5"
+      className="space-y-4"
       id="profile-edit-form"
       method="post"
       onSubmit={handleSubmit}
     >
-      <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 className="font-serif text-6xl font-bold leading-none text-blue-950 sm:text-7xl">
+          <h1 className="mm-page-title font-serif font-bold text-blue-950">
             Edit profile
           </h1>
-          <p className="mt-3 text-xl leading-8 text-blue-900/80 sm:text-2xl">
+          <p className="mm-page-subtitle text-blue-900/80">
             Update your information and shape how you appear to the Mohyla Match
             community.
           </p>
         </div>
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
           <Link
-            className="inline-flex h-12 items-center justify-center rounded-md border border-blue-300 bg-white px-8 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
+            className="inline-flex h-11 items-center justify-center rounded-md border border-blue-300 bg-white px-6 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
             href="/profile"
           >
             Cancel
           </Link>
           <AuthSubmitButton
-            className="inline-flex h-12 items-center justify-center rounded-md bg-blue-800 px-8 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex h-11 items-center justify-center rounded-md bg-blue-800 px-6 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
             pendingLabel="Saving..."
           >
             Save changes
@@ -924,7 +924,7 @@ function StudentProfileEditForm({
         systemAvatarKey={data.profile.system_avatar_key}
       />
 
-      <section className="rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
+      <section className="mm-panel rounded-lg border border-blue-100 bg-white">
         <div className="grid gap-4 lg:grid-cols-3">
           <label className="block">
             <span className="text-sm font-bold text-blue-900">
@@ -1017,7 +1017,7 @@ function StudentProfileEditForm({
           <label className="block lg:col-span-3">
             <span className="text-sm font-bold text-blue-900">Bio</span>
             <textarea
-              className="mt-2 min-h-28 w-full resize-y rounded-md border border-blue-200 bg-white px-4 py-3 text-sm font-medium leading-6 text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400"
+              className="mt-2 min-h-24 w-full resize-y rounded-md border border-blue-200 bg-white px-3.5 py-2.5 text-sm font-medium leading-6 text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400"
               maxLength={500}
               name="bio"
               onChange={(event) => setBioValue(event.target.value)}
@@ -1048,7 +1048,7 @@ function StudentProfileEditForm({
         </div>
       </section>
 
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2">
         <PickerCard icon={<BarsIcon />} title="Skills">
           <TaxonomyMultiSelect
             emptyLabel="Choose at least one offered skill."
@@ -1211,13 +1211,13 @@ function StudentProfileEditForm({
 
       <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
         <Link
-          className="inline-flex h-12 items-center justify-center rounded-md border border-blue-300 bg-white px-8 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
+          className="inline-flex h-11 items-center justify-center rounded-md border border-blue-300 bg-white px-6 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
           href="/profile"
         >
           Cancel
         </Link>
         <AuthSubmitButton
-          className="inline-flex h-12 items-center justify-center rounded-md bg-blue-800 px-8 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex h-11 items-center justify-center rounded-md bg-blue-800 px-6 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
           pendingLabel="Saving..."
         >
           Save changes

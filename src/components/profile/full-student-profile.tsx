@@ -205,19 +205,19 @@ function ProfileInfoCard({
   title: string;
 }>) {
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
+    <section className="mm-panel rounded-lg border border-blue-100 bg-white">
       <div className="flex gap-3">
         <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center text-blue-800">
           {icon}
         </span>
         <div className="min-w-0">
-          <h2 className="font-serif text-2xl font-semibold leading-none text-blue-950">
+          <h2 className="font-serif text-xl font-semibold leading-none text-blue-950">
             {title}
           </h2>
           <p className="mt-2 text-sm font-medium text-blue-700/75">
             {description}
           </p>
-          <div className="mt-4">{children}</div>
+          <div className="mt-3">{children}</div>
         </div>
       </div>
     </section>
@@ -353,28 +353,28 @@ export function FullStudentProfile({
   return (
     <section className="min-w-0">
       <Link
-        className="mb-6 inline-flex items-center gap-2 text-sm font-bold text-blue-800 transition hover:text-blue-950"
+        className="mb-4 inline-flex items-center gap-2 text-sm font-bold text-blue-800 transition hover:text-blue-950"
         href={backHref}
       >
         <ArrowLeftIcon />
         {backLabel}
       </Link>
 
-      <header className="mb-5">
+      <header className="mb-4">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-600">
           {profileKind}
         </p>
-        <h1 className="mt-3 font-serif text-6xl font-bold leading-none text-blue-950 sm:text-7xl">
+        <h1 className="mm-page-title mt-2 font-serif font-bold text-blue-950">
           Full profile
         </h1>
-        <p className="mt-3 text-xl leading-8 text-blue-900/80 sm:text-2xl">
+        <p className="mm-page-subtitle text-blue-900/80">
           {isFaculty
             ? `Explore ${firstName(profile.fullName)}'s academic programs and expertise.`
             : `Learn more about ${firstName(profile.fullName)} and see if you might work well together.`}
         </p>
       </header>
 
-      <article className="relative rounded-lg border border-blue-100 bg-white p-5 sm:p-6">
+      <article className="mm-panel relative rounded-lg border border-blue-100 bg-white">
         {!isFaculty ? (
           <div className="absolute right-5 top-5 z-10 sm:right-6 sm:top-6">
           <SaveProfileButton
@@ -392,7 +392,7 @@ export function FullStudentProfile({
           </div>
         ) : null}
 
-        <div className="grid gap-6 pr-0 md:grid-cols-[14rem_minmax(0,1fr)] md:pr-24 xl:grid-cols-[15rem_minmax(0,1fr)]">
+        <div className="grid gap-4 pr-0 md:grid-cols-[10.5rem_minmax(0,1fr)] md:pr-20 xl:grid-cols-[11rem_minmax(0,1fr)]">
           <SystemAvatar
             availability={profile.availability}
             avatarMode={profile.avatarMode}
@@ -406,26 +406,26 @@ export function FullStudentProfile({
           />
 
           <div className="min-w-0">
-            <h2 className="font-serif text-5xl font-semibold leading-none text-blue-950">
+            <h2 className="font-serif text-3xl font-semibold leading-none text-blue-950">
               {profile.fullName}
             </h2>
-            <p className="mt-3 text-base font-semibold text-blue-800">
+            <p className="mt-2 text-sm font-semibold text-blue-800">
               {programLine}
             </p>
             <p className="mt-1 text-sm font-semibold text-blue-700/75">
               {profile.facultyName}
             </p>
             {profile.bio ? (
-              <p className="mt-5 max-w-3xl text-base leading-7 text-blue-900/80">
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-blue-900/80">
                 {profile.bio}
               </p>
             ) : null}
           </div>
         </div>
 
-        <div className="mt-6 grid gap-3 border-t border-blue-100 pt-5 sm:grid-cols-[1fr_1fr_auto] sm:items-start">
+        <div className="mt-4 grid gap-3 border-t border-blue-100 pt-4 sm:grid-cols-[1fr_1fr_auto] sm:items-start">
           <Link
-            className="inline-flex h-12 items-center justify-center gap-3 rounded-md border border-blue-200 bg-white px-5 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
+            className="inline-flex h-11 items-center justify-center gap-2.5 rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
             href={backHref}
           >
             <ArrowLeftIcon />
@@ -438,7 +438,7 @@ export function FullStudentProfile({
               targetUserId={profile.userId}
             />
           ) : !isFaculty ? (
-            <p className="inline-flex min-h-12 items-center justify-center rounded-md border border-blue-100 bg-blue-50 px-5 text-center text-sm font-semibold text-blue-700">
+            <p className="inline-flex min-h-11 items-center justify-center rounded-md border border-blue-100 bg-blue-50 px-4 text-center text-sm font-semibold text-blue-700">
               Email contact is off for this profile.
             </p>
           ) : null}
@@ -449,7 +449,7 @@ export function FullStudentProfile({
       </article>
 
       {profileSections.length > 0 ? (
-        <div className="mt-5 grid gap-4 xl:grid-cols-2">
+        <div className="mt-4 grid gap-3 xl:grid-cols-2">
           {profileSections.map((section) => (
             <ProfileInfoCard
               description={section.description}

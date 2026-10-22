@@ -8,8 +8,8 @@ import { formatMatchedDate } from "@/lib/matching/view-model";
 
 export function MatchCard({ match }: Readonly<{ match: MatchSummary }>) {
   return (
-    <article className="rounded-lg border border-border bg-surface p-5 shadow-sm sm:p-6">
-      <header className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+    <article className="mm-panel rounded-lg border border-border bg-surface shadow-sm">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <SystemAvatar
             availability={match.availability}
@@ -40,18 +40,18 @@ export function MatchCard({ match }: Readonly<{ match: MatchSummary }>) {
         </Link>
       </header>
 
-      <p className="mt-5 leading-7 text-muted">{match.bio || "No bio yet."}</p>
+      <p className="mt-4 text-sm leading-6 text-muted">{match.bio || "No bio yet."}</p>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="mt-5 grid gap-5 lg:grid-cols-2">
         <section>
           <h3 className="text-sm font-semibold">Can offer</h3>
-          <div className="mt-3">
+          <div className="mt-2.5">
             <TaxonomyChipList items={match.offeredSkills} showCategory />
           </div>
         </section>
         <section>
           <h3 className="text-sm font-semibold">Looking for</h3>
-          <div className="mt-3">
+          <div className="mt-2.5">
             <TaxonomyChipList
               emptyLabel="No looking-for skills listed."
               items={match.lookingForSkills}
@@ -62,7 +62,7 @@ export function MatchCard({ match }: Readonly<{ match: MatchSummary }>) {
       </div>
 
       {match.canDirectContact ? (
-        <div className="mt-6 border-t border-border pt-5">
+        <div className="mt-5 border-t border-border pt-4">
           <ContactReveal targetUserId={match.userId} />
         </div>
       ) : null}

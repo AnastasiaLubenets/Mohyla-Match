@@ -54,9 +54,9 @@ function ProfileSection({
   title: string;
 }>) {
   return (
-    <section className="border-t border-border pt-6">
-      <h2 className="text-lg font-semibold">{title}</h2>
-      <div className="mt-4">{children}</div>
+    <section className="border-t border-border pt-4">
+      <h2 className="text-base font-semibold">{title}</h2>
+      <div className="mt-3">{children}</div>
     </section>
   );
 }
@@ -69,9 +69,9 @@ export function ProfileDetails({
   profile: SafeProfile;
 }>) {
   return (
-    <article className="rounded-lg border border-border bg-surface p-5 shadow-sm sm:p-8">
-      <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+    <article className="mm-panel rounded-lg border border-border bg-surface shadow-sm">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <SystemAvatar
             availability={profile.availability}
             avatarMode={profile.avatarMode}
@@ -87,10 +87,10 @@ export function ProfileDetails({
             <p className="text-sm font-semibold uppercase tracking-[0.08em] text-primary">
               Student profile
             </p>
-            <h1 className="mt-2 text-4xl font-semibold leading-tight">
+            <h1 className="mt-1.5 text-3xl font-semibold leading-tight">
               {profile.fullName}
             </h1>
-            <p className="mt-3 max-w-2xl leading-7 text-muted">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
               {profile.bio || "No bio yet."}
             </p>
           </div>
@@ -98,7 +98,7 @@ export function ProfileDetails({
 
         {canEdit ? (
           <Link
-            className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-5 text-sm font-semibold text-white transition hover:bg-primary-strong"
+            className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-semibold text-white transition hover:bg-primary-strong"
             href="/profile/edit"
           >
             Edit profile
@@ -106,14 +106,14 @@ export function ProfileDetails({
         ) : null}
       </header>
 
-      <dl className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <dl className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <ValueRow label="Faculty" value={profile.facultyName} />
         <ValueRow label="Program" value={profile.academicProgramName} />
         <ValueRow label="Year" value={profile.yearOfStudy} />
         <ValueRow label="Availability" value={profile.availability} />
       </dl>
 
-      <div className="mt-8 space-y-7">
+      <div className="mt-5 space-y-5">
         <ProfileSection title="Can offer">
           <ChipList
             emptyLabel="No offered skills are visible."

@@ -60,18 +60,18 @@ function EditorTopBar({
   systemAvatarKey: string;
 }>) {
   return (
-    <header className="z-30 shrink-0 border-b border-blue-100 bg-white/85 px-4 py-3 backdrop-blur sm:px-6">
-      <div className="mx-auto flex max-w-[96rem] flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex items-center gap-8">
+    <header className="z-30 shrink-0 border-b border-blue-100 bg-white/85 px-4 py-2 backdrop-blur sm:px-5">
+      <div className="mx-auto flex max-w-[72rem] flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-center gap-6">
           <Link
-            className="font-serif text-3xl font-bold leading-none text-blue-950"
+            className="font-serif text-2xl font-bold leading-none text-blue-950"
             href="/app"
           >
             Mohyla Match
           </Link>
           <nav
             aria-label="Primary"
-            className="hidden items-center gap-7 text-sm font-semibold text-blue-900 lg:flex"
+            className="hidden items-center gap-5 text-sm font-semibold text-blue-900 lg:flex"
           >
             <Link className="transition hover:text-blue-950" href="/app">
               Discover
@@ -86,7 +86,7 @@ function EditorTopBar({
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <form action="/app" className="relative w-full sm:w-96">
+          <form action="/app" className="relative w-full sm:w-72">
             <label className="sr-only" htmlFor="profile-edit-search">
               Search students, skills or interests
             </label>
@@ -94,7 +94,7 @@ function EditorTopBar({
               <SearchIcon />
             </span>
             <input
-              className="h-11 w-full rounded-md border border-blue-100 bg-blue-50/80 pl-12 pr-5 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
+              className="h-10 w-full rounded-md border border-blue-100 bg-blue-50/80 pl-11 pr-4 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
               id="profile-edit-search"
               name="q"
               placeholder="Search students, skills or interests..."
@@ -102,7 +102,7 @@ function EditorTopBar({
             />
           </form>
           <Link
-            className="inline-flex items-center gap-3 rounded-lg px-2 py-1.5 text-blue-950 transition hover:bg-blue-50"
+            className="inline-flex items-center gap-2.5 rounded-lg px-2 py-1 text-blue-950 transition hover:bg-blue-50"
             href="/profile"
           >
             <SystemAvatar
@@ -179,7 +179,7 @@ export default async function EditProfilePage({ searchParams }: PageProps) {
         fullName={editData.profile.full_name}
         systemAvatarKey={editData.profile.system_avatar_key}
       />
-      <section className="mx-auto w-full max-w-[96rem] px-4 py-6 sm:px-6 lg:py-8">
+      <section className="mx-auto w-full max-w-[72rem] px-4 py-5 sm:px-5 lg:py-6">
         <ProfileEditForm data={editData} error={error} />
       </section>
     </main>

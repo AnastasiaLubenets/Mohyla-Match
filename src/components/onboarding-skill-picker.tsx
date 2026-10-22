@@ -74,7 +74,7 @@ function SkillToggle({
     <button
       aria-describedby={tooltipId}
       aria-pressed={isSelected}
-      className={`group relative flex min-h-12 w-full cursor-pointer items-center justify-start gap-3 rounded-full border px-4 py-3 text-left text-sm font-bold text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2] ${
+      className={`group relative flex min-h-11 w-full cursor-pointer items-center justify-start gap-2.5 rounded-full border px-3.5 py-2.5 text-left text-sm font-bold text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2] ${
         isSelected
           ? "border-[#a9c6ee] bg-[#edf4ff] text-[#174ca7]"
           : "border-[#cddaf0] bg-white/75 hover:border-[#3567a8]"
@@ -93,7 +93,7 @@ function SkillToggle({
         >
           ✓
         </span>
-        <span className="min-w-0 break-words leading-snug">
+        <span className="min-w-0 break-words text-[0.82rem] leading-snug">
           {skill.name}
         </span>
       </span>
@@ -197,7 +197,7 @@ export function OnboardingSkillPicker({
     <form
       action={action}
       aria-label={title}
-      className="mt-8 space-y-7"
+      className="mt-6 space-y-5"
       method="post"
     >
 
@@ -207,7 +207,7 @@ export function OnboardingSkillPicker({
 
       <fieldset className="space-y-3">
         <legend className={onboardingLabelClass}>{suggestedLabel}</legend>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {suggestedSkills.map((skill) => (
             <SkillToggle
               isSelected={selectedSkillIds.includes(skill.id)}
@@ -224,7 +224,7 @@ export function OnboardingSkillPicker({
           {selectedLabel}
         </h2>
         {selectedSkills.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {selectedSkills.map((skill) => (
               <SelectedSkillChip
                 key={skill.id}
@@ -270,7 +270,7 @@ export function OnboardingSkillPicker({
 
         {hasQuery ? (
           <div
-            className="max-h-72 overflow-y-auto rounded-[0.875rem] border border-[#cddaf0] bg-white/95 shadow-sm"
+            className="max-h-60 overflow-y-auto rounded-lg border border-[#cddaf0] bg-white/95 shadow-sm"
             id={resultsId}
             role="listbox"
           >
@@ -279,7 +279,7 @@ export function OnboardingSkillPicker({
                 <button
                   aria-describedby={`${resultsId}-${skill.id}-category`}
                   aria-selected={index === activeResultIndex}
-                  className={`group relative flex w-full items-center justify-start gap-3 px-4 py-3 text-left text-sm text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-primary ${
+                  className={`group relative flex w-full items-center justify-start gap-3 px-3.5 py-2.5 text-left text-sm text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-primary ${
                     index === activeResultIndex
                       ? "bg-[#EAF2FF] hover:bg-[#EAF2FF]"
                       : "bg-white hover:bg-[#F5F8FF]"
@@ -309,7 +309,7 @@ export function OnboardingSkillPicker({
         ) : null}
       </div>
 
-      <div className="flex flex-col-reverse gap-3 pt-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
         <Link
           className={onboardingSecondaryButtonClass}
           href={backHref}
@@ -319,7 +319,7 @@ export function OnboardingSkillPicker({
         <div className="flex flex-col gap-3 sm:w-auto sm:min-w-52 sm:flex-row">
           {isOptional ? (
             <button
-              className="h-[3.25rem] rounded-full px-5 text-sm font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
+              className="h-11 rounded-full px-5 text-sm font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
               name="skip"
               type="submit"
               value="true"

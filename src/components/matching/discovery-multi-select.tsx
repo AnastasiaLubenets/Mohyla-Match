@@ -127,7 +127,7 @@ export function DiscoveryMultiSelect({
         ) : null}
       </div>
 
-      <div className="mt-1.5 rounded-md border border-blue-100 bg-white px-2 py-2 transition focus-within:border-blue-300">
+      <div className="mt-1 rounded-md border border-blue-100 bg-white px-2 py-1.5 transition focus-within:border-blue-300">
         {selectedOptions.length > 0 ? (
           <div className="mb-2 flex flex-wrap gap-1.5">
             {selectedOptions.map((option) => (
@@ -152,7 +152,7 @@ export function DiscoveryMultiSelect({
         <button
           aria-controls={`${baseId}-options`}
           aria-expanded={open}
-          className="flex min-h-8 w-full items-center justify-between gap-3 rounded-sm px-1 text-left text-sm font-medium text-blue-900 outline-none transition hover:text-blue-950 focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="flex min-h-10 w-full items-center justify-between gap-3 rounded-sm px-1 text-left text-sm font-medium text-blue-900 outline-none transition hover:text-blue-950 focus-visible:ring-2 focus-visible:ring-blue-500"
           onClick={() => onOpenChange(!open)}
           type="button"
         >
@@ -165,7 +165,7 @@ export function DiscoveryMultiSelect({
 
       {open ? (
         <div
-          className="absolute left-0 right-0 z-20 mt-2 rounded-lg border border-blue-100 bg-white p-2 shadow-md"
+          className="absolute left-0 right-0 z-20 mt-1.5 rounded-lg border border-blue-100 bg-white p-2 shadow-md"
           id={`${baseId}-options`}
         >
           <div className="relative">
@@ -184,7 +184,7 @@ export function DiscoveryMultiSelect({
 
           <div
             aria-label={`${label} options`}
-            className="scrollbar-hidden mt-2 max-h-72 overflow-y-auto pr-1"
+            className="scrollbar-hidden mt-2 max-h-60 overflow-y-auto pr-1"
             role="group"
           >
             {visibleOptions.length > 0 ? (

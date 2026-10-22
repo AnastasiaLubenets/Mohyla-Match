@@ -123,7 +123,7 @@ export default async function StudentProfilePage({
       currentProfile={currentProfile}
       toast={saveStatusToast(status)}
     >
-      <div className="grid gap-6 px-4 py-6 sm:px-6 xl:h-full xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_20rem] xl:overflow-hidden xl:px-8 2xl:gap-8">
+      <div className="mm-app-content mm-profile-grid grid xl:h-full xl:min-h-0 xl:overflow-hidden">
         <div className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-2">
           <ProfileStatusMessage
             error={firstParam(pageParams.error)}
@@ -138,7 +138,7 @@ export default async function StudentProfilePage({
           />
         </div>
 
-        <aside className="space-y-4 xl:h-full xl:min-h-0 xl:overflow-hidden">
+        <aside className="space-y-3 xl:h-full xl:min-h-0 xl:overflow-hidden">
           <BrandQuoteCard
             lines={["People", "Ideas", "Collaboration", "Impact"]}
             text="Great ideas start with real conversations."
