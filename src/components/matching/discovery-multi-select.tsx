@@ -195,8 +195,8 @@ export function DiscoveryMultiSelect({
                   <label
                     className={
                       checked
-                        ? "flex cursor-pointer items-center gap-2.5 rounded-md bg-blue-50 px-3 py-1.5 text-[0.8125rem] font-bold text-blue-900"
-                        : "flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-1.5 text-[0.8125rem] font-semibold text-blue-800 transition hover:bg-blue-50"
+                        ? "mm-filter-label flex cursor-pointer items-center gap-2.5 rounded-md bg-blue-50 px-3 py-1.5 font-bold text-blue-900"
+                        : "mm-filter-label flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-1.5 font-semibold text-blue-800 transition hover:bg-blue-50"
                     }
                     key={option.value}
                   >
@@ -220,7 +220,7 @@ export function DiscoveryMultiSelect({
                 );
               })
             ) : (
-              <p className="px-3 py-3 text-[0.8125rem] font-medium text-blue-500">
+              <p className="mm-filter-label px-3 py-3 font-medium text-blue-500">
                 No options match.
               </p>
             )}

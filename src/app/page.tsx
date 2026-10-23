@@ -46,7 +46,7 @@ export default function LandingPage() {
               Student collaboration network
             </PublicBadge>
 
-            <h1 className="landing-hero-heading mt-5 font-serif text-5xl font-bold leading-[0.98] tracking-normal text-[#070d35] sm:mt-6 sm:text-6xl">
+            <h1 className="landing-hero-heading mm-landing-title mt-5 font-serif font-bold leading-[0.98] tracking-normal text-[#070d35] sm:mt-6">
               Find your people.
               <br />
               Build something
@@ -57,7 +57,7 @@ export default function LandingPage() {
               </span>
             </h1>
 
-            <p className="landing-hero-description mt-5 max-w-2xl text-sm leading-5 text-[#56637f] sm:mt-6 sm:text-[0.9375rem] sm:leading-6">
+            <p className="landing-hero-description mm-body-text mt-5 max-w-2xl text-[#56637f] sm:mt-6">
               Discover students across Mohyla based on skills, interests and
               what they want to build.
             </p>
@@ -87,7 +87,7 @@ export default function LandingPage() {
                   <span className="landing-hero-benefit-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#edf4ff] text-[#1855b5]">
                     {benefit.icon}
                   </span>
-                  <p className="landing-hero-benefit-text text-xs font-semibold leading-4 text-[#344268] sm:text-[0.8125rem] sm:leading-[1.125rem]">
+                  <p className="landing-hero-benefit-text text-xs font-semibold leading-4 text-[#344268]">
                     {benefit.description}
                   </p>
                 </div>

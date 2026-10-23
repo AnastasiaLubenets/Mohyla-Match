@@ -7,8 +7,8 @@ export default function ProfileNotFound() {
         <Link href="/app" className="text-sm font-semibold text-primary">
           Mohyla Match
         </Link>
-        <h1 className="mt-8 text-3xl font-semibold">Profile not found</h1>
-        <p className="mt-3 leading-7 text-muted">
+        <h1 className="mm-empty-title mt-8 font-semibold">Profile not found</h1>
+        <p className="mm-body-text mt-3 text-muted">
           This profile is unavailable or cannot be viewed.
         </p>
       </section>

@@ -18,7 +18,7 @@ export function PublicBenefit({ description, icon, title }: PublicBenefitProps) 
         ) : null}
         {description ? (
           <p
-            className={`text-xs leading-[1.125rem] text-[#5b6683] sm:text-[0.8125rem] ${
+            className={`text-xs leading-4 text-[#5b6683] ${
               title ? "mt-1" : "font-semibold text-[#344268]"
             }`}
           >
@@ -35,7 +35,7 @@ export function PublicBadge({
   icon,
 }: Readonly<{ children: ReactNode; icon: ReactNode }>) {
   return (
-    <p className="inline-flex items-center gap-2 rounded-full bg-[#edf4ff] px-2.5 py-1 text-xs font-semibold text-[#174ca7] sm:text-[0.8125rem]">
+    <p className="inline-flex items-center gap-2 rounded-full bg-[#edf4ff] px-2.5 py-1 text-xs font-semibold text-[#174ca7]">
       <span className="text-[#1855b5]">{icon}</span>
       {children}
     </p>

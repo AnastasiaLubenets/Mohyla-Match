@@ -190,7 +190,7 @@ export function FacultyProgramsForm({
           {additionalProgramOptions.length > 0 ? (
             additionalProgramOptions.map((program) => (
               <label
-                className="flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-[0.8125rem] font-semibold text-[#102653] transition hover:bg-white/80"
+                className="mm-filter-label flex items-start gap-2.5 rounded-lg px-2.5 py-2 font-semibold text-[#102653] transition hover:bg-white/80"
                 key={program.id}
               >
                 <input

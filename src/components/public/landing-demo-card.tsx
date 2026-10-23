@@ -15,7 +15,7 @@ export function LandingDemoCard() {
       className="landing-demo-card relative w-full max-w-[22rem] rounded-2xl border border-[#dce7f7] bg-white/95 p-4 text-[#101b55] shadow-[0_18px_50px_rgba(37,76,139,0.14)] backdrop-blur"
     >
       <div className="landing-demo-meta mb-3.5 flex items-center justify-between gap-3">
-        <p className="landing-demo-eyebrow inline-flex items-center gap-2 text-[0.8125rem] font-semibold text-[#344268]">
+        <p className="landing-demo-eyebrow inline-flex items-center gap-2 text-xs font-semibold text-[#344268]">
           <span className="h-2 w-2 rounded-full bg-[#84aef9]" />
           Featured match
         </p>
@@ -35,8 +35,8 @@ export function LandingDemoCard() {
           />
         </div>
         <div>
-          <h2 className="landing-demo-name text-lg font-bold">Maria Koval</h2>
-          <p className="landing-demo-program mt-1 text-[0.8125rem] text-[#5b6683]">
+          <h2 className="landing-demo-name text-base font-bold">Maria Koval</h2>
+          <p className="landing-demo-program mt-1 text-xs text-[#5b6683]">
             Computer Science, year 3
           </p>
         </div>
@@ -53,7 +53,7 @@ export function LandingDemoCard() {
         ))}
       </div>
 
-      <p className="landing-demo-description mt-3.5 text-[0.8125rem] leading-5 text-[#56637f]">
+      <p className="landing-demo-description mt-3.5 text-xs leading-4 text-[#56637f]">
         Maria offers React and Figma experience for teams building student
         products.
       </p>

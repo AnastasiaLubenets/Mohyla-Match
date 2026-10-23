@@ -99,7 +99,7 @@ function SavedTaxonomyRow({
 }>) {
   return (
     <section className="grid gap-2.5 sm:grid-cols-[7rem_minmax(0,1fr)] sm:items-start">
-      <h3 className="inline-flex items-center gap-2.5 text-[0.8125rem] font-bold text-blue-950">
+      <h3 className="mm-filter-label inline-flex items-center gap-2.5 font-bold text-blue-950">
         <span className="inline-flex h-6 w-6 items-center justify-center text-blue-800">
           {icon}
         </span>
@@ -152,7 +152,7 @@ export function SavedProfileCard({
         </Link>
 
         <div className="min-w-0">
-          <h2 className="font-serif text-[1.75rem] font-semibold leading-none text-blue-950">
+          <h2 className="mm-profile-name font-serif font-semibold text-blue-950">
             <Link
               className="transition hover:text-blue-800"
               href={`/profiles/${profile.userId}?from=saved`}

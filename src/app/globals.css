@@ -11,11 +11,16 @@
   --primary-strong: #0a426e;
   --accent: #d7a928;
   --mm-body-font-size: 0.875rem;
-  --mm-label-font-size: 0.8125rem;
-  --mm-button-font-size: 0.8125rem;
+  --mm-body-line-height: 1.375rem;
+  --mm-helper-font-size: 0.75rem;
+  --mm-helper-line-height: 1rem;
+  --mm-label-font-size: 0.75rem;
+  --mm-control-font-size: 1rem;
+  --mm-control-line-height: 1.25rem;
+  --mm-button-font-size: 0.75rem;
   --mm-button-height: 2.75rem;
   --mm-control-height: 2.875rem;
-  --mm-chip-font-size: 0.75rem;
+  --mm-chip-font-size: 0.6875rem;
   --mm-chip-padding-x: 0.625rem;
   --mm-chip-padding-y: 0.1875rem;
   --mm-icon-size: 1.125rem;
@@ -23,12 +28,24 @@
   --mm-card-padding: 0.9375rem;
   --mm-content-gap: 0.875rem;
   --mm-content-gutter: 0.875rem;
-  --mm-filter-title-size: 1.375rem;
-  --mm-page-title-size: 2.625rem;
-  --mm-display-title-size: 3rem;
+  --mm-filter-title-size: 1.25rem;
+  --mm-section-title-size: 1.125rem;
+  --mm-card-title-size: 1.25rem;
+  --mm-empty-title-size: 1.5rem;
+  --mm-profile-name-size: 1.375rem;
+  --mm-page-title-size: 2.375rem;
+  --mm-display-title-size: 2.625rem;
+  --mm-auth-title-size: 2.375rem;
+  --mm-landing-title-size: 2.625rem;
+  --mm-faculty-title-size: 1.875rem;
+  --mm-onboarding-title-size: 1.75rem;
   --mm-sidebar-width: 14rem;
   --mm-filter-rail-width: 17rem;
   --mm-profile-rail-width: 16rem;
+  --text-xs: var(--mm-helper-font-size);
+  --text-xs--line-height: var(--mm-helper-line-height);
+  --text-sm: var(--mm-body-font-size);
+  --text-sm--line-height: var(--mm-body-line-height);
 }
 
 @theme inline {
@@ -50,6 +67,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-size: var(--mm-body-font-size);
+  line-height: var(--mm-body-line-height);
   letter-spacing: 0;
 }
 
@@ -60,8 +78,8 @@ a {
 
 .mm-control {
   min-height: var(--mm-control-height);
-  font-size: var(--mm-label-font-size);
-  line-height: 1.25rem;
+  font-size: var(--mm-control-font-size);
+  line-height: var(--mm-control-line-height);
 }
 
 .mm-button {
@@ -76,23 +94,23 @@ a {
 
 .mm-page-title {
   font-size: var(--mm-page-title-size);
-  line-height: 0.98;
+  line-height: 1;
 }
 
 .mm-display-title {
   font-size: var(--mm-display-title-size);
-  line-height: 0.96;
+  line-height: 0.98;
 }
 
 .mm-page-subtitle {
-  margin-top: 0.5rem;
+  margin-top: 0.375rem;
   font-size: var(--mm-body-font-size);
-  line-height: 1.375rem;
+  line-height: var(--mm-body-line-height);
 }
 
 .mm-filter-title {
   font-size: var(--mm-filter-title-size);
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .mm-filter-label {
@@ -103,7 +121,58 @@ a {
 .mm-chip {
   padding: var(--mm-chip-padding-y) var(--mm-chip-padding-x);
   font-size: var(--mm-chip-font-size);
-  line-height: 1rem;
+  line-height: 0.875rem;
+}
+
+.mm-body-text {
+  font-size: var(--mm-body-font-size);
+  line-height: var(--mm-body-line-height);
+}
+
+.mm-helper-text {
+  font-size: var(--mm-helper-font-size);
+  line-height: var(--mm-helper-line-height);
+}
+
+.mm-input-text {
+  font-size: var(--mm-control-font-size);
+  line-height: var(--mm-control-line-height);
+}
+
+.mm-section-title {
+  font-size: var(--mm-section-title-size);
+  line-height: 1.15;
+}
+
+.mm-card-title {
+  font-size: var(--mm-card-title-size);
+  line-height: 1.1;
+}
+
+.mm-empty-title {
+  font-size: var(--mm-empty-title-size);
+  line-height: 1.15;
+}
+
+.mm-profile-name {
+  font-size: var(--mm-profile-name-size);
+  line-height: 1.05;
+}
+
+.mm-auth-title {
+  font-size: var(--mm-auth-title-size);
+}
+
+.mm-landing-title {
+  font-size: var(--mm-landing-title-size);
+}
+
+.mm-faculty-title {
+  font-size: var(--mm-faculty-title-size);
+}
+
+.mm-onboarding-title {
+  font-size: var(--mm-onboarding-title-size);
 }
 
 .mm-icon {
@@ -123,10 +192,21 @@ a {
 
 @media (min-width: 640px) {
   :root {
+    --mm-body-font-size: 0.8125rem;
+    --mm-body-line-height: 1.25rem;
+    --mm-helper-font-size: 0.6875rem;
+    --mm-helper-line-height: 0.9375rem;
+    --mm-control-font-size: 0.75rem;
+    --mm-control-line-height: 1rem;
     --mm-card-padding: 1rem;
     --mm-content-gutter: 1.125rem;
-    --mm-page-title-size: 3.25rem;
-    --mm-display-title-size: 4rem;
+    --mm-page-title-size: 2.875rem;
+    --mm-display-title-size: 3.5rem;
+    --mm-auth-title-size: 2.875rem;
+    --mm-landing-title-size: 3rem;
+    --mm-faculty-title-size: 2.375rem;
+    --mm-onboarding-title-size: 1.875rem;
+    --mm-empty-title-size: 1.625rem;
   }
 }
 
@@ -141,8 +221,8 @@ a {
     --mm-card-padding: 1rem;
     --mm-content-gap: 1rem;
     --mm-content-gutter: 1.25rem;
-    --mm-page-title-size: 4.25rem;
-    --mm-display-title-size: 5rem;
+    --mm-page-title-size: 3.75rem;
+    --mm-display-title-size: 4.25rem;
   }
 
   .mm-app-grid {
@@ -160,7 +240,15 @@ a {
 
 @media (min-width: 1536px) {
   :root {
-    --mm-display-title-size: 5.375rem;
+    --mm-display-title-size: 4.375rem;
+  }
+}
+
+@media (max-width: 639px) {
+  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]),
+  select:not([multiple]),
+  textarea:not([readonly]) {
+    font-size: 1rem;
   }
 }
 
@@ -189,6 +277,10 @@ a {
 }
 
 @media (min-width: 1024px) {
+  :root {
+    --mm-auth-title-size: 3.375rem;
+  }
+
   .public-auth-shell .auth-watercolor {
     -webkit-mask-image: none;
     mask-image: none;
@@ -204,14 +296,14 @@ a {
 
   .landing-hero-heading {
     margin-top: 0.75rem;
-    font-size: 3.75rem;
+    font-size: 3.375rem;
     line-height: 1.1;
   }
 
   .landing-hero-description {
     margin-top: 1.25rem;
-    font-size: 0.95rem;
-    line-height: 1.45rem;
+    font-size: var(--mm-body-font-size);
+    line-height: var(--mm-body-line-height);
   }
 
   .landing-hero-actions {
@@ -238,7 +330,7 @@ a {
 
   .landing-demo-eyebrow,
   .landing-demo-match {
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
   }
 
   .landing-demo-profile-row {
@@ -251,13 +343,13 @@ a {
   }
 
   .landing-demo-name {
-    font-size: 1.4rem;
+    font-size: 1.25rem;
     line-height: 1.1;
   }
 
   .landing-demo-program {
     margin-top: 0.25rem;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .landing-demo-tags {
@@ -267,13 +359,13 @@ a {
 
   .landing-demo-tag {
     padding: 0.35rem 0.7rem;
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
   }
 
   .landing-demo-description {
     margin-top: 0.875rem;
-    font-size: 0.8rem;
-    line-height: 1.2rem;
+    font-size: 0.75rem;
+    line-height: 1.125rem;
   }
 
   .landing-demo-footer {
@@ -283,7 +375,7 @@ a {
 
   .landing-demo-button {
     height: 2.625rem;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .landing-demo-button-icon {
@@ -322,7 +414,7 @@ a {
 
   .landing-demo-eyebrow,
   .landing-demo-match {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .landing-demo-profile-row {
@@ -335,11 +427,11 @@ a {
   }
 
   .landing-demo-name {
-    font-size: 1.7rem;
+    font-size: 1.5rem;
   }
 
   .landing-demo-program {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
   }
 
   .landing-demo-tags {
@@ -349,13 +441,13 @@ a {
 
   .landing-demo-tag {
     padding: 0.425rem 0.85rem;
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
   }
 
   .landing-demo-description {
     margin-top: 1.125rem;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
+    font-size: 0.8125rem;
+    line-height: 1.1875rem;
   }
 
   .landing-demo-footer {
@@ -365,7 +457,7 @@ a {
 
   .landing-demo-button {
     height: 3rem;
-    font-size: 0.825rem;
+    font-size: 0.75rem;
   }
 
   .landing-demo-button-icon {
@@ -389,14 +481,14 @@ a {
 
   .landing-hero-heading {
     margin-top: 0.375rem;
-    font-size: 3.25rem;
+    font-size: 2.875rem;
     line-height: 1.05;
   }
 
   .landing-hero-description {
     margin-top: 0.75rem;
     max-width: 27rem;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     line-height: 1.45;
   }
 
@@ -408,7 +500,7 @@ a {
     height: 2.625rem;
     padding-left: 1.3rem;
     padding-right: 1.3rem;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .landing-hero-benefits {
@@ -446,7 +538,7 @@ a {
 
   .landing-demo-eyebrow,
   .landing-demo-match {
-    font-size: 0.7rem;
+    font-size: 0.6875rem;
   }
 
   .landing-demo-profile-row {
@@ -459,12 +551,12 @@ a {
   }
 
   .landing-demo-name {
-    font-size: 1.225rem;
+    font-size: 1.125rem;
   }
 
   .landing-demo-program {
     margin-top: 0.2rem;
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
   }
 
   .landing-demo-tags {
@@ -474,12 +566,12 @@ a {
 
   .landing-demo-tag {
     padding: 0.35rem 0.65rem;
-    font-size: 0.7rem;
+    font-size: 0.6875rem;
   }
 
   .landing-demo-description {
     margin-top: 0.75rem;
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     line-height: 1.1rem;
   }
 
@@ -490,7 +582,7 @@ a {
 
   .landing-demo-button {
     height: 2.625rem;
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
   }
 
   .landing-demo-button-icon {
@@ -513,7 +605,7 @@ a {
 
   .landing-hero-heading {
     margin-top: 0.3rem;
-    font-size: 3rem;
+    font-size: 2.75rem;
     line-height: 1.02;
   }
 
@@ -524,7 +616,7 @@ a {
   }
 
   .landing-hero-description {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     line-height: 1.45;
   }
 
@@ -546,7 +638,7 @@ a {
   }
 
   .landing-demo-name {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 
   .landing-demo-description {
