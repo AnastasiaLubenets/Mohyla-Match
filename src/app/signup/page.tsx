@@ -167,7 +167,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
             <ArrowRightIcon className="mm-icon" />
           </AuthSubmitButton>
         </form>
-        <div className="mt-4 flex items-center gap-4 text-xs font-semibold text-[#344268] sm:text-[0.8125rem]">
+        <div className="mt-4 flex items-center gap-4 text-xs font-semibold text-[#344268]">
           <span className="h-px flex-1 bg-[#dce7f7]" />
           <p>
             Already have an account?{" "}

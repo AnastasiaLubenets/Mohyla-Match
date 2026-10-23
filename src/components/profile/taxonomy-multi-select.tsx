@@ -255,7 +255,7 @@ export function TaxonomyMultiSelect({
             results.map((option, index) => (
               <button
                 aria-selected={index === activeIndex}
-                className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-[0.8125rem] transition hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-blue-700 ${
+                className={`mm-filter-label flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left transition hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-blue-700 ${
                   index === activeIndex ? "bg-blue-50" : ""
                 }`}
                 disabled={disabled}
@@ -274,7 +274,7 @@ export function TaxonomyMultiSelect({
               </button>
             ))
           ) : (
-            <p className="px-4 py-3 text-[0.8125rem] font-medium text-blue-700/70">
+            <p className="mm-filter-label px-4 py-3 font-medium text-blue-700/70">
               No canonical options match this search.
             </p>
           )}

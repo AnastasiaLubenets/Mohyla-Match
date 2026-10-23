@@ -84,8 +84,8 @@ function DiscoveryFilterPanelDraft({
         <button
           className={
             resetEnabled
-              ? "text-[0.8125rem] font-bold text-blue-700 transition hover:text-blue-950"
-              : "cursor-not-allowed text-[0.8125rem] font-bold text-blue-300"
+              ? "mm-filter-label font-bold text-blue-700 transition hover:text-blue-950"
+              : "mm-filter-label cursor-not-allowed font-bold text-blue-300"
           }
           disabled={!resetEnabled}
           onClick={resetFilters}

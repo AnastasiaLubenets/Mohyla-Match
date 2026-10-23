@@ -76,10 +76,10 @@ export default async function MyProfilePage({ searchParams }: PageProps) {
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
               My profile
             </p>
-            <h1 className="mt-4 font-serif text-4xl font-semibold text-blue-950">
+            <h1 className="mm-empty-title mt-4 font-serif font-semibold text-blue-950">
               Profile unavailable
             </h1>
-            <p className="mt-3 leading-7 text-slate-600">
+            <p className="mm-body-text mt-3 text-slate-600">
               We could not load your profile. Try again in a moment.
             </p>
           </div>

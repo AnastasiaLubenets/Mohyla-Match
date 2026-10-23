@@ -25,7 +25,7 @@ export function MatchCard({ match }: Readonly<{ match: MatchSummary }>) {
             <p className="text-xs font-semibold uppercase tracking-[0.08em] text-primary">
               Matched {formatMatchedDate(match.matchedAt)}
             </p>
-            <h2 className="mt-2 text-[1.375rem] font-semibold">{match.fullName}</h2>
+            <h2 className="mm-profile-name mt-2 font-semibold">{match.fullName}</h2>
             <p className="mt-2 text-sm font-medium text-muted">
               {match.facultyName} · {match.academicProgramName} · Year{" "}
               {match.yearOfStudy}
@@ -40,7 +40,7 @@ export function MatchCard({ match }: Readonly<{ match: MatchSummary }>) {
         </Link>
       </header>
 
-      <p className="mt-4 text-sm leading-6 text-muted">{match.bio || "No bio yet."}</p>
+      <p className="mt-4 text-sm leading-5 text-muted">{match.bio || "No bio yet."}</p>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
         <section>

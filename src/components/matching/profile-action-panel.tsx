@@ -52,7 +52,7 @@ export function ProfileActionPanel({
               value={`/profiles/${targetUserId}`}
             />
             <label className="block">
-              <span className="text-sm font-semibold">Reason</span>
+              <span className="mm-filter-label font-semibold">Reason</span>
               <select
                 className="mm-control mt-2 w-full rounded-lg border border-border bg-surface px-3 outline-none transition focus:border-primary"
                 name="reasonCode"
@@ -66,9 +66,9 @@ export function ProfileActionPanel({
               </select>
             </label>
             <label className="block">
-              <span className="text-sm font-semibold">Details</span>
+              <span className="mm-filter-label font-semibold">Details</span>
               <textarea
-                className="mt-2 min-h-24 w-full resize-y rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none transition focus:border-primary"
+                className="mm-input-text mt-2 min-h-24 w-full resize-y rounded-lg border border-border bg-surface px-3 py-2 outline-none transition focus:border-primary"
                 maxLength={2000}
                 name="details"
               />

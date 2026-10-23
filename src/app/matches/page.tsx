@@ -23,8 +23,8 @@ export default async function MatchesPage() {
         <section className="mx-auto w-full max-w-5xl">
           <MatchingNav />
           <div className="mm-panel rounded-lg border border-border bg-surface shadow-sm">
-            <h1 className="text-2xl font-semibold">Matches unavailable</h1>
-            <p className="mt-3 leading-7 text-muted">
+            <h1 className="mm-empty-title font-semibold">Matches unavailable</h1>
+            <p className="mm-body-text mt-3 text-muted">
               We could not load your matches. Try again in a moment.
             </p>
           </div>
@@ -43,7 +43,7 @@ export default async function MatchesPage() {
           <p className="text-sm font-semibold uppercase tracking-[0.08em] text-primary">
             Mutual connections
           </p>
-          <h1 className="mt-2 text-3xl font-semibold">Matches</h1>
+          <h1 className="mm-page-title mt-2 font-semibold">Matches</h1>
         </header>
 
         {matches.length > 0 ? (
@@ -54,8 +54,8 @@ export default async function MatchesPage() {
           </div>
         ) : (
           <section className="mm-panel rounded-lg border border-border bg-surface shadow-sm">
-            <h2 className="text-xl font-semibold">No mutual matches yet.</h2>
-            <p className="mt-3 max-w-2xl leading-7 text-muted">
+            <h2 className="mm-section-title font-semibold">No mutual matches yet.</h2>
+            <p className="mm-body-text mt-3 max-w-2xl text-muted">
               Matches appear here after both students choose Connect.
             </p>
             <Link

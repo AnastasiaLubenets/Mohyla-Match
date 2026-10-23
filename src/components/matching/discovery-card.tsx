@@ -171,10 +171,10 @@ export function DiscoveryCard({
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
             Discover
           </p>
-          <h1 className="mt-3 font-serif text-3xl font-semibold leading-tight text-blue-950">
+          <h1 className="mm-empty-title mt-3 font-serif font-semibold text-blue-950">
             {emptyTitle}
           </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">{emptyDescription}</p>
+          <p className="mt-3 max-w-2xl text-sm leading-5 text-slate-600">{emptyDescription}</p>
           {emptyAction || showProfileAction ? (
             <div className="mt-4 flex flex-col gap-3 sm:flex-row">
               {emptyAction}
@@ -224,7 +224,7 @@ export function DiscoveryCard({
           </Link>
 
           <div className="min-w-0">
-            <h2 className="font-serif text-[1.75rem] font-semibold leading-none text-blue-950">
+            <h2 className="mm-profile-name font-serif font-semibold text-blue-950">
               <Link
                 className="transition hover:text-blue-800"
                 href={`/profiles/${candidate.userId}?from=discover`}
@@ -295,7 +295,7 @@ export function DiscoveryCard({
               <BarsIcon />
             </SectionIcon>
             <div>
-              <h3 className="text-[0.8125rem] font-bold text-blue-950">
+              <h3 className="mm-filter-label font-bold text-blue-950">
                 Skills
               </h3>
               <div className="mt-2">
@@ -308,7 +308,7 @@ export function DiscoveryCard({
               <SparkIcon />
             </SectionIcon>
             <div>
-              <h3 className="text-[0.8125rem] font-bold text-blue-950">
+              <h3 className="mm-filter-label font-bold text-blue-950">
                 Academic interests
               </h3>
               <div className="mt-2">
@@ -325,7 +325,7 @@ export function DiscoveryCard({
               <TargetIcon />
             </SectionIcon>
             <div>
-              <h3 className="text-[0.8125rem] font-bold text-blue-950">
+              <h3 className="mm-filter-label font-bold text-blue-950">
                 Looking for
               </h3>
               <div className="mt-2">

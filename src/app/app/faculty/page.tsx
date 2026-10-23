@@ -97,7 +97,7 @@ function FacultyHiddenFilterInputs({
 function FacultyHero() {
   return (
     <header className="mb-4 text-center">
-      <h1 className="font-serif text-[2.125rem] font-bold leading-[0.98] text-blue-950 sm:text-[2.625rem]">
+      <h1 className="mm-faculty-title font-serif font-bold leading-[0.98] text-blue-950">
         Find the right faculty member.
       </h1>
       <p className="mm-page-subtitle mx-auto max-w-3xl text-blue-900/75">
@@ -131,8 +131,8 @@ function FacultyDiscoveryFilterRail({
           <Link
             className={
               hasActiveFilters
-                ? "text-[0.8125rem] font-bold text-blue-700 transition hover:text-blue-950"
-                : "text-[0.8125rem] font-bold text-blue-300"
+                ? "mm-filter-label font-bold text-blue-700 transition hover:text-blue-950"
+                : "mm-filter-label font-bold text-blue-300"
             }
             href="/app/faculty"
           >

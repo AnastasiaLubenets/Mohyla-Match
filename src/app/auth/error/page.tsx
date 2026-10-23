@@ -32,8 +32,8 @@ export default async function AuthErrorPage({
         <Link href="/" className="text-sm font-semibold text-primary">
           Mohyla Match
         </Link>
-        <h1 className="mt-8 text-3xl font-semibold">Confirmation failed</h1>
-        <p className="mt-3 leading-7 text-muted">{message}</p>
+        <h1 className="mm-empty-title mt-8 font-semibold">Confirmation failed</h1>
+        <p className="mm-body-text mt-3 text-muted">{message}</p>
         <Link
           href="/login"
           className="mt-8 inline-flex h-12 w-full items-center justify-center rounded-full bg-primary px-5 font-semibold text-white transition hover:bg-primary-strong"

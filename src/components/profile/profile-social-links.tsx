@@ -170,7 +170,7 @@ export function SocialLinksList({
             ? "inline-flex h-9 w-9 items-center justify-center bg-transparent text-blue-800 transition-colors duration-200 hover:bg-transparent hover:text-blue-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
             : compact
               ? "inline-flex h-10 w-10 items-center justify-center rounded-md border border-blue-100 bg-white text-blue-800 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-              : "inline-flex min-h-10 items-center gap-2 rounded-md border border-blue-100 bg-white px-3 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500";
+              : "mm-filter-label inline-flex min-h-10 items-center gap-2 rounded-md border border-blue-100 bg-white px-3 font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500";
 
         const iconClassName =
           compact && appearance === "bare"

@@ -78,13 +78,13 @@ function AllStudentsEmptyState({
       <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
         All students
       </p>
-      <h2 className="mt-3 font-serif text-3xl font-semibold leading-tight text-blue-950">
+      <h2 className="mm-empty-title mt-3 font-serif font-semibold text-blue-950">
         {hasActiveFilters || totalCount > 0
           ? "No students match these filters."
           : "No other students are available yet."}
       </h2>
       {hasActiveFilters || totalCount > 0 ? (
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
+        <p className="mt-3 max-w-2xl text-sm leading-5 text-slate-600">
           Try clearing filters or changing your search.
         </p>
       ) : null}
@@ -98,7 +98,7 @@ function AllStudentsLoadError() {
       <p className="text-sm font-semibold uppercase tracking-[0.12em] text-red-700">
         All students
       </p>
-      <h2 className="mt-3 font-serif text-3xl font-semibold leading-tight text-red-950">
+      <h2 className="mm-empty-title mt-3 font-serif font-semibold text-red-950">
         Could not load students. Try again.
       </h2>
     </section>
@@ -138,7 +138,7 @@ function AllStudentRow({
       </Link>
 
       <div className="min-w-0">
-        <h3 className="font-serif text-[1.375rem] font-semibold leading-tight text-blue-950">
+        <h3 className="mm-profile-name font-serif font-semibold text-blue-950">
           <Link
             className="transition hover:text-blue-800"
             href={profileHref}

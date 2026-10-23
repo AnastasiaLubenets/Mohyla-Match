@@ -179,7 +179,7 @@ function fieldClassName() {
 function PickerCard({ children, icon, title }: PickerCardProps) {
   return (
     <section className="mm-panel rounded-lg border border-blue-100 bg-white">
-      <h2 className="inline-flex items-center gap-2.5 font-serif text-xl font-semibold text-blue-950">
+      <h2 className="mm-section-title inline-flex items-center gap-2.5 font-serif font-semibold text-blue-950">
         <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
           {icon}
         </span>
@@ -305,13 +305,13 @@ function AvatarPickerSection({
         </div>
 
         <div className="min-w-0">
-          <h2 className="inline-flex items-center gap-2.5 font-serif text-xl font-semibold text-blue-950">
+          <h2 className="mm-section-title inline-flex items-center gap-2.5 font-serif font-semibold text-blue-950">
             <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
               <UserIcon />
             </span>
             Avatar
           </h2>
-          <p className="mt-2 text-sm leading-6 text-blue-800/75">
+          <p className="mt-2 text-sm leading-5 text-blue-800/75">
             Choose the avatar style shown across Discover, Saved and profiles.
           </p>
           <input
@@ -673,7 +673,7 @@ function FacultyProfileEditForm({
               <span className="block text-sm font-bold text-blue-950">
                 Allow direct email contact
               </span>
-              <span className="mt-1 block text-sm leading-6 text-blue-800/75">
+              <span className="mt-1 block text-sm leading-5 text-blue-800/75">
                 Email remains hidden unless a user explicitly requests it.
               </span>
             </span>
@@ -682,7 +682,7 @@ function FacultyProfileEditForm({
           <label className="block lg:col-span-2">
             <span className="text-sm font-bold text-blue-900">Bio</span>
             <textarea
-              className="mt-2 min-h-24 w-full resize-y rounded-md border border-blue-200 bg-white px-3.5 py-2.5 text-sm font-medium leading-6 text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400"
+              className="mm-input-text mt-2 min-h-24 w-full resize-y rounded-md border border-blue-200 bg-white px-3.5 py-2.5 font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400"
               maxLength={500}
               name="bio"
               onChange={(event) => setBioValue(event.target.value)}
@@ -1017,7 +1017,7 @@ function StudentProfileEditForm({
           <label className="block lg:col-span-3">
             <span className="text-sm font-bold text-blue-900">Bio</span>
             <textarea
-              className="mt-2 min-h-24 w-full resize-y rounded-md border border-blue-200 bg-white px-3.5 py-2.5 text-sm font-medium leading-6 text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400"
+              className="mm-input-text mt-2 min-h-24 w-full resize-y rounded-md border border-blue-200 bg-white px-3.5 py-2.5 font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400"
               maxLength={500}
               name="bio"
               onChange={(event) => setBioValue(event.target.value)}
@@ -1039,7 +1039,7 @@ function StudentProfileEditForm({
               <span className="block text-sm font-bold text-blue-950">
                 Allow direct email contact
               </span>
-              <span className="mt-1 block text-sm leading-6 text-blue-800/75">
+              <span className="mt-1 block text-sm leading-5 text-blue-800/75">
                 Other Mohyla Match students can request and copy your student
                 email after an explicit Get email click.
               </span>

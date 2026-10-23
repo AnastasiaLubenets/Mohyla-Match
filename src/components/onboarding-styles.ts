@@ -2,7 +2,7 @@ export const onboardingFieldClass =
   "mm-control mt-1.5 w-full rounded-lg border border-[#cddaf0] bg-white/95 px-3.5 text-[#102653] outline-none transition placeholder:text-[#8292b5] hover:border-[#9fb8df] focus:border-[#3567a8] focus:ring-4 focus:ring-[#3567a8]/15";
 
 export const onboardingTextareaClass =
-  "mt-1.5 min-h-20 w-full resize-y rounded-lg border border-[#cddaf0] bg-white/95 px-3.5 py-2 text-[0.8125rem] leading-5 text-[#102653] outline-none transition placeholder:text-[#8292b5] hover:border-[#9fb8df] focus:border-[#3567a8] focus:ring-4 focus:ring-[#3567a8]/15";
+  "mm-input-text mt-1.5 min-h-20 w-full resize-y rounded-lg border border-[#cddaf0] bg-white/95 px-3.5 py-2 text-[#102653] outline-none transition placeholder:text-[#8292b5] hover:border-[#9fb8df] focus:border-[#3567a8] focus:ring-4 focus:ring-[#3567a8]/15";
 
 export const onboardingLabelClass =
   "mm-filter-label font-bold text-[#132a56]";

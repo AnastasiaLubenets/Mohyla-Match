@@ -279,7 +279,7 @@ export function OnboardingSkillPicker({
                 <button
                   aria-describedby={`${resultsId}-${skill.id}-category`}
                   aria-selected={index === activeResultIndex}
-                  className={`group relative flex w-full items-center justify-start gap-2.5 px-3.5 py-2 text-left text-[0.8125rem] text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-primary ${
+                  className={`mm-filter-label group relative flex w-full items-center justify-start gap-2.5 px-3.5 py-2 text-left text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-primary ${
                     index === activeResultIndex
                       ? "bg-[#EAF2FF] hover:bg-[#EAF2FF]"
                       : "bg-white hover:bg-[#F5F8FF]"

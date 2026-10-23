@@ -211,7 +211,7 @@ function ProfileInfoCard({
           {icon}
         </span>
         <div className="min-w-0">
-          <h2 className="font-serif text-xl font-semibold leading-none text-blue-950">
+          <h2 className="mm-section-title font-serif font-semibold text-blue-950">
             {title}
           </h2>
           <p className="mt-2 text-sm font-medium text-blue-700/75">
@@ -353,7 +353,7 @@ export function FullStudentProfile({
   return (
     <section className="min-w-0">
       <Link
-        className="mb-4 inline-flex items-center gap-2 text-[0.8125rem] font-bold text-blue-800 transition hover:text-blue-950"
+        className="mm-filter-label mb-4 inline-flex items-center gap-2 font-bold text-blue-800 transition hover:text-blue-950"
         href={backHref}
       >
         <ArrowLeftIcon />
@@ -380,8 +380,8 @@ export function FullStudentProfile({
           <SaveProfileButton
             className={
               saved
-                ? "inline-flex h-10 items-center justify-center gap-2 rounded-md bg-blue-800 px-3 text-[0.8125rem] font-bold text-white transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
-                : "inline-flex h-10 items-center justify-center gap-2 rounded-md border border-blue-200 bg-white px-3 text-[0.8125rem] font-bold text-blue-800 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-70"
+                ? "mm-filter-label inline-flex h-10 items-center justify-center gap-2 rounded-md bg-blue-800 px-3 font-bold text-white transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+                : "mm-filter-label inline-flex h-10 items-center justify-center gap-2 rounded-md border border-blue-200 bg-white px-3 font-bold text-blue-800 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-70"
             }
             label={saved ? "Saved" : "Save"}
             pendingLabel={saved ? "Removing..." : "Saving..."}
@@ -406,7 +406,7 @@ export function FullStudentProfile({
           />
 
           <div className="min-w-0">
-            <h2 className="font-serif text-[1.75rem] font-semibold leading-none text-blue-950">
+            <h2 className="mm-profile-name font-serif font-semibold text-blue-950">
               {profile.fullName}
             </h2>
             <p className="mt-2 text-sm font-semibold text-blue-800">
@@ -416,7 +416,7 @@ export function FullStudentProfile({
               {profile.facultyName}
             </p>
             {profile.bio ? (
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-blue-900/80">
+              <p className="mt-3 max-w-3xl text-sm leading-5 text-blue-900/80">
                 {profile.bio}
               </p>
             ) : null}

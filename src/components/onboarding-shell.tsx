@@ -60,7 +60,7 @@ function BrandMark() {
         unoptimized
         width={563}
       />
-      <span className="font-serif text-lg font-bold leading-none">
+      <span className="font-serif text-base font-bold leading-none">
         Mohyla Match
       </span>
     </Link>
@@ -107,10 +107,10 @@ export function OnboardingShell({
           <SetupErrorMessage message={error} />
 
           <div className="mt-5">
-            <h1 className="font-serif text-[1.875rem] font-bold leading-[1.06] text-[#07133f] sm:text-[2.125rem]">
+            <h1 className="mm-onboarding-title font-serif font-bold leading-[1.06] text-[#07133f]">
               {title}
             </h1>
-            <p className="mt-2 max-w-[40rem] text-[0.8125rem] leading-5 text-[#66769e] sm:text-sm">
+            <p className="mm-body-text mt-2 max-w-[40rem] text-[#66769e]">
               {description}
             </p>
           </div>

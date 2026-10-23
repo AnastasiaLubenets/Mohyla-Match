@@ -31,7 +31,7 @@ export function DeleteProfileDangerZone() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold text-red-950">Danger zone</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-red-900">
+          <p className="mt-2 max-w-2xl text-sm leading-5 text-red-900">
             Permanently delete your Mohyla Match account and all profile data.
           </p>
         </div>
@@ -53,8 +53,8 @@ export function DeleteProfileDangerZone() {
       >
         <form action="/profile/delete" className="space-y-5 p-5 sm:p-6" method="post">
           <div>
-            <h3 className="text-xl font-semibold">Delete your account?</h3>
-            <p className="mt-3 leading-7 text-muted">
+            <h3 className="mm-card-title font-semibold">Delete your account?</h3>
+            <p className="mm-body-text mt-3 text-muted">
               This permanently deletes your Mohyla Match account and all profile
               data. This action cannot be undone.
             </p>
@@ -64,7 +64,7 @@ export function DeleteProfileDangerZone() {
             <span className="text-sm font-semibold">Type DELETE to confirm</span>
             <input
               autoComplete="off"
-              className="mt-2 h-12 w-full rounded-lg border border-border bg-background px-4 text-base outline-none transition focus:border-red-700 focus:ring-2 focus:ring-red-100"
+              className="mm-input-text mt-2 h-12 w-full rounded-lg border border-border bg-background px-4 outline-none transition focus:border-red-700 focus:ring-2 focus:ring-red-100"
               name="confirmation"
               onChange={(event) => setConfirmation(event.target.value)}
               value={confirmation}

@@ -29,7 +29,7 @@ export function MatchPercentageIndicator({
   return (
     <span
       aria-label={`Match score ${percentage}`}
-      className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold text-blue-800"
+      className="mm-filter-label inline-flex items-center gap-1.5 font-bold text-blue-800"
     >
       <UsersRoundIcon />
       <span>{percentage}</span>
