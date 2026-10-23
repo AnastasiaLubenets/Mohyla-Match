@@ -12,7 +12,7 @@ function DeleteProfileSubmitButton({
 
   return (
     <button
-      className="h-11 rounded-full bg-red-700 px-5 text-sm font-semibold text-white transition hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-60"
+      className="mm-button rounded-full bg-red-700 px-5 font-semibold text-white transition hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-60"
       disabled={!canDelete || pending}
       type="submit"
     >
@@ -36,7 +36,7 @@ export function DeleteProfileDangerZone() {
           </p>
         </div>
         <button
-          className="inline-flex h-11 items-center justify-center rounded-full border border-red-700 px-5 text-sm font-semibold text-red-800 transition hover:bg-red-100"
+          className="mm-button inline-flex items-center justify-center rounded-full border border-red-700 px-5 font-semibold text-red-800 transition hover:bg-red-100"
           onClick={() => {
             setConfirmation("");
             dialogRef.current?.showModal();
@@ -73,7 +73,7 @@ export function DeleteProfileDangerZone() {
 
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button
-              className="h-11 rounded-full border border-border px-5 text-sm font-semibold transition hover:border-primary"
+              className="mm-button rounded-full border border-border px-5 font-semibold transition hover:border-primary"
               onClick={() => dialogRef.current?.close()}
               type="button"
             >

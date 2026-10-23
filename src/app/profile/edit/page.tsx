@@ -26,7 +26,7 @@ function SearchIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -64,14 +64,14 @@ function EditorTopBar({
       <div className="mx-auto flex max-w-[72rem] flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-6">
           <Link
-            className="font-serif text-2xl font-bold leading-none text-blue-950"
+            className="font-serif text-[1.375rem] font-bold leading-none text-blue-950"
             href="/app"
           >
             Mohyla Match
           </Link>
           <nav
             aria-label="Primary"
-            className="hidden items-center gap-5 text-sm font-semibold text-blue-900 lg:flex"
+            className="hidden items-center gap-5 text-[0.8125rem] font-semibold text-blue-900 lg:flex"
           >
             <Link className="transition hover:text-blue-950" href="/app">
               Discover
@@ -94,7 +94,7 @@ function EditorTopBar({
               <SearchIcon />
             </span>
             <input
-              className="h-10 w-full rounded-md border border-blue-100 bg-blue-50/80 pl-11 pr-4 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
+              className="h-10 w-full rounded-md border border-blue-100 bg-blue-50/80 pl-10 pr-4 text-[0.8125rem] font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
               id="profile-edit-search"
               name="q"
               placeholder="Search students, skills or interests..."
@@ -117,7 +117,7 @@ function EditorTopBar({
               systemAvatarKey={systemAvatarKey}
             />
             <span className="text-left">
-              <span className="block text-sm font-semibold">{fullName}</span>
+              <span className="block text-[0.8125rem] font-semibold">{fullName}</span>
               <span className="block text-xs text-slate-500">My profile</span>
             </span>
           </Link>

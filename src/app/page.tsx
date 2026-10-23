@@ -15,15 +15,15 @@ import { PublicWatercolor } from "@/components/public/public-watercolor";
 const miniBenefits = [
   {
     description: "Meet like-minded students",
-    icon: <UsersIcon className="h-5 w-5" />,
+    icon: <UsersIcon className="mm-icon" />,
   },
   {
     description: "Find project teammates",
-    icon: <BoltIcon className="h-5 w-5" />,
+    icon: <BoltIcon className="mm-icon" />,
   },
   {
     description: "Turn ideas into real projects",
-    icon: <BarChartIcon className="h-5 w-5" />,
+    icon: <BarChartIcon className="mm-icon" />,
   },
 ] as const;
 
@@ -57,7 +57,7 @@ export default function LandingPage() {
               </span>
             </h1>
 
-            <p className="landing-hero-description mt-5 max-w-2xl text-base leading-6 text-[#56637f] sm:mt-6 sm:text-lg sm:leading-7">
+            <p className="landing-hero-description mt-5 max-w-2xl text-sm leading-5 text-[#56637f] sm:mt-6 sm:text-[0.9375rem] sm:leading-6">
               Discover students across Mohyla based on skills, interests and
               what they want to build.
             </p>
@@ -65,14 +65,14 @@ export default function LandingPage() {
             <div className="landing-hero-actions mt-6 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/signup"
-                className="landing-hero-action inline-flex h-12 items-center justify-center gap-3 rounded-full bg-[#3154b8] px-7 text-sm font-bold text-white transition hover:bg-[#27469f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3154b8] sm:text-base"
+                className="landing-hero-action mm-button inline-flex items-center justify-center gap-2.5 rounded-full bg-[#3154b8] px-6 font-bold text-white transition hover:bg-[#27469f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3154b8]"
               >
                 Join Mohyla Match
-                <ArrowRightIcon className="h-5 w-5" />
+                <ArrowRightIcon className="mm-icon" />
               </Link>
               <Link
                 href="/login"
-                className="landing-hero-action inline-flex h-12 items-center justify-center rounded-full border border-[#d7e2f3] bg-white/85 px-8 text-sm font-bold text-[#070d35] backdrop-blur transition hover:border-[#3154b8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3154b8] sm:text-base"
+                className="landing-hero-action mm-button inline-flex items-center justify-center rounded-full border border-[#d7e2f3] bg-white/85 px-7 font-bold text-[#070d35] backdrop-blur transition hover:border-[#3154b8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3154b8]"
               >
                 Login
               </Link>
@@ -84,10 +84,10 @@ export default function LandingPage() {
                   className="landing-hero-benefit flex items-center gap-2.5"
                   key={benefit.description}
                 >
-                  <span className="landing-hero-benefit-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#edf4ff] text-[#1855b5]">
+                  <span className="landing-hero-benefit-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#edf4ff] text-[#1855b5]">
                     {benefit.icon}
                   </span>
-                  <p className="landing-hero-benefit-text text-xs font-semibold leading-4 text-[#344268] sm:text-sm sm:leading-5">
+                  <p className="landing-hero-benefit-text text-xs font-semibold leading-4 text-[#344268] sm:text-[0.8125rem] sm:leading-[1.125rem]">
                     {benefit.description}
                   </p>
                 </div>

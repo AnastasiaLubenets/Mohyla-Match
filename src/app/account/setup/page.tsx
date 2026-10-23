@@ -97,11 +97,11 @@ function ChoiceCard({
         value={id}
       />
       <label
-        className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-full border border-[#cddaf0] bg-white/75 px-3.5 py-2.5 text-sm font-bold text-[#102653] transition peer-checked:border-[#a9c6ee] peer-checked:bg-[#edf4ff] peer-checked:text-[#174ca7] peer-checked:[&_.choice-check]:border-[#3567a8] peer-checked:[&_.choice-check]:bg-[#3567a8] peer-checked:[&_.choice-check]:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#245ba2]"
+        className="mm-button flex cursor-pointer items-center gap-2.5 rounded-full border border-[#cddaf0] bg-white/75 px-3.5 py-2 font-bold text-[#102653] transition peer-checked:border-[#a9c6ee] peer-checked:bg-[#edf4ff] peer-checked:text-[#174ca7] peer-checked:[&_.choice-check]:border-[#3567a8] peer-checked:[&_.choice-check]:bg-[#3567a8] peer-checked:[&_.choice-check]:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#245ba2]"
         htmlFor={inputId}
       >
         <span
-          className="choice-check inline-flex size-6 shrink-0 items-center justify-center rounded-full border border-[#bed0ea] bg-white text-xs text-transparent transition"
+          className="choice-check inline-flex size-5 shrink-0 items-center justify-center rounded-full border border-[#bed0ea] bg-white text-[0.6875rem] text-transparent transition"
           aria-hidden="true"
         >
           ✓
@@ -137,7 +137,7 @@ function RoleSelection({ error }: Readonly<{ error?: string }>) {
             },
           ].map((role) => (
             <label
-              className="group flex cursor-pointer flex-col rounded-xl border border-[#cddaf0] bg-white/75 p-4 transition hover:border-[#3567a8] has-[:checked]:border-[#a9c6ee] has-[:checked]:bg-[#edf4ff]"
+              className="group flex cursor-pointer flex-col rounded-xl border border-[#cddaf0] bg-white/75 p-3.5 transition hover:border-[#3567a8] has-[:checked]:border-[#a9c6ee] has-[:checked]:bg-[#edf4ff]"
               key={role.value}
             >
               <input
@@ -147,10 +147,10 @@ function RoleSelection({ error }: Readonly<{ error?: string }>) {
                 type="radio"
                 value={role.value}
               />
-              <span className="font-serif text-2xl font-bold text-[#07133f]">
+              <span className="font-serif text-[1.375rem] font-bold text-[#07133f]">
                 {role.label}
               </span>
-              <span className="mt-2 text-sm leading-5 text-[#66769e]">
+              <span className="mt-1.5 text-[0.8125rem] leading-5 text-[#66769e]">
                 {role.description}
               </span>
             </label>
@@ -268,7 +268,7 @@ function FacultyResearchStep({
   return (
     <form action="/account/setup/faculty-research" className="mt-6 space-y-5" method="post">
       <fieldset className="space-y-3">
-        <legend className="text-sm font-bold text-[#132a56]">
+        <legend className="mm-filter-label font-bold text-[#132a56]">
           Research interests · Optional
         </legend>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -290,7 +290,7 @@ function FacultyResearchStep({
       />
       <div className="flex justify-end">
         <button
-          className="text-sm font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
+          className="text-[0.8125rem] font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
           name="skip"
           type="submit"
           value="true"
@@ -319,7 +319,7 @@ function FacultyPreviewStep({
         <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#245ba2]">
           Preview
         </p>
-        <h2 className="mt-2 font-serif text-2xl font-bold text-[#07133f]">
+        <h2 className="mt-2 font-serif text-[1.375rem] font-bold text-[#07133f]">
           {profile?.full_name ?? "Faculty profile"}
         </h2>
         <dl className="mt-4 grid gap-3 text-sm text-[#66769e] sm:grid-cols-3">
@@ -362,7 +362,7 @@ function BuildStep({
   return (
     <form action="/account/setup/build" className="mt-6 space-y-5" method="post">
       <fieldset className="space-y-3">
-        <legend className="text-sm font-bold text-[#132a56]">
+        <legend className="mm-filter-label font-bold text-[#132a56]">
           Interests · Optional
         </legend>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -379,7 +379,7 @@ function BuildStep({
       </fieldset>
 
       <fieldset className="space-y-3">
-        <legend className="text-sm font-bold text-[#132a56]">
+        <legend className="mm-filter-label font-bold text-[#132a56]">
           Collaboration goals · Optional
         </legend>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -403,7 +403,7 @@ function BuildStep({
       </FormNavigation>
       <div className="flex justify-end">
         <button
-          className="text-sm font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
+          className="text-[0.8125rem] font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
           name="skip"
           type="submit"
           value="true"

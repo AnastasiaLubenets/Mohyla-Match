@@ -123,7 +123,7 @@ export function FacultyFilterForm({
         selectedValues={draftFilters.interestSlugs}
       />
       <button
-        className="mt-2 inline-flex h-11 w-full items-center justify-center rounded-md bg-blue-800 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900"
+        className="mm-button mt-2 inline-flex w-full items-center justify-center rounded-md bg-blue-800 px-4 font-bold text-white shadow-sm transition hover:bg-blue-900"
         type="submit"
       >
         Apply filters

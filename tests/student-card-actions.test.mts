@@ -70,8 +70,8 @@ test("student recommendation card places actions in the upper profile area", () 
   );
   assert.match(
     discoveryCardSource,
-    /studentBookmarkIconClassName =\s*"h-\[1\.375rem\] w-\[1\.375rem\] transition-\[fill,color\] duration-200";/,
-    "The visible bookmark icon should be slightly larger than the default 20px icon",
+    /studentBookmarkIconClassName =\s*"mm-icon transition-\[fill,color\] duration-200";/,
+    "The visible bookmark icon should use the shared 18px icon token",
   );
   assert.match(
     discoveryCardSource,

@@ -44,7 +44,7 @@ function UserIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -62,7 +62,7 @@ function BarsIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -80,7 +80,7 @@ function LinkIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -115,7 +115,7 @@ function GraduationIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -133,7 +133,7 @@ function SparkIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -150,7 +150,7 @@ function TargetIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -173,7 +173,7 @@ function yearLabel(year: number) {
 }
 
 function fieldClassName() {
-  return "mt-2 h-11 w-full rounded-md border border-blue-200 bg-white px-4 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400";
+  return "mm-control mt-2 w-full rounded-md border border-blue-200 bg-white px-4 font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400";
 }
 
 function PickerCard({ children, icon, title }: PickerCardProps) {
@@ -551,13 +551,13 @@ function FacultyProfileEditForm({
         </div>
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
           <Link
-            className="inline-flex h-11 items-center justify-center rounded-md border border-blue-300 bg-white px-6 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
+            className="mm-button inline-flex items-center justify-center rounded-md border border-blue-300 bg-white px-6 font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
             href="/profile"
           >
             Cancel
           </Link>
           <AuthSubmitButton
-            className="inline-flex h-11 items-center justify-center rounded-md bg-blue-800 px-6 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+            className="mm-button inline-flex items-center justify-center rounded-md bg-blue-800 px-6 font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
             pendingLabel="Saving..."
           >
             Save changes
@@ -737,13 +737,13 @@ function FacultyProfileEditForm({
 
       <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
         <Link
-          className="inline-flex h-11 items-center justify-center rounded-md border border-blue-300 bg-white px-6 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
+          className="mm-button inline-flex items-center justify-center rounded-md border border-blue-300 bg-white px-6 font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
           href="/profile"
         >
           Cancel
         </Link>
         <AuthSubmitButton
-          className="inline-flex h-11 items-center justify-center rounded-md bg-blue-800 px-6 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+          className="mm-button inline-flex items-center justify-center rounded-md bg-blue-800 px-6 font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
           pendingLabel="Saving..."
         >
           Save changes
@@ -885,13 +885,13 @@ function StudentProfileEditForm({
         </div>
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
           <Link
-            className="inline-flex h-11 items-center justify-center rounded-md border border-blue-300 bg-white px-6 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
+            className="mm-button inline-flex items-center justify-center rounded-md border border-blue-300 bg-white px-6 font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
             href="/profile"
           >
             Cancel
           </Link>
           <AuthSubmitButton
-            className="inline-flex h-11 items-center justify-center rounded-md bg-blue-800 px-6 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+            className="mm-button inline-flex items-center justify-center rounded-md bg-blue-800 px-6 font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
             pendingLabel="Saving..."
           >
             Save changes
@@ -1156,7 +1156,7 @@ function StudentProfileEditForm({
                     </label>
 
                     <button
-                      className="inline-flex h-11 items-center justify-center rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-800 transition hover:border-blue-300 hover:bg-blue-50"
+                      className="mm-button inline-flex items-center justify-center rounded-md border border-blue-200 bg-white px-4 font-bold text-blue-800 transition hover:border-blue-300 hover:bg-blue-50"
                       onClick={() => removeSocialLink(index)}
                       type="button"
                     >
@@ -1173,12 +1173,12 @@ function StudentProfileEditForm({
             )}
 
             <button
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
+              className="mm-button inline-flex items-center justify-center gap-2 rounded-md border border-blue-200 bg-white px-4 font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
               onClick={addSocialLink}
               type="button"
             >
               <SocialPlatformIcon
-                className="h-5 w-5"
+                className="mm-icon"
                 platform="personal-website"
               />
               Add social link
@@ -1190,7 +1190,7 @@ function StudentProfileEditForm({
                   .filter((link) => link.url.trim())
                   .map((link) => (
                     <li
-                      className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-800 ring-1 ring-blue-100"
+                      className="mm-chip inline-flex items-center gap-1.5 rounded-full bg-blue-50 font-bold text-blue-800 ring-1 ring-blue-100"
                       key={`${link.platform}-preview`}
                     >
                       <SocialPlatformIcon
@@ -1211,13 +1211,13 @@ function StudentProfileEditForm({
 
       <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
         <Link
-          className="inline-flex h-11 items-center justify-center rounded-md border border-blue-300 bg-white px-6 text-sm font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
+          className="mm-button inline-flex items-center justify-center rounded-md border border-blue-300 bg-white px-6 font-bold text-blue-800 transition hover:border-blue-400 hover:bg-blue-50"
           href="/profile"
         >
           Cancel
         </Link>
         <AuthSubmitButton
-          className="inline-flex h-11 items-center justify-center rounded-md bg-blue-800 px-6 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+          className="mm-button inline-flex items-center justify-center rounded-md bg-blue-800 px-6 font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
           pendingLabel="Saving..."
         >
           Save changes

@@ -12,14 +12,14 @@ export function LandingDemoCard() {
   return (
     <aside
       aria-label="Illustrative featured match preview"
-      className="landing-demo-card relative w-full max-w-[22rem] rounded-2xl border border-[#dce7f7] bg-white/95 p-5 text-[#101b55] shadow-[0_18px_50px_rgba(37,76,139,0.14)] backdrop-blur"
+      className="landing-demo-card relative w-full max-w-[22rem] rounded-2xl border border-[#dce7f7] bg-white/95 p-4 text-[#101b55] shadow-[0_18px_50px_rgba(37,76,139,0.14)] backdrop-blur"
     >
-      <div className="landing-demo-meta mb-4 flex items-center justify-between gap-3">
-        <p className="landing-demo-eyebrow inline-flex items-center gap-2 text-sm font-semibold text-[#344268]">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#84aef9]" />
+      <div className="landing-demo-meta mb-3.5 flex items-center justify-between gap-3">
+        <p className="landing-demo-eyebrow inline-flex items-center gap-2 text-[0.8125rem] font-semibold text-[#344268]">
+          <span className="h-2 w-2 rounded-full bg-[#84aef9]" />
           Featured match
         </p>
-        <span className="landing-demo-match rounded-full bg-[#edf4ff] px-3 py-1 text-sm font-bold text-[#174ca7]">
+        <span className="landing-demo-match rounded-full bg-[#edf4ff] px-2.5 py-1 text-xs font-bold text-[#174ca7]">
           92% match
         </span>
       </div>
@@ -35,8 +35,8 @@ export function LandingDemoCard() {
           />
         </div>
         <div>
-          <h2 className="landing-demo-name text-xl font-bold">Maria Koval</h2>
-          <p className="landing-demo-program mt-1 text-[#5b6683]">
+          <h2 className="landing-demo-name text-lg font-bold">Maria Koval</h2>
+          <p className="landing-demo-program mt-1 text-[0.8125rem] text-[#5b6683]">
             Computer Science, year 3
           </p>
         </div>
@@ -46,25 +46,25 @@ export function LandingDemoCard() {
         {["React", "Figma", "Startups", "Education"].map((tag) => (
           <span
             key={tag}
-            className="landing-demo-tag rounded-full border border-[#dce7f7] bg-white px-3 py-1.5 text-xs font-semibold text-[#26355f]"
+            className="landing-demo-tag rounded-full border border-[#dce7f7] bg-white px-2.5 py-1 text-xs font-semibold text-[#26355f]"
           >
             {tag}
           </span>
         ))}
       </div>
 
-      <p className="landing-demo-description mt-4 text-sm leading-6 text-[#56637f]">
+      <p className="landing-demo-description mt-3.5 text-[0.8125rem] leading-5 text-[#56637f]">
         Maria offers React and Figma experience for teams building student
         products.
       </p>
 
-      <div className="landing-demo-footer mt-4 border-t border-[#dce7f7] pt-4">
+      <div className="landing-demo-footer mt-3.5 border-t border-[#dce7f7] pt-3.5">
         <Link
           href="/signup"
-          className="landing-demo-button inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#eef4ff] text-sm font-bold text-[#174ca7] transition hover:bg-[#dfeaff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3154b8]"
+          className="landing-demo-button mm-button inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#eef4ff] font-bold text-[#174ca7] transition hover:bg-[#dfeaff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3154b8]"
         >
           View profile
-          <ArrowRightIcon className="landing-demo-button-icon h-5 w-5" />
+          <ArrowRightIcon className="landing-demo-button-icon mm-icon" />
         </Link>
       </div>
     </aside>

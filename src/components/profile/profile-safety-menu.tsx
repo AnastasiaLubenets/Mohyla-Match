@@ -7,7 +7,7 @@ function MoreIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"

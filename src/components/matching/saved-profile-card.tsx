@@ -12,7 +12,7 @@ function BarsIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -30,7 +30,7 @@ function ExternalIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -49,7 +49,7 @@ function SparkIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -66,7 +66,7 @@ function TargetIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -99,8 +99,8 @@ function SavedTaxonomyRow({
 }>) {
   return (
     <section className="grid gap-2.5 sm:grid-cols-[7rem_minmax(0,1fr)] sm:items-start">
-      <h3 className="inline-flex items-center gap-3 text-sm font-bold text-blue-950">
-        <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
+      <h3 className="inline-flex items-center gap-2.5 text-[0.8125rem] font-bold text-blue-950">
+        <span className="inline-flex h-6 w-6 items-center justify-center text-blue-800">
           {icon}
         </span>
         {title}
@@ -152,7 +152,7 @@ export function SavedProfileCard({
         </Link>
 
         <div className="min-w-0">
-          <h2 className="font-serif text-3xl font-semibold leading-none text-blue-950">
+          <h2 className="font-serif text-[1.75rem] font-semibold leading-none text-blue-950">
             <Link
               className="transition hover:text-blue-800"
               href={`/profiles/${profile.userId}?from=saved`}
@@ -201,7 +201,7 @@ export function SavedProfileCard({
 
       <footer className="mt-4 grid gap-3 border-t border-blue-100 pt-4 sm:grid-cols-2">
         <Link
-          className="inline-flex h-11 items-center justify-center gap-2.5 rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
+          className="mm-button inline-flex items-center justify-center gap-2 rounded-md border border-blue-200 bg-white px-4 font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
           href={`/profiles/${profile.userId}?from=saved`}
         >
           <ExternalIcon />
@@ -209,12 +209,12 @@ export function SavedProfileCard({
         </Link>
         {profile.canDirectContact ? (
           <ContactReveal
-            buttonClassName="inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-md bg-blue-800 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+            buttonClassName="mm-button inline-flex w-full items-center justify-center gap-2 rounded-md bg-blue-800 px-4 font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
             showIcon
             targetUserId={profile.userId}
           />
         ) : (
-          <p className="inline-flex min-h-11 items-center justify-center rounded-md border border-blue-100 bg-blue-50 px-4 text-center text-sm font-semibold text-blue-700">
+          <p className="mm-button inline-flex items-center justify-center rounded-md border border-blue-100 bg-blue-50 px-4 text-center font-semibold text-blue-700">
             Email contact is off for this profile.
           </p>
         )}

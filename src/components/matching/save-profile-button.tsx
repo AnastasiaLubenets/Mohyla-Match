@@ -3,7 +3,7 @@
 import { useFormStatus } from "react-dom";
 
 function BookmarkIcon({
-  className = "h-5 w-5",
+  className = "mm-icon",
   filled,
   previewFillOnHover = false,
 }: Readonly<{
@@ -59,8 +59,8 @@ function SaveSubmitButton({
       className={
         className ??
         (saved
-          ? "inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-70"
-          : "inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-surface px-4 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-70")
+          ? "mm-button inline-flex w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 font-semibold text-blue-700 transition hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-70"
+          : "mm-button inline-flex w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-surface px-4 font-semibold text-blue-700 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-70")
       }
       disabled={pending}
       title={actionLabel}
@@ -113,8 +113,8 @@ export function SaveProfileButton({
           className ??
           (variant === "icon"
             ? saved
-              ? "inline-flex h-11 w-11 items-center justify-center rounded-full border border-blue-700 bg-blue-700 text-white shadow-sm transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-70"
-              : "inline-flex h-11 w-11 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-70"
+              ? "inline-flex h-10 w-10 items-center justify-center rounded-full border border-blue-700 bg-blue-700 text-white shadow-sm transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-70"
+              : "inline-flex h-10 w-10 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-70"
             : undefined)
         }
         iconClassName={iconClassName}

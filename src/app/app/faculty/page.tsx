@@ -97,10 +97,10 @@ function FacultyHiddenFilterInputs({
 function FacultyHero() {
   return (
     <header className="mb-4 text-center">
-      <h1 className="font-serif text-4xl font-bold leading-[0.98] text-blue-950 sm:text-[2.75rem]">
+      <h1 className="font-serif text-[2.125rem] font-bold leading-[0.98] text-blue-950 sm:text-[2.625rem]">
         Find the right faculty member.
       </h1>
-      <p className="mx-auto mt-3 max-w-3xl text-base leading-6 text-blue-900/75">
+      <p className="mm-page-subtitle mx-auto max-w-3xl text-blue-900/75">
         Discover Mohyla faculty by expertise, academic field, and research
         interests.
       </p>
@@ -125,14 +125,14 @@ function FacultyDiscoveryFilterRail({
     <aside className="scrollbar-hidden space-y-3 xl:h-full xl:min-h-0 xl:overflow-y-auto xl:pb-4">
       <section className="mm-panel rounded-lg border border-blue-100 bg-white">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="font-serif text-2xl font-bold leading-none text-blue-950">
+          <h2 className="mm-filter-title font-serif font-bold text-blue-950">
             Faculty filters
           </h2>
           <Link
             className={
               hasActiveFilters
-                ? "text-sm font-bold text-blue-700 transition hover:text-blue-950"
-                : "text-sm font-bold text-blue-300"
+                ? "text-[0.8125rem] font-bold text-blue-700 transition hover:text-blue-950"
+                : "text-[0.8125rem] font-bold text-blue-300"
             }
             href="/app/faculty"
           >

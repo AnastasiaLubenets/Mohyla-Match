@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AuthSubmitButton } from "@/components/auth-submit-button";
 import {
   onboardingFieldClass,
+  onboardingLabelClass,
   onboardingPrimaryButtonClass,
   onboardingSecondaryButtonClass,
 } from "@/components/onboarding-styles";
@@ -21,7 +22,7 @@ export function FacultyVerificationForm({
       method="post"
     >
       <label className="block">
-        <span className="text-sm font-bold text-[#132a56]">
+        <span className={onboardingLabelClass}>
           Faculty verification code
         </span>
         <input

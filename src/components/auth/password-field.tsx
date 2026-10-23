@@ -27,13 +27,13 @@ export function PasswordField({
   return (
     <label className="block">
       <span className="sr-only">{label}</span>
-      <span className="flex min-h-11 items-center gap-3 rounded-lg border border-[#d7e2f3] bg-white px-3.5 text-[#101b55] transition focus-within:border-[#3154b8] focus-within:ring-4 focus-within:ring-[#3154b8]/10">
-        <LockIcon className="h-5 w-5 shrink-0 text-[#56637f]" />
+      <span className="mm-control flex items-center gap-2.5 rounded-lg border border-[#d7e2f3] bg-white px-3.5 text-[#101b55] transition focus-within:border-[#3154b8] focus-within:ring-4 focus-within:ring-[#3154b8]/10">
+        <LockIcon className="mm-icon shrink-0 text-[#56637f]" />
         <input
           aria-describedby={helper ? helperId : undefined}
           aria-label={label}
           autoComplete={autoComplete}
-          className="min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-[#66728f]"
+          className="min-w-0 flex-1 bg-transparent font-medium outline-none placeholder:text-[#66728f]"
           minLength={6}
           name={name}
           placeholder={label}
@@ -47,9 +47,9 @@ export function PasswordField({
           type="button"
         >
           {isVisible ? (
-            <EyeOffIcon className="h-5 w-5" />
+            <EyeOffIcon className="mm-icon" />
           ) : (
-            <EyeIcon className="h-5 w-5" />
+            <EyeIcon className="mm-icon" />
           )}
         </button>
       </span>

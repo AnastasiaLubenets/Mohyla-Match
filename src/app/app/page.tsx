@@ -112,7 +112,7 @@ function Hero() {
         <br />
         <span className="font-semibold italic">Build something together.</span>
       </h1>
-      <p className="mx-auto mt-3 max-w-3xl text-base leading-6 text-blue-900/75">
+      <p className="mm-page-subtitle mx-auto max-w-3xl text-blue-900/75">
         <span>Con</span>nect with fellow Mohylians for projects, studies,
         research and more.
       </p>
@@ -299,7 +299,7 @@ export default async function AppPage({ searchParams }: PageProps) {
                 <p className="font-serif text-4xl font-bold leading-none text-blue-800">
                   &quot;
                 </p>
-                <p className="mt-1 font-serif text-2xl font-semibold italic leading-[1.05] text-blue-950">
+                <p className="mt-1 font-serif text-[1.375rem] font-semibold italic leading-[1.08] text-blue-950">
                   Great things happen when Mohylians find each other.
                 </p>
                 <div className="mt-4 h-px w-12 bg-blue-300" />

@@ -25,7 +25,7 @@ type AuthPageShellProps = Readonly<{
 
 export function AuthPageShell({
   active,
-  badgeIcon = <GraduationCapIcon className="h-4 w-4" />,
+  badgeIcon = <GraduationCapIcon className="mm-icon-sm" />,
   benefits,
   benefitsDividers = false,
   children,
@@ -35,8 +35,8 @@ export function AuthPageShell({
   const shellClassName =
     "public-auth-shell relative min-h-screen overflow-x-hidden bg-transparent text-[#101b55] lg:min-h-[100dvh]";
   const benefitsClassName = benefitsDividers
-    ? "public-auth-inline-benefits mt-6 grid gap-3 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-[#dce7f7]"
-    : "public-auth-inline-benefits mt-6 grid gap-3 sm:grid-cols-3 lg:gap-4";
+    ? "public-auth-inline-benefits mt-5 grid gap-2.5 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-[#dce7f7]"
+    : "public-auth-inline-benefits mt-5 grid gap-2.5 sm:grid-cols-3 lg:gap-3.5";
 
   return (
     <main className={shellClassName}>
@@ -51,11 +51,11 @@ export function AuthPageShell({
       <section className="relative grid min-h-[calc(100vh-4.5rem)] w-full gap-6 px-5 pb-8 pt-6 sm:px-8 lg:min-h-[calc(100dvh-4.5rem)] lg:grid-cols-[minmax(0,32.25rem)_1fr] lg:items-start lg:px-[7vw] lg:pt-6 xl:pt-7">
         <div className="relative z-10 min-w-0 max-w-[32.25rem]">
           <PublicBadge icon={badgeIcon}>Student collaboration network</PublicBadge>
-          <h1 className="relative mt-6 max-w-3xl font-serif text-[2.75rem] font-bold leading-[0.98] tracking-normal text-[#070d35] sm:text-6xl lg:text-[4rem]">
+          <h1 className="relative mt-5 max-w-3xl font-serif text-[2.625rem] font-bold leading-[0.98] tracking-normal text-[#070d35] sm:text-[3.25rem] lg:text-[3.75rem]">
             {title}
             <PublicUnderline className="w-[min(100%,28rem)]" />
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-6 text-[#56637f] sm:text-lg sm:leading-7">
+          <p className="mt-4 max-w-2xl text-sm leading-5 text-[#56637f] sm:text-[0.9375rem] sm:leading-6">
             {subtitle}
           </p>
           {children}
