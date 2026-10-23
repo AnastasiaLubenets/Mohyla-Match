@@ -26,7 +26,7 @@ function BookmarkIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-7 w-7"
+      className="h-6 w-6"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -61,7 +61,7 @@ function SavedStatusMessage({
 function SavedSummaryCard({ count }: Readonly<{ count: number }>) {
   return (
     <section className="mm-panel rounded-lg border border-blue-100 bg-white">
-      <div className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-blue-100 text-blue-800">
+      <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-800">
         <BookmarkIcon />
       </div>
       <h2 className="mt-4 font-serif text-xl font-semibold text-blue-950">
@@ -88,7 +88,7 @@ function EmptySavedState() {
         Save people you would like to come back to or collaborate with later.
       </p>
       <Link
-        className="mt-4 inline-flex h-11 items-center justify-center rounded-md bg-blue-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900"
+        className="mm-button mt-4 inline-flex items-center justify-center rounded-md bg-blue-800 px-5 font-bold text-white shadow-sm transition hover:bg-blue-900"
         href="/app"
       >
         Discover students

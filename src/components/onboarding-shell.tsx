@@ -15,7 +15,7 @@ type OnboardingShellProps = Readonly<{
 function OnboardingProgress({ step }: Readonly<{ step: OnboardingStep }>) {
   return (
     <div>
-      <p className="text-[0.8125rem] font-bold uppercase tracking-[0.22em] text-[#245ba2]">
+      <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#245ba2]">
         Step {step} of {onboardingStepCount}
       </p>
       <div className="mt-3 grid grid-cols-4 gap-2" aria-hidden="true">
@@ -60,7 +60,7 @@ function BrandMark() {
         unoptimized
         width={563}
       />
-      <span className="font-serif text-xl font-bold leading-none">
+      <span className="font-serif text-lg font-bold leading-none">
         Mohyla Match
       </span>
     </Link>
@@ -94,7 +94,7 @@ export function OnboardingShell({
           <BrandMark />
           <form action="/auth/logout" method="post">
             <button
-              className="inline-flex h-10 min-w-20 items-center justify-center rounded-full border border-[#cddaf0] bg-white/70 px-4 text-sm font-bold text-[#102653] backdrop-blur-md transition hover:border-[#3567a8] hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
+              className="mm-button inline-flex min-w-20 items-center justify-center rounded-full border border-[#cddaf0] bg-white/70 px-4 font-bold text-[#102653] backdrop-blur-md transition hover:border-[#3567a8] hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
               type="submit"
             >
               Logout
@@ -102,15 +102,15 @@ export function OnboardingShell({
           </form>
         </nav>
 
-        <div className="rounded-2xl border border-[#becde4]/70 bg-white/92 px-4 py-5 shadow-[0_12px_35px_rgba(34,80,130,0.08)] backdrop-blur-md sm:px-6 sm:py-7 lg:px-8 lg:py-8">
+        <div className="rounded-2xl border border-[#becde4]/70 bg-white/92 px-4 py-5 shadow-[0_12px_35px_rgba(34,80,130,0.08)] backdrop-blur-md sm:px-6 sm:py-6 lg:px-7 lg:py-7">
           <OnboardingProgress step={step} />
           <SetupErrorMessage message={error} />
 
-          <div className="mt-6">
-            <h1 className="font-serif text-[2rem] font-bold leading-[1.05] text-[#07133f] sm:text-[2.25rem]">
+          <div className="mt-5">
+            <h1 className="font-serif text-[1.875rem] font-bold leading-[1.06] text-[#07133f] sm:text-[2.125rem]">
               {title}
             </h1>
-            <p className="mt-2 max-w-[40rem] text-sm leading-6 text-[#66769e] sm:text-base">
+            <p className="mt-2 max-w-[40rem] text-[0.8125rem] leading-5 text-[#66769e] sm:text-sm">
               {description}
             </p>
           </div>

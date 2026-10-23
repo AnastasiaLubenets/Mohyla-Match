@@ -1,13 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { AuthSubmitButton } from "@/components/auth-submit-button";
 import {
+  onboardingFieldClass,
+  onboardingLabelClass,
   onboardingPrimaryButtonClass,
   onboardingSecondaryButtonClass,
+  onboardingTextareaClass,
 } from "@/components/onboarding-styles";
-import Link from "next/link";
 
 type FacultyOption = Readonly<{
   id: number;
@@ -123,11 +126,11 @@ export function FacultyProgramsForm({
   return (
     <form action="/account/setup/faculty-programs" className="mt-6 space-y-4" method="post">
       <label className="block">
-        <span className="text-sm font-bold text-[#132a56]">
+        <span className={onboardingLabelClass}>
           Full name · Required
         </span>
         <input
-          className="mt-1.5 h-11 w-full rounded-[0.75rem] border border-[#cddaf0] bg-white/80 px-3.5 text-sm font-semibold text-[#102653] outline-none transition placeholder:text-[#93a0bc] focus:border-[#3567a8] focus:bg-white"
+          className={onboardingFieldClass}
           defaultValue={profile?.full_name ?? suggestedFullName ?? ""}
           maxLength={120}
           minLength={2}
@@ -138,11 +141,11 @@ export function FacultyProgramsForm({
       </label>
 
       <label className="block">
-        <span className="text-sm font-bold text-[#132a56]">
+        <span className={onboardingLabelClass}>
           Faculty · Required
         </span>
         <select
-          className="mt-1.5 h-11 w-full rounded-[0.75rem] border border-[#cddaf0] bg-white/80 px-3.5 text-sm font-semibold text-[#102653] outline-none transition focus:border-[#3567a8] focus:bg-white"
+          className={onboardingFieldClass}
           name="facultyId"
           onChange={(event) => handleFacultyChange(event.target.value)}
           required
@@ -157,11 +160,11 @@ export function FacultyProgramsForm({
       </label>
 
       <label className="block">
-        <span className="text-sm font-bold text-[#132a56]">
+        <span className={onboardingLabelClass}>
           Primary academic program · Required
         </span>
         <select
-          className="mt-1.5 h-11 w-full rounded-[0.75rem] border border-[#cddaf0] bg-white/80 px-3.5 text-sm font-semibold text-[#102653] outline-none transition focus:border-[#3567a8] focus:bg-white"
+          className={onboardingFieldClass}
           disabled={!selectedFacultyId || availablePrograms.length === 0}
           name="primaryAcademicProgramId"
           onChange={(event) => handlePrimaryProgramChange(event.target.value)}
@@ -180,14 +183,14 @@ export function FacultyProgramsForm({
       </label>
 
       <fieldset className="space-y-3">
-        <legend className="text-sm font-bold text-[#132a56]">
+        <legend className={onboardingLabelClass}>
           Additional academic programs · Optional
         </legend>
         <div className="max-h-60 space-y-1.5 overflow-y-auto rounded-[0.75rem] border border-[#cddaf0] bg-white/55 p-2.5">
           {additionalProgramOptions.length > 0 ? (
             additionalProgramOptions.map((program) => (
               <label
-                className="flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-sm font-semibold text-[#102653] transition hover:bg-white/80"
+                className="flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-[0.8125rem] font-semibold text-[#102653] transition hover:bg-white/80"
                 key={program.id}
               >
                 <input
@@ -215,9 +218,9 @@ export function FacultyProgramsForm({
       </fieldset>
 
       <label className="block">
-        <span className="text-sm font-bold text-[#132a56]">Bio · Optional</span>
+        <span className={onboardingLabelClass}>Bio · Optional</span>
         <textarea
-          className="mt-1.5 min-h-24 w-full rounded-[0.75rem] border border-[#cddaf0] bg-white/80 px-3.5 py-2.5 text-sm font-semibold text-[#102653] outline-none transition placeholder:text-[#93a0bc] focus:border-[#3567a8] focus:bg-white"
+          className={onboardingTextareaClass}
           defaultValue={profile?.bio ?? ""}
           maxLength={500}
           name="bio"
@@ -225,11 +228,11 @@ export function FacultyProgramsForm({
       </label>
 
       <label className="block">
-        <span className="text-sm font-bold text-[#132a56]">
+        <span className={onboardingLabelClass}>
           Availability · Optional
         </span>
         <input
-          className="mt-1.5 h-11 w-full rounded-[0.75rem] border border-[#cddaf0] bg-white/80 px-3.5 text-sm font-semibold text-[#102653] outline-none transition placeholder:text-[#93a0bc] focus:border-[#3567a8] focus:bg-white"
+          className={onboardingFieldClass}
           defaultValue={profile?.availability ?? ""}
           maxLength={160}
           name="availability"

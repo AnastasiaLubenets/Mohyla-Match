@@ -95,7 +95,7 @@ function SearchIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -215,7 +215,7 @@ export function TaxonomyMultiSelect({
             aria-autocomplete="list"
             aria-controls={listboxId}
             aria-expanded={hasQuery}
-            className="h-11 w-full rounded-md border border-blue-200 bg-white pl-11 pr-10 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400 disabled:cursor-not-allowed disabled:bg-blue-50"
+            className="mm-control w-full rounded-md border border-blue-200 bg-white pl-10 pr-10 font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400 disabled:cursor-not-allowed disabled:bg-blue-50"
             disabled={disabled}
             id={inputId}
             onChange={(event) => {
@@ -255,7 +255,7 @@ export function TaxonomyMultiSelect({
             results.map((option, index) => (
               <button
                 aria-selected={index === activeIndex}
-                className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm transition hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-blue-700 ${
+                className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-[0.8125rem] transition hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-blue-700 ${
                   index === activeIndex ? "bg-blue-50" : ""
                 }`}
                 disabled={disabled}
@@ -274,18 +274,18 @@ export function TaxonomyMultiSelect({
               </button>
             ))
           ) : (
-            <p className="px-4 py-3 text-sm font-medium text-blue-700/70">
+            <p className="px-4 py-3 text-[0.8125rem] font-medium text-blue-700/70">
               No canonical options match this search.
             </p>
           )}
         </div>
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5">
         {selected.length > 0 ? (
           selected.map((option) => (
             <span
-              className="inline-flex min-h-8 items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-800 ring-1 ring-blue-100"
+              className="mm-chip inline-flex min-h-7 items-center gap-1.5 rounded-full bg-blue-50 font-bold text-blue-800 ring-1 ring-blue-100"
               key={option.id}
             >
               {option.name}
@@ -314,7 +314,7 @@ export function TaxonomyMultiSelect({
           </span>
           {suggestions.map((option) => (
             <button
-              className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 ring-1 ring-blue-100 transition hover:bg-blue-100 hover:text-blue-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mm-chip rounded-full bg-blue-50 font-bold text-blue-700 ring-1 ring-blue-100 transition hover:bg-blue-100 hover:text-blue-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
               disabled={disabled}
               key={option.id}
               onClick={() => addOption(option.id)}

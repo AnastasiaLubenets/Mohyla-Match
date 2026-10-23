@@ -59,7 +59,7 @@ export default async function MatchesPage() {
               Matches appear here after both students choose Connect.
             </p>
             <Link
-              className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-semibold text-white transition hover:bg-primary-strong"
+              className="mm-button mt-5 inline-flex items-center justify-center rounded-full bg-primary px-5 font-semibold text-white transition hover:bg-primary-strong"
               href="/app"
             >
               Discover profiles

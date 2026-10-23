@@ -18,7 +18,7 @@ export function ProfileActionPanel({
   const canToggleSave = !status?.isMatched && !alreadyConnected;
 
   return (
-    <aside className="mt-6 rounded-lg border border-border bg-surface p-5 shadow-sm">
+    <aside className="mm-panel mt-6 rounded-lg border border-border bg-surface shadow-sm">
       <h2 className="text-lg font-semibold">Profile actions</h2>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -37,7 +37,7 @@ export function ProfileActionPanel({
         ) : null}
 
         <details className="group">
-          <summary className="inline-flex h-11 w-full cursor-pointer list-none items-center justify-center rounded-full border border-border px-4 text-sm font-semibold transition hover:border-primary">
+          <summary className="mm-button inline-flex w-full cursor-pointer list-none items-center justify-center rounded-full border border-border px-4 font-semibold transition hover:border-primary">
             Report
           </summary>
           <form
@@ -54,7 +54,7 @@ export function ProfileActionPanel({
             <label className="block">
               <span className="text-sm font-semibold">Reason</span>
               <select
-                className="mt-2 h-11 w-full rounded-lg border border-border bg-surface px-3 text-sm outline-none transition focus:border-primary"
+                className="mm-control mt-2 w-full rounded-lg border border-border bg-surface px-3 outline-none transition focus:border-primary"
                 name="reasonCode"
                 required
               >

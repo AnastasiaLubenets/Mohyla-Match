@@ -25,7 +25,7 @@ export function MatchCard({ match }: Readonly<{ match: MatchSummary }>) {
             <p className="text-xs font-semibold uppercase tracking-[0.08em] text-primary">
               Matched {formatMatchedDate(match.matchedAt)}
             </p>
-            <h2 className="mt-2 text-2xl font-semibold">{match.fullName}</h2>
+            <h2 className="mt-2 text-[1.375rem] font-semibold">{match.fullName}</h2>
             <p className="mt-2 text-sm font-medium text-muted">
               {match.facultyName} · {match.academicProgramName} · Year{" "}
               {match.yearOfStudy}
@@ -33,7 +33,7 @@ export function MatchCard({ match }: Readonly<{ match: MatchSummary }>) {
           </div>
         </div>
         <Link
-          className="inline-flex h-11 items-center justify-center rounded-full border border-border px-4 text-sm font-semibold transition hover:border-primary"
+          className="mm-button inline-flex items-center justify-center rounded-full border border-border px-4 font-semibold transition hover:border-primary"
           href={`/profiles/${match.userId}`}
         >
           View profile

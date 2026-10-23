@@ -36,7 +36,7 @@ function ChipList({
     <ul className="flex flex-wrap gap-2">
       {items.map((item) => (
         <li
-          className="rounded-full border border-border bg-surface px-3 py-1 text-sm font-semibold"
+          className="mm-chip rounded-full border border-border bg-surface font-semibold"
           key={item}
         >
           {item}
@@ -87,7 +87,7 @@ export function ProfileDetails({
             <p className="text-sm font-semibold uppercase tracking-[0.08em] text-primary">
               Student profile
             </p>
-            <h1 className="mt-1.5 text-3xl font-semibold leading-tight">
+            <h1 className="mt-1.5 text-[1.75rem] font-semibold leading-tight">
               {profile.fullName}
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
@@ -98,7 +98,7 @@ export function ProfileDetails({
 
         {canEdit ? (
           <Link
-            className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-semibold text-white transition hover:bg-primary-strong"
+            className="mm-button inline-flex items-center justify-center rounded-full bg-primary px-5 font-semibold text-white transition hover:bg-primary-strong"
             href="/profile/edit"
           >
             Edit profile

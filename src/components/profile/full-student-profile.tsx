@@ -29,7 +29,7 @@ function BarsIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -47,7 +47,7 @@ function CalendarIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -67,7 +67,7 @@ function LinkIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -85,7 +85,7 @@ function GraduationIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -103,7 +103,7 @@ function SparkIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -120,7 +120,7 @@ function TargetIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -180,10 +180,10 @@ function ChipList({
   }
 
   return (
-    <ul className="flex flex-wrap gap-2">
+    <ul className="flex flex-wrap gap-1.5">
       {items.map((item) => (
         <li
-          className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-800 ring-1 ring-blue-100"
+          className="mm-chip rounded-full bg-blue-50 font-bold text-blue-800 ring-1 ring-blue-100"
           key={item}
         >
           {item}
@@ -353,7 +353,7 @@ export function FullStudentProfile({
   return (
     <section className="min-w-0">
       <Link
-        className="mb-4 inline-flex items-center gap-2 text-sm font-bold text-blue-800 transition hover:text-blue-950"
+        className="mb-4 inline-flex items-center gap-2 text-[0.8125rem] font-bold text-blue-800 transition hover:text-blue-950"
         href={backHref}
       >
         <ArrowLeftIcon />
@@ -380,8 +380,8 @@ export function FullStudentProfile({
           <SaveProfileButton
             className={
               saved
-                ? "inline-flex h-10 items-center justify-center gap-2 rounded-md bg-blue-800 px-3 text-sm font-bold text-white transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
-                : "inline-flex h-10 items-center justify-center gap-2 rounded-md border border-blue-200 bg-white px-3 text-sm font-bold text-blue-800 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-70"
+                ? "inline-flex h-10 items-center justify-center gap-2 rounded-md bg-blue-800 px-3 text-[0.8125rem] font-bold text-white transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+                : "inline-flex h-10 items-center justify-center gap-2 rounded-md border border-blue-200 bg-white px-3 text-[0.8125rem] font-bold text-blue-800 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-70"
             }
             label={saved ? "Saved" : "Save"}
             pendingLabel={saved ? "Removing..." : "Saving..."}
@@ -406,7 +406,7 @@ export function FullStudentProfile({
           />
 
           <div className="min-w-0">
-            <h2 className="font-serif text-3xl font-semibold leading-none text-blue-950">
+            <h2 className="font-serif text-[1.75rem] font-semibold leading-none text-blue-950">
               {profile.fullName}
             </h2>
             <p className="mt-2 text-sm font-semibold text-blue-800">
@@ -425,7 +425,7 @@ export function FullStudentProfile({
 
         <div className="mt-4 grid gap-3 border-t border-blue-100 pt-4 sm:grid-cols-[1fr_1fr_auto] sm:items-start">
           <Link
-            className="inline-flex h-11 items-center justify-center gap-2.5 rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
+            className="mm-button inline-flex items-center justify-center gap-2 rounded-md border border-blue-200 bg-white px-4 font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
             href={backHref}
           >
             <ArrowLeftIcon />
@@ -433,12 +433,12 @@ export function FullStudentProfile({
           </Link>
           {!isFaculty && status?.canDirectContact ? (
             <ContactReveal
-              buttonClassName="inline-flex h-12 w-full items-center justify-center gap-3 rounded-md bg-blue-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+              buttonClassName="mm-button inline-flex w-full items-center justify-center gap-2 rounded-md bg-blue-800 px-5 font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
               showIcon
               targetUserId={profile.userId}
             />
           ) : !isFaculty ? (
-            <p className="inline-flex min-h-11 items-center justify-center rounded-md border border-blue-100 bg-blue-50 px-4 text-center text-sm font-semibold text-blue-700">
+            <p className="mm-button inline-flex items-center justify-center rounded-md border border-blue-100 bg-blue-50 px-4 text-center font-semibold text-blue-700">
               Email contact is off for this profile.
             </p>
           ) : null}

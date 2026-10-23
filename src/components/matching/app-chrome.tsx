@@ -40,7 +40,7 @@ function CompassIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -58,7 +58,7 @@ function BookmarkIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -75,7 +75,7 @@ function GraduationCapIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -93,7 +93,7 @@ function UserIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -111,7 +111,7 @@ function SearchIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -131,8 +131,8 @@ function SidebarLink({ active = false, children, href, label }: SidebarLinkProps
       aria-current={active ? "page" : undefined}
       className={
         active
-          ? "inline-flex min-h-11 items-center gap-3 rounded-md bg-blue-100/90 px-3.5 py-2.5 text-sm font-bold text-blue-950 shadow-sm"
-          : "inline-flex min-h-11 items-center gap-3 rounded-md px-3.5 py-2.5 text-sm font-bold text-blue-900 transition hover:bg-blue-50"
+          ? "mm-button inline-flex items-center gap-2.5 rounded-md bg-blue-100/90 px-3.5 py-2 font-bold text-blue-950 shadow-sm"
+          : "mm-button inline-flex items-center gap-2.5 rounded-md px-3.5 py-2 font-bold text-blue-900 transition hover:bg-blue-50"
       }
       href={href}
     >
@@ -225,7 +225,7 @@ export function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
         </div>
         <form action="/auth/logout" className="px-2.5" method="post">
           <button
-            className="text-sm font-semibold text-slate-500 transition hover:text-blue-900"
+            className="text-[0.8125rem] font-semibold text-slate-500 transition hover:text-blue-900"
             type="submit"
           >
             Log out
@@ -250,7 +250,7 @@ function AppTopBar({
             <SearchIcon />
           </span>
           <input
-            className="h-10 w-full rounded-lg border border-blue-100 bg-blue-50/80 pl-11 pr-4 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
+            className="h-10 w-full rounded-lg border border-blue-100 bg-blue-50/80 pl-10 pr-4 text-[0.8125rem] font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
             id="global-search"
             name="q"
             placeholder="Search students, skills or interests..."
@@ -280,7 +280,7 @@ function AppTopBar({
               />
             ) : null}
             <span className="text-left">
-              <span className="block text-sm font-semibold">
+              <span className="block text-[0.8125rem] font-semibold">
                 {currentProfile?.fullName ?? "My profile"}
               </span>
               <span className="block text-xs text-slate-500">My profile</span>
@@ -335,7 +335,7 @@ export function BrandQuoteCard({
       <p className="font-serif text-4xl font-bold leading-none text-blue-800">
         &quot;
       </p>
-      <p className="mt-1 font-serif text-2xl font-semibold italic leading-[1.05] text-blue-950">
+      <p className="mt-1 font-serif text-[1.375rem] font-semibold italic leading-[1.08] text-blue-950">
         {text}
       </p>
       <div className="mt-4 h-px w-12 bg-blue-300" />

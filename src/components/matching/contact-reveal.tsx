@@ -12,7 +12,7 @@ function EnvelopeIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -85,7 +85,7 @@ export function ContactReveal({
       <button
         className={
           buttonClassName ??
-          "inline-flex h-11 w-full items-center justify-center rounded-full bg-primary px-4 text-sm font-semibold text-white transition hover:bg-primary-strong disabled:cursor-not-allowed disabled:opacity-70"
+          "mm-button inline-flex w-full items-center justify-center rounded-full bg-primary px-4 font-semibold text-white transition hover:bg-primary-strong disabled:cursor-not-allowed disabled:opacity-70"
         }
         disabled={isPending}
         onClick={handleGetEmail}

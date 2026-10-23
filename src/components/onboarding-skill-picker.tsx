@@ -74,7 +74,7 @@ function SkillToggle({
     <button
       aria-describedby={tooltipId}
       aria-pressed={isSelected}
-      className={`group relative flex min-h-11 w-full cursor-pointer items-center justify-start gap-2.5 rounded-full border px-3.5 py-2.5 text-left text-sm font-bold text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2] ${
+      className={`mm-button group relative flex w-full cursor-pointer items-center justify-start gap-2.5 rounded-full border px-3.5 py-2 text-left font-bold text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2] ${
         isSelected
           ? "border-[#a9c6ee] bg-[#edf4ff] text-[#174ca7]"
           : "border-[#cddaf0] bg-white/75 hover:border-[#3567a8]"
@@ -84,7 +84,7 @@ function SkillToggle({
     >
       <span className="flex min-w-0 flex-1 items-center gap-3">
         <span
-          className={`inline-flex size-6 shrink-0 items-center justify-center rounded-full border text-xs ${
+          className={`inline-flex size-5 shrink-0 items-center justify-center rounded-full border text-[0.6875rem] ${
             isSelected
               ? "border-[#3567a8] bg-[#3567a8] text-white"
               : "border-[#bed0ea] bg-white text-transparent"
@@ -93,7 +93,7 @@ function SkillToggle({
         >
           ✓
         </span>
-        <span className="min-w-0 break-words text-[0.82rem] leading-snug">
+        <span className="min-w-0 break-words leading-snug">
           {skill.name}
         </span>
       </span>
@@ -279,7 +279,7 @@ export function OnboardingSkillPicker({
                 <button
                   aria-describedby={`${resultsId}-${skill.id}-category`}
                   aria-selected={index === activeResultIndex}
-                  className={`group relative flex w-full items-center justify-start gap-3 px-3.5 py-2.5 text-left text-sm text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-primary ${
+                  className={`group relative flex w-full items-center justify-start gap-2.5 px-3.5 py-2 text-left text-[0.8125rem] text-[#102653] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-primary ${
                     index === activeResultIndex
                       ? "bg-[#EAF2FF] hover:bg-[#EAF2FF]"
                       : "bg-white hover:bg-[#F5F8FF]"
@@ -319,7 +319,7 @@ export function OnboardingSkillPicker({
         <div className="flex flex-col gap-3 sm:w-auto sm:min-w-52 sm:flex-row">
           {isOptional ? (
             <button
-              className="h-11 rounded-full px-5 text-sm font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
+              className="mm-button rounded-full px-5 font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
               name="skip"
               type="submit"
               value="true"

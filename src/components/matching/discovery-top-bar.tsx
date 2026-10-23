@@ -8,7 +8,7 @@ function SearchIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -48,7 +48,7 @@ export function DiscoveryTopBar({
             <SearchIcon />
           </span>
           <input
-            className="h-10 w-full rounded-lg border border-blue-100 bg-blue-50/80 pl-11 pr-4 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
+            className="h-10 w-full rounded-lg border border-blue-100 bg-blue-50/80 pl-10 pr-4 text-[0.8125rem] font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
             defaultValue={searchQuery}
             id="discover-search"
             name="q"
@@ -80,7 +80,7 @@ export function DiscoveryTopBar({
               />
             ) : null}
             <span className="text-left">
-              <span className="block text-sm font-semibold">
+              <span className="block text-[0.8125rem] font-semibold">
                 {currentProfile?.fullName ?? "My profile"}
               </span>
               <span className="block text-xs text-slate-500">My profile</span>

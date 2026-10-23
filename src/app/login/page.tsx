@@ -82,17 +82,17 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       benefits={[
         {
           description: "Find collaborators",
-          icon: <UsersIcon className="h-5 w-5" />,
+          icon: <UsersIcon className="mm-icon" />,
           title: "",
         },
         {
           description: "Return to saved profiles",
-          icon: <BoltIcon className="h-5 w-5" />,
+          icon: <BoltIcon className="mm-icon" />,
           title: "",
         },
         {
           description: "Keep building",
-          icon: <BarChartIcon className="h-5 w-5" />,
+          icon: <BarChartIcon className="mm-icon" />,
           title: "",
         },
       ]}
@@ -105,7 +105,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <AuthMessage message={message} />
           <AuthField
             helper="Use your @ukma.edu.ua student email"
-            icon={<MailIcon className="h-5 w-5" />}
+            icon={<MailIcon className="mm-icon" />}
             inputProps={{
               autoComplete: "email",
               name: "email",
@@ -123,14 +123,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             name="password"
           />
           <AuthSubmitButton
-            className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-full bg-[#3154b8] px-7 text-base font-bold text-white transition hover:bg-[#27469f] disabled:cursor-not-allowed disabled:opacity-70"
+            className="mm-button inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-[#3154b8] px-6 font-bold text-white transition hover:bg-[#27469f] disabled:cursor-not-allowed disabled:opacity-70"
             pendingLabel="Logging in..."
           >
             Login
-            <ArrowRightIcon className="h-5 w-5" />
+            <ArrowRightIcon className="mm-icon" />
           </AuthSubmitButton>
         </form>
-        <div className="mt-4 flex items-center gap-4 text-xs font-semibold text-[#344268] sm:text-sm">
+        <div className="mt-4 flex items-center gap-4 text-xs font-semibold text-[#344268] sm:text-[0.8125rem]">
           <span className="h-px flex-1 bg-[#dce7f7]" />
           <p>
             New here?{" "}

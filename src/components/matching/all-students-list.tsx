@@ -13,7 +13,7 @@ const studentBookmarkButtonClassName =
   "group inline-flex h-10 w-10 items-center justify-center border-0 bg-transparent p-0 text-blue-800 shadow-none transition-colors duration-200 hover:bg-transparent hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70";
 
 const studentBookmarkIconClassName =
-  "h-[1.375rem] w-[1.375rem] transition-[fill,color] duration-200";
+  "mm-icon transition-[fill,color] duration-200";
 
 function AllStudentsStatusMessage({
   error,
@@ -138,7 +138,7 @@ function AllStudentRow({
       </Link>
 
       <div className="min-w-0">
-        <h3 className="font-serif text-2xl font-semibold leading-tight text-blue-950">
+        <h3 className="font-serif text-[1.375rem] font-semibold leading-tight text-blue-950">
           <Link
             className="transition hover:text-blue-800"
             href={profileHref}
@@ -179,13 +179,13 @@ function AllStudentRow({
           />
         </div>
         <ContactReveal
-          buttonClassName="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-blue-800 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+          buttonClassName="mm-button inline-flex w-full items-center justify-center gap-2 rounded-md bg-blue-800 px-4 font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
           className="w-full sm:w-auto"
           showIcon
           targetUserId={candidate.userId}
         />
         <Link
-          className="inline-flex h-11 items-center justify-center rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
+          className="mm-button inline-flex items-center justify-center rounded-md border border-blue-200 bg-white px-4 font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
           href={profileHref}
         >
           <span aria-hidden="true">View profile</span>

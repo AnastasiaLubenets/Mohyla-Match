@@ -11,7 +11,7 @@ function SearchIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-4 w-4"
+      className="mm-icon-sm"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -29,7 +29,7 @@ function ChevronIcon({ open }: Readonly<{ open: boolean }>) {
   return (
     <svg
       aria-hidden="true"
-      className={open ? "h-4 w-4 rotate-180" : "h-4 w-4"}
+      className={open ? "mm-icon-sm rotate-180" : "mm-icon-sm"}
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -111,7 +111,7 @@ export function DiscoveryMultiSelect({
       ))}
       <div className="flex items-center justify-between gap-3">
         <label
-          className="text-sm font-bold text-blue-900"
+          className="mm-filter-label font-bold text-blue-900"
           htmlFor={`${baseId}-search`}
         >
           {label}
@@ -127,12 +127,12 @@ export function DiscoveryMultiSelect({
         ) : null}
       </div>
 
-      <div className="mt-1 rounded-md border border-blue-100 bg-white px-2 py-1.5 transition focus-within:border-blue-300">
+      <div className="mm-control mt-1 rounded-md border border-blue-100 bg-white px-2 py-1.5 transition focus-within:border-blue-300">
         {selectedOptions.length > 0 ? (
           <div className="mb-2 flex flex-wrap gap-1.5">
             {selectedOptions.map((option) => (
               <span
-                className="inline-flex min-h-7 items-center gap-1 rounded-full bg-blue-50 px-2.5 text-xs font-bold text-blue-800 ring-1 ring-blue-100"
+                className="mm-chip inline-flex min-h-7 items-center gap-1 rounded-full bg-blue-50 font-bold text-blue-800 ring-1 ring-blue-100"
                 key={option.value}
               >
                 {option.label}
@@ -152,7 +152,7 @@ export function DiscoveryMultiSelect({
         <button
           aria-controls={`${baseId}-options`}
           aria-expanded={open}
-          className="flex min-h-10 w-full items-center justify-between gap-3 rounded-sm px-1 text-left text-sm font-medium text-blue-900 outline-none transition hover:text-blue-950 focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="flex min-h-8 w-full items-center justify-between gap-3 rounded-sm px-1 text-left font-medium text-blue-900 outline-none transition hover:text-blue-950 focus-visible:ring-2 focus-visible:ring-blue-500"
           onClick={() => onOpenChange(!open)}
           type="button"
         >
@@ -173,7 +173,7 @@ export function DiscoveryMultiSelect({
               <SearchIcon />
             </span>
             <input
-              className="h-10 w-full rounded-md border border-blue-100 bg-blue-50/70 pl-9 pr-3 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
+              className="mm-control w-full rounded-md border border-blue-100 bg-blue-50/70 pl-9 pr-3 font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
               id={`${baseId}-search`}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={searchPlaceholder}
@@ -195,8 +195,8 @@ export function DiscoveryMultiSelect({
                   <label
                     className={
                       checked
-                        ? "flex cursor-pointer items-center gap-3 rounded-md bg-blue-50 px-3 py-2 text-sm font-bold text-blue-900"
-                        : "flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm font-semibold text-blue-800 transition hover:bg-blue-50"
+                        ? "flex cursor-pointer items-center gap-2.5 rounded-md bg-blue-50 px-3 py-1.5 text-[0.8125rem] font-bold text-blue-900"
+                        : "flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-1.5 text-[0.8125rem] font-semibold text-blue-800 transition hover:bg-blue-50"
                     }
                     key={option.value}
                   >
@@ -209,8 +209,8 @@ export function DiscoveryMultiSelect({
                     <span
                       className={
                         checked
-                          ? "flex size-5 shrink-0 items-center justify-center rounded-full bg-blue-800 text-white"
-                          : "size-5 shrink-0 rounded-full border border-blue-200 bg-white"
+                          ? "flex size-[1.125rem] shrink-0 items-center justify-center rounded-full bg-blue-800 text-white"
+                          : "size-[1.125rem] shrink-0 rounded-full border border-blue-200 bg-white"
                       }
                     >
                       {checked ? <CheckIcon /> : null}
@@ -220,7 +220,7 @@ export function DiscoveryMultiSelect({
                 );
               })
             ) : (
-              <p className="px-3 py-4 text-sm font-medium text-blue-500">
+              <p className="px-3 py-3 text-[0.8125rem] font-medium text-blue-500">
                 No options match.
               </p>
             )}

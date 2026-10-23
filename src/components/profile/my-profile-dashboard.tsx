@@ -43,7 +43,7 @@ function UserIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -61,7 +61,7 @@ function BarsIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -79,7 +79,7 @@ function CalendarIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -131,7 +131,7 @@ function EditIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -149,7 +149,7 @@ function EnvelopeIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -167,7 +167,7 @@ function GraduationIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -185,7 +185,7 @@ function LinkIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -203,7 +203,7 @@ function SparkIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -220,7 +220,7 @@ function TargetIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -346,10 +346,10 @@ function ChipList({
   }
 
   return (
-    <ul className="flex flex-wrap gap-2">
+    <ul className="flex flex-wrap gap-1.5">
       {items.map((item) => (
         <li
-          className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800 ring-1 ring-blue-100/80"
+          className="mm-chip rounded-full bg-blue-50 font-semibold text-blue-800 ring-1 ring-blue-100/80"
           key={item}
         >
           {item}
@@ -387,7 +387,7 @@ function DashboardCard({
           {title}
         </h2>
         <button
-          className="text-sm font-bold text-blue-700 transition hover:text-blue-950 disabled:cursor-not-allowed disabled:text-blue-300"
+          className="text-[0.8125rem] font-bold text-blue-700 transition hover:text-blue-950 disabled:cursor-not-allowed disabled:text-blue-300"
           disabled={otherSectionActive}
           onClick={() => onEdit(section)}
           type="button"
@@ -429,7 +429,7 @@ function InlineActionButtons({
   return (
     <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
       <button
-        className="inline-flex h-10 items-center justify-center rounded-md border border-blue-200 px-5 text-sm font-bold text-blue-800 transition hover:border-blue-300 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex h-10 items-center justify-center rounded-md border border-blue-200 px-5 text-[0.8125rem] font-bold text-blue-800 transition hover:border-blue-300 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-60"
         disabled={isSaving}
         onClick={onCancel}
         type="button"
@@ -437,7 +437,7 @@ function InlineActionButtons({
         Cancel
       </button>
       <button
-        className="inline-flex h-10 items-center justify-center rounded-md bg-blue-800 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex h-10 items-center justify-center rounded-md bg-blue-800 px-5 text-[0.8125rem] font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-60"
         disabled={isSaving}
         onClick={onSave}
         type="button"
@@ -579,7 +579,7 @@ function FacultyProfileDashboard({
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
               Faculty profile
             </p>
-            <h2 className="mt-2 font-serif text-3xl font-semibold leading-none text-blue-950">
+            <h2 className="mt-2 font-serif text-[1.75rem] font-semibold leading-none text-blue-950">
               {profile.fullName}
             </h2>
             <p className="mt-2 text-sm font-semibold text-blue-800">
@@ -600,7 +600,7 @@ function FacultyProfileDashboard({
 
           <div className="flex flex-col gap-2">
             <Link
-              className="inline-flex h-11 items-center justify-center gap-2.5 rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
+              className="mm-button inline-flex items-center justify-center gap-2 rounded-md border border-blue-200 bg-white px-4 font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
               href="/profile/edit"
             >
               <EditIcon />
@@ -838,7 +838,7 @@ function StudentProfileDashboard({
           />
 
           <div className="min-w-0">
-            <h2 className="font-serif text-3xl font-semibold leading-none text-blue-950">
+            <h2 className="font-serif text-[1.75rem] font-semibold leading-none text-blue-950">
               {profile.fullName}
             </h2>
             <p className="mt-2 text-sm font-semibold text-blue-800">
@@ -870,7 +870,7 @@ function StudentProfileDashboard({
 
           <div className="flex flex-col gap-2">
             <Link
-              className="inline-flex h-11 items-center justify-center gap-2.5 rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
+              className="mm-button inline-flex items-center justify-center gap-2 rounded-md border border-blue-200 bg-white px-4 font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
               href="/profile/edit"
             >
               <EditIcon />
@@ -1040,7 +1040,7 @@ function StudentProfileDashboard({
                 Availability
               </label>
               <input
-                className="h-11 w-full rounded-md border border-blue-200 bg-white px-4 text-sm font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400 disabled:cursor-not-allowed disabled:bg-blue-50"
+                className="mm-control w-full rounded-md border border-blue-200 bg-white px-4 font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-400 disabled:cursor-not-allowed disabled:bg-blue-50"
                 disabled={isSaving}
                 id="inline-availability"
                 maxLength={160}

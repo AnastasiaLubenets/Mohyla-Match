@@ -77,7 +77,7 @@ function CompactChipRow({
         <ul className="flex flex-wrap items-start gap-1.5">
           {visibleItems.map((item) => (
             <li
-              className="inline-flex w-fit max-w-full self-start rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold leading-snug text-blue-800 ring-1 ring-blue-100/70"
+              className="mm-chip inline-flex w-fit max-w-full self-start rounded-full bg-blue-50 font-semibold text-blue-800 ring-1 ring-blue-100/70"
               key={item.key}
             >
               <span className="min-w-0 break-words">{item.label}</span>
@@ -89,7 +89,7 @@ function CompactChipRow({
             </li>
           ))}
           {hiddenCount ? (
-            <li className="inline-flex w-fit self-start rounded-full bg-slate-50 px-2.5 py-1 text-xs font-semibold leading-snug text-slate-500 ring-1 ring-slate-100">
+            <li className="mm-chip inline-flex w-fit self-start rounded-full bg-slate-50 font-semibold text-slate-500 ring-1 ring-slate-100">
               +{hiddenCount} more
             </li>
           ) : null}
@@ -179,7 +179,7 @@ function FacultyRow({
 
         <div className="flex min-w-0 flex-col">
           <div className="min-w-0">
-            <h3 className="font-serif text-2xl font-semibold leading-tight text-blue-950">
+            <h3 className="font-serif text-[1.375rem] font-semibold leading-tight text-blue-950">
               <Link
                 className="transition hover:text-blue-800"
                 href={profileHref}
@@ -212,7 +212,7 @@ function FacultyRow({
 
           <div className="mt-2.5 flex justify-end">
             <Link
-              className="inline-flex h-11 items-center justify-center rounded-md border border-blue-200 bg-white px-4 text-sm font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
+              className="mm-button inline-flex items-center justify-center rounded-md border border-blue-200 bg-white px-4 font-bold text-blue-900 transition hover:border-blue-300 hover:bg-blue-50"
               href={profileHref}
             >
               View profile

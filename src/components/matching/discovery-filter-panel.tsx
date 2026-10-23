@@ -78,14 +78,14 @@ function DiscoveryFilterPanelDraft({
   return (
     <section className="mm-panel rounded-lg border border-blue-100 bg-white">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="font-serif text-2xl font-bold leading-none text-blue-950">
+        <h2 className="mm-filter-title font-serif font-bold text-blue-950">
           Filters
         </h2>
         <button
           className={
             resetEnabled
-              ? "text-sm font-bold text-blue-700 transition hover:text-blue-950"
-              : "cursor-not-allowed text-sm font-bold text-blue-300"
+              ? "text-[0.8125rem] font-bold text-blue-700 transition hover:text-blue-950"
+              : "cursor-not-allowed text-[0.8125rem] font-bold text-blue-300"
           }
           disabled={!resetEnabled}
           onClick={resetFilters}

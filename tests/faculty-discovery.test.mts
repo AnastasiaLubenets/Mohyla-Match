@@ -180,7 +180,7 @@ test("faculty discovery has its own sidebar route and keeps student discover sep
   assert.match(facultyPage, /Find the right faculty member\./);
   assert.match(
     facultyPage,
-    /text-4xl[\s\S]*sm:text-\[2\.75rem\]/,
+    /text-\[2\.125rem\][\s\S]*sm:text-\[2\.625rem\]/,
     "Faculty hero heading should stay centered at the compact desktop size",
   );
   assert.match(

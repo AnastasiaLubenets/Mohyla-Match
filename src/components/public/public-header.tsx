@@ -5,7 +5,7 @@ type PublicHeaderProps = Readonly<{
 }>;
 
 const headerLayoutClassName =
-  "mx-auto flex w-full max-w-[1350px] items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-9 xl:px-12";
+  "mx-auto flex w-full max-w-[1350px] items-center justify-between gap-4 px-5 py-3.5 sm:px-8 lg:px-9 xl:px-12";
 
 export function PublicHeader({ active = "landing" }: PublicHeaderProps) {
   return (
@@ -17,7 +17,7 @@ export function PublicHeader({ active = "landing" }: PublicHeaderProps) {
         >
           Mohyla Match
         </Link>
-        <nav className="flex items-center gap-4 text-sm font-bold text-[#070d35] sm:gap-5">
+        <nav className="flex items-center gap-3.5 text-[0.8125rem] font-bold text-[#070d35] sm:gap-4">
           <Link
             href="/login"
             className={`relative rounded-sm transition after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-0.5 after:rounded-full hover:text-[#3154b8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3154b8] ${
@@ -30,7 +30,7 @@ export function PublicHeader({ active = "landing" }: PublicHeaderProps) {
           </Link>
           <Link
             href="/signup"
-            className="inline-flex h-10 min-w-20 items-center justify-center rounded-full bg-[#3154b8] px-6 font-bold text-white transition hover:bg-[#27469f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3154b8]"
+            className="mm-button inline-flex min-w-20 items-center justify-center rounded-full bg-[#3154b8] px-5 font-bold text-white transition hover:bg-[#27469f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3154b8]"
             aria-current={active === "signup" ? "page" : undefined}
           >
             Join

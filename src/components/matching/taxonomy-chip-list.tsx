@@ -21,10 +21,10 @@ export function TaxonomyChipList<TItem extends MatchingItem | MatchingSkill>({
   const hiddenCount = limit && items.length > limit ? items.length - limit : 0;
 
   return (
-    <ul className="flex flex-wrap gap-2">
+    <ul className="flex flex-wrap gap-1.5">
       {visibleItems.map((item) => (
         <li
-          className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800 ring-1 ring-blue-100/70"
+          className="mm-chip rounded-full bg-blue-50 font-semibold text-blue-800 ring-1 ring-blue-100/70"
           key={`${item.slug}-${item.id}`}
         >
           {item.name}
@@ -36,7 +36,7 @@ export function TaxonomyChipList<TItem extends MatchingItem | MatchingSkill>({
         </li>
       ))}
       {hiddenCount ? (
-        <li className="rounded-full bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-500 ring-1 ring-slate-100">
+        <li className="mm-chip rounded-full bg-slate-50 font-semibold text-slate-500 ring-1 ring-slate-100">
           +{hiddenCount} more
         </li>
       ) : null}

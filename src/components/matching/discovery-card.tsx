@@ -17,7 +17,7 @@ const studentBookmarkButtonClassName =
   "group inline-flex h-10 w-10 items-center justify-center border-0 bg-transparent p-0 text-blue-800 shadow-none transition-colors duration-200 hover:bg-transparent hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-70";
 
 const studentBookmarkIconClassName =
-  "h-[1.375rem] w-[1.375rem] transition-[fill,color] duration-200";
+  "mm-icon transition-[fill,color] duration-200";
 
 function StatusMessage({
   error,
@@ -57,7 +57,7 @@ function SectionIcon({
   children: ReactNode;
 }>) {
   return (
-    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center text-blue-800">
+    <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center text-blue-800">
       {children}
     </span>
   );
@@ -67,7 +67,7 @@ function BarsIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -85,7 +85,7 @@ function SparkIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -102,7 +102,7 @@ function TargetIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-5 w-5"
+      className="mm-icon"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -180,7 +180,7 @@ export function DiscoveryCard({
               {emptyAction}
               {showProfileAction ? (
                 <Link
-                  className="inline-flex h-11 items-center justify-center rounded-full border border-blue-200 px-5 text-sm font-semibold text-blue-900 transition hover:border-blue-400 hover:bg-blue-50"
+                  className="mm-button inline-flex items-center justify-center rounded-full border border-blue-200 px-5 font-semibold text-blue-900 transition hover:border-blue-400 hover:bg-blue-50"
                   href="/profile"
                 >
                   Update my profile
@@ -224,7 +224,7 @@ export function DiscoveryCard({
           </Link>
 
           <div className="min-w-0">
-            <h2 className="font-serif text-3xl font-semibold leading-none text-blue-950">
+            <h2 className="font-serif text-[1.75rem] font-semibold leading-none text-blue-950">
               <Link
                 className="transition hover:text-blue-800"
                 href={`/profiles/${candidate.userId}?from=discover`}
@@ -281,7 +281,7 @@ export function DiscoveryCard({
               />
             </div>
             <ContactReveal
-              buttonClassName="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-blue-800 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+              buttonClassName="mm-button inline-flex w-full items-center justify-center gap-2 rounded-md bg-blue-800 px-4 font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
               className="w-full sm:w-auto"
               showIcon
               targetUserId={candidate.userId}
@@ -295,7 +295,7 @@ export function DiscoveryCard({
               <BarsIcon />
             </SectionIcon>
             <div>
-              <h3 className="text-sm font-bold text-blue-950">
+              <h3 className="text-[0.8125rem] font-bold text-blue-950">
                 Skills
               </h3>
               <div className="mt-2">
@@ -308,7 +308,7 @@ export function DiscoveryCard({
               <SparkIcon />
             </SectionIcon>
             <div>
-              <h3 className="text-sm font-bold text-blue-950">
+              <h3 className="text-[0.8125rem] font-bold text-blue-950">
                 Academic interests
               </h3>
               <div className="mt-2">
@@ -325,7 +325,7 @@ export function DiscoveryCard({
               <TargetIcon />
             </SectionIcon>
             <div>
-              <h3 className="text-sm font-bold text-blue-950">
+              <h3 className="text-[0.8125rem] font-bold text-blue-950">
                 Looking for
               </h3>
               <div className="mt-2">
@@ -344,7 +344,7 @@ export function DiscoveryCard({
           <footer className="mt-2 flex justify-end">
             <button
               aria-label={`Skip ${candidate.fullName}`}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
+              className="mm-button inline-flex items-center justify-center gap-2 rounded-md px-3 font-semibold text-blue-700 transition hover:bg-blue-50 hover:text-blue-950 disabled:cursor-not-allowed disabled:opacity-70"
               onClick={() => onSkip?.(candidate.userId)}
               type="button"
             >
