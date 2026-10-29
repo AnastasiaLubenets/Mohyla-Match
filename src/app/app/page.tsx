@@ -289,7 +289,7 @@ export default async function AppPage({ searchParams }: PageProps) {
                 view={view}
               />
               <section
-                className="mm-panel flex min-h-[18.5rem] flex-col rounded-lg border border-blue-50 bg-[#fffaf0] bg-cover bg-center bg-no-repeat"
+                className="mm-panel flex min-h-[16.125rem] flex-col rounded-lg border border-blue-50 bg-[#fffaf0] bg-cover bg-center bg-no-repeat"
                 style={{
                   backgroundImage:
                     "url('/branding/mohyla-quote-architecture-v2.png')",
