@@ -23,6 +23,16 @@ test("discover quote card uses the supplied background while keeping real HTML t
 
   assert.match(page, /mohyla-quote-architecture-v2\.png/);
   assert.match(chrome, /mohyla-quote-architecture-v2\.png/);
+  assert.match(
+    page,
+    /flex min-h-\[18\.5rem\] flex-col[\s\S]*bg-cover/,
+    "the Discover quote card should be about 35% taller while preserving the background aspect ratio",
+  );
+  assert.match(
+    page,
+    /Great things happen[\s\S]*mt-auto pt-4[\s\S]*Community/,
+    "the quote should stay at the top while the decorative labels stay at the bottom",
+  );
   assert.match(page, /backgroundPosition: "center bottom"/);
   assert.match(chrome, /backgroundPosition: "center bottom"/);
   assert.match(

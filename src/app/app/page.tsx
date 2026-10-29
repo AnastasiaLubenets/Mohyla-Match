@@ -289,7 +289,7 @@ export default async function AppPage({ searchParams }: PageProps) {
                 view={view}
               />
               <section
-                className="mm-panel rounded-lg border border-blue-50 bg-[#fffaf0] bg-cover bg-center bg-no-repeat"
+                className="mm-panel flex min-h-[18.5rem] flex-col rounded-lg border border-blue-50 bg-[#fffaf0] bg-cover bg-center bg-no-repeat"
                 style={{
                   backgroundImage:
                     "url('/branding/mohyla-quote-architecture-v2.png')",
@@ -302,16 +302,18 @@ export default async function AppPage({ searchParams }: PageProps) {
                 <p className="mt-1 font-serif text-[1.375rem] font-semibold italic leading-[1.08] text-blue-950">
                   Great things happen when Mohylians find each other.
                 </p>
-                <div className="mt-4 h-px w-12 bg-blue-300" />
-                <p className="mt-4 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-blue-500">
-                  Community
-                  <br />
-                  Ideas
-                  <br />
-                  People
-                  <br />
-                  Impact
-                </p>
+                <div className="mt-auto pt-4">
+                  <div className="h-px w-12 bg-blue-300" />
+                  <p className="mt-4 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-blue-500">
+                    Community
+                    <br />
+                    Ideas
+                    <br />
+                    People
+                    <br />
+                    Impact
+                  </p>
+                </div>
               </section>
             </aside>
           </div>
