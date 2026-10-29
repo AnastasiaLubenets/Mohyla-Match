@@ -251,7 +251,7 @@ export default async function AppPage({ searchParams }: PageProps) {
             searchQuery={filters.searchQuery}
           />
           <div className="mm-app-content mm-workspace-grid grid xl:min-h-0 xl:flex-1 xl:grid-rows-[minmax(0,1fr)] xl:overflow-hidden">
-            <section className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto">
+            <section className="scrollbar-hidden relative min-w-0 xl:min-h-0 xl:overflow-y-auto">
               <Hero />
               <DiscoveryViewTabs currentView={view} params={params} />
               {view === "all" ? (
