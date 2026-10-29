@@ -335,6 +335,11 @@ test("discover filters use searchable multi-selects and full taxonomy loader", (
   );
   assert.match(
     appPageSource,
+    /<section className="[^"]*scrollbar-hidden[^"]*relative[^"]*xl:overflow-y-auto/,
+    "The student list scroll container should contain absolute card descendants so they cannot expand the document root",
+  );
+  assert.match(
+    appPageSource,
     /<aside className="[^"]*xl:max-h-full[^"]*xl:self-start/,
     "The filter rail should stay content-sized until it reaches the available height",
   );
