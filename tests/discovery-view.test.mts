@@ -328,6 +328,21 @@ test("discover filters use searchable multi-selects and full taxonomy loader", (
     /<aside className="[^"]*xl:overflow-y-auto/,
     "The desktop filter rail should scroll instead of clipping lower dropdowns",
   );
+  assert.match(
+    appPageSource,
+    /mm-workspace-grid grid[^"]*xl:grid-rows-\[minmax\(0,1fr\)\]/,
+    "The desktop workspace should constrain its row to the available height",
+  );
+  assert.match(
+    appPageSource,
+    /<aside className="[^"]*xl:max-h-full[^"]*xl:self-start/,
+    "The filter rail should stay content-sized until it reaches the available height",
+  );
+  assert.doesNotMatch(
+    appPageSource,
+    /<aside className="[^"]*xl:h-full/,
+    "The filter rail should not force the workspace to a full-height rail",
+  );
   assert.doesNotMatch(
     appPageSource,
     /<aside className="[^"]*xl:overflow-hidden/,
