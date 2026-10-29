@@ -122,6 +122,16 @@ test("signup and login forms render inside contained auth cards", () => {
   assert.match(loginPage, /backdrop-blur/);
 });
 
+test("login centers its full content group below the public header", () => {
+  const shell = source("src/components/auth/auth-page-shell.tsx");
+
+  assert.match(shell, /active === "login"/);
+  assert.match(shell, /lg:items-center lg:py-6/);
+  assert.match(shell, /lg:items-start lg:pt-6 xl:pt-7/);
+  assert.match(shell, /min-h-\[calc\(100dvh-4\.5rem\)\]/);
+  assert.doesNotMatch(shell, /translateY|translate-y|lg:mt-/);
+});
+
 test("auth shell uses one full-bleed watercolor background without a solid left panel", () => {
   const shell = source("src/components/auth/auth-page-shell.tsx");
   const header = source("src/components/public/public-header.tsx");
@@ -135,7 +145,7 @@ test("auth shell uses one full-bleed watercolor background without a solid left 
   assert.match(header, /max-w-\[1350px\]/);
   assert.match(header, /lg:px-9 xl:px-12/);
   assert.match(shell, /lg:items-start/);
-  assert.doesNotMatch(shell, /lg:items-center/);
+  assert.match(shell, /lg:items-center/);
   assert.match(shell, /max-w-\[32\.25rem\]/);
   assert.match(shell, /public-auth-shell relative min-h-screen overflow-x-hidden bg-transparent/);
   assert.doesNotMatch(shell, /bg-\[#f8fbff\]/);
