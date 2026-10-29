@@ -37,6 +37,10 @@ export function AuthPageShell({
   const benefitsClassName = benefitsDividers
     ? "public-auth-inline-benefits mt-5 grid gap-2.5 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-[#dce7f7]"
     : "public-auth-inline-benefits mt-5 grid gap-2.5 sm:grid-cols-3 lg:gap-3.5";
+  const contentAlignmentClassName =
+    active === "login"
+      ? "lg:items-center lg:py-6"
+      : "lg:items-start lg:pt-6 xl:pt-7";
 
   return (
     <main className={shellClassName}>
@@ -48,7 +52,9 @@ export function AuthPageShell({
         sizes="100vw"
       />
       <PublicHeader active={active} />
-      <section className="relative grid min-h-[calc(100vh-4.5rem)] w-full gap-6 px-5 pb-8 pt-6 sm:px-8 lg:min-h-[calc(100dvh-4.5rem)] lg:grid-cols-[minmax(0,32.25rem)_1fr] lg:items-start lg:px-[7vw] lg:pt-6 xl:pt-7">
+      <section
+        className={`relative grid min-h-[calc(100vh-4.5rem)] w-full gap-6 px-5 pb-8 pt-6 sm:px-8 lg:min-h-[calc(100dvh-4.5rem)] lg:grid-cols-[minmax(0,32.25rem)_1fr] lg:px-[7vw] ${contentAlignmentClassName}`}
+      >
         <div className="relative z-10 min-w-0 max-w-[32.25rem]">
           <PublicBadge icon={badgeIcon}>Student collaboration network</PublicBadge>
           <h1 className="relative mt-5 max-w-3xl font-serif text-[2.625rem] font-bold leading-[0.98] tracking-normal text-[#070d35] sm:text-[3.25rem] lg:text-[3.75rem]">
