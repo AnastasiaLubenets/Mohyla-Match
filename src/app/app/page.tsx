@@ -250,7 +250,7 @@ export default async function AppPage({ searchParams }: PageProps) {
             searchPlaceholder="Search students, skills or interests..."
             searchQuery={filters.searchQuery}
           />
-          <div className="mm-app-content mm-workspace-grid grid xl:min-h-0 xl:flex-1 xl:overflow-hidden">
+          <div className="mm-app-content mm-workspace-grid grid xl:min-h-0 xl:flex-1 xl:grid-rows-[minmax(0,1fr)] xl:overflow-hidden">
             <section className="scrollbar-hidden min-w-0 xl:min-h-0 xl:overflow-y-auto">
               <Hero />
               <DiscoveryViewTabs currentView={view} params={params} />
@@ -280,7 +280,7 @@ export default async function AppPage({ searchParams }: PageProps) {
               )}
             </section>
 
-            <aside className="scrollbar-hidden space-y-3 xl:h-full xl:min-h-0 xl:overflow-y-auto xl:pb-4">
+            <aside className="scrollbar-hidden space-y-3 xl:max-h-full xl:min-h-0 xl:self-start xl:overflow-y-auto xl:pb-4">
               <DiscoveryFilterPanel
                 filters={filters}
                 options={options}
