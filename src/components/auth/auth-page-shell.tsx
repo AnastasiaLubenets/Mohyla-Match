@@ -39,7 +39,7 @@ export function AuthPageShell({
     : "public-auth-inline-benefits mt-5 grid gap-2.5 sm:grid-cols-3 lg:gap-3.5";
   const contentAlignmentClassName =
     active === "login"
-      ? "lg:items-center lg:py-6"
+      ? "lg:items-center lg:pb-20 lg:pt-6"
       : "lg:items-start lg:pt-6 xl:pt-7";
 
   return (

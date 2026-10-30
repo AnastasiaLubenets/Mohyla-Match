@@ -126,7 +126,7 @@ test("login centers its full content group below the public header", () => {
   const shell = source("src/components/auth/auth-page-shell.tsx");
 
   assert.match(shell, /active === "login"/);
-  assert.match(shell, /lg:items-center lg:py-6/);
+  assert.match(shell, /lg:items-center lg:pb-20 lg:pt-6/);
   assert.match(shell, /lg:items-start lg:pt-6 xl:pt-7/);
   assert.match(shell, /min-h-\[calc\(100dvh-4\.5rem\)\]/);
   assert.doesNotMatch(shell, /translateY|translate-y|lg:mt-/);
