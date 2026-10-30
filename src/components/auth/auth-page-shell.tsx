@@ -57,11 +57,11 @@ export function AuthPageShell({
       >
         <div className="relative z-10 min-w-0 max-w-[32.25rem]">
           <PublicBadge icon={badgeIcon}>Student collaboration network</PublicBadge>
-          <h1 className="relative mt-5 max-w-3xl font-serif text-[2.625rem] font-bold leading-[0.98] tracking-normal text-[#070d35] sm:text-[3.25rem] lg:text-[3.75rem]">
+          <h1 className="mm-auth-title relative mt-5 max-w-3xl font-serif font-bold leading-[0.98] tracking-normal text-[#070d35]">
             {title}
             <PublicUnderline className="w-[min(100%,28rem)]" />
           </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-5 text-[#56637f] sm:text-[0.9375rem] sm:leading-6">
+          <p className="mm-body-text mt-4 max-w-2xl text-[#56637f]">
             {subtitle}
           </p>
           {children}

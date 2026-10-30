@@ -64,14 +64,14 @@ function EditorTopBar({
       <div className="mx-auto flex max-w-[72rem] flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-6">
           <Link
-            className="font-serif text-[1.375rem] font-bold leading-none text-blue-950"
+            className="mm-filter-title font-serif font-bold text-blue-950"
             href="/app"
           >
             Mohyla Match
           </Link>
           <nav
             aria-label="Primary"
-            className="hidden items-center gap-5 text-[0.8125rem] font-semibold text-blue-900 lg:flex"
+            className="mm-filter-label hidden items-center gap-5 font-semibold text-blue-900 lg:flex"
           >
             <Link className="transition hover:text-blue-950" href="/app">
               Discover
@@ -94,7 +94,7 @@ function EditorTopBar({
               <SearchIcon />
             </span>
             <input
-              className="h-10 w-full rounded-md border border-blue-100 bg-blue-50/80 pl-10 pr-4 text-[0.8125rem] font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
+              className="mm-input-text h-10 w-full rounded-md border border-blue-100 bg-blue-50/80 pl-10 pr-4 font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
               id="profile-edit-search"
               name="q"
               placeholder="Search students, skills or interests..."
@@ -117,7 +117,7 @@ function EditorTopBar({
               systemAvatarKey={systemAvatarKey}
             />
             <span className="text-left">
-              <span className="block text-[0.8125rem] font-semibold">{fullName}</span>
+              <span className="mm-body-text block font-semibold">{fullName}</span>
               <span className="block text-xs text-slate-500">My profile</span>
             </span>
           </Link>
@@ -143,10 +143,10 @@ export default async function EditProfilePage({ searchParams }: PageProps) {
           <Link href="/profile" className="text-sm font-semibold text-blue-700">
             Mohyla Match
           </Link>
-          <h1 className="mt-8 font-serif text-4xl font-semibold">
+          <h1 className="mm-empty-title mt-8 font-serif font-semibold">
             Editor unavailable
           </h1>
-          <p className="mt-3 leading-7 text-blue-900/70">
+          <p className="mm-body-text mt-3 text-blue-900/70">
             We could not load profile editing data. Try again in a moment.
           </p>
         </section>

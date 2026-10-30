@@ -16,7 +16,7 @@ function ValueRow({
       <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">
         {label}
       </dt>
-      <dd className="mt-1 text-base font-medium">{value || "Not specified"}</dd>
+      <dd className="mm-body-text mt-1 font-medium">{value || "Not specified"}</dd>
     </div>
   );
 }
@@ -55,7 +55,7 @@ function ProfileSection({
 }>) {
   return (
     <section className="border-t border-border pt-4">
-      <h2 className="text-base font-semibold">{title}</h2>
+      <h2 className="mm-section-title font-semibold">{title}</h2>
       <div className="mt-3">{children}</div>
     </section>
   );
@@ -87,10 +87,10 @@ export function ProfileDetails({
             <p className="text-sm font-semibold uppercase tracking-[0.08em] text-primary">
               Student profile
             </p>
-            <h1 className="mt-1.5 text-[1.75rem] font-semibold leading-tight">
+            <h1 className="mm-profile-name mt-1.5 font-semibold">
               {profile.fullName}
             </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+            <p className="mt-2 max-w-2xl text-sm leading-5 text-muted">
               {profile.bio || "No bio yet."}
             </p>
           </div>

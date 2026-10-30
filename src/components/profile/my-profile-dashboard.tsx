@@ -380,14 +380,14 @@ function DashboardCard({
   return (
     <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
       <div className="flex items-start justify-between gap-4">
-        <h2 className="inline-flex items-center gap-2.5 font-serif text-xl font-semibold text-blue-950">
+        <h2 className="mm-section-title inline-flex items-center gap-2.5 font-serif font-semibold text-blue-950">
           <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
             {icon}
           </span>
           {title}
         </h2>
         <button
-          className="text-[0.8125rem] font-bold text-blue-700 transition hover:text-blue-950 disabled:cursor-not-allowed disabled:text-blue-300"
+          className="mm-filter-label font-bold text-blue-700 transition hover:text-blue-950 disabled:cursor-not-allowed disabled:text-blue-300"
           disabled={otherSectionActive}
           onClick={() => onEdit(section)}
           type="button"
@@ -429,7 +429,7 @@ function InlineActionButtons({
   return (
     <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
       <button
-        className="inline-flex h-10 items-center justify-center rounded-md border border-blue-200 px-5 text-[0.8125rem] font-bold text-blue-800 transition hover:border-blue-300 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mm-filter-label inline-flex h-10 items-center justify-center rounded-md border border-blue-200 px-5 font-bold text-blue-800 transition hover:border-blue-300 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-60"
         disabled={isSaving}
         onClick={onCancel}
         type="button"
@@ -437,7 +437,7 @@ function InlineActionButtons({
         Cancel
       </button>
       <button
-        className="inline-flex h-10 items-center justify-center rounded-md bg-blue-800 px-5 text-[0.8125rem] font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mm-filter-label inline-flex h-10 items-center justify-center rounded-md bg-blue-800 px-5 font-bold text-white shadow-sm transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-60"
         disabled={isSaving}
         onClick={onSave}
         type="button"
@@ -456,7 +456,7 @@ export function ProfileCompletenessCard({
 
   return (
     <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
-      <h2 className="font-serif text-xl font-semibold text-blue-950">
+      <h2 className="mm-section-title font-serif font-semibold text-blue-950">
         Profile completeness
       </h2>
       <div className="mt-3 flex items-center gap-3">
@@ -467,7 +467,7 @@ export function ProfileCompletenessCard({
             background: `conic-gradient(#1d66d2 ${completion}%, #dbeafe ${completion}% 100%)`,
           }}
         >
-          <div className="grid h-11 w-11 place-items-center rounded-full bg-white text-base font-bold text-blue-800">
+          <div className="grid h-11 w-11 place-items-center rounded-full bg-white text-sm font-bold text-blue-800">
             {completion}%
           </div>
         </div>
@@ -512,7 +512,7 @@ export function MyAccountCard({
 }>) {
   return (
     <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
-      <h2 className="font-serif text-xl font-semibold text-blue-950">
+      <h2 className="mm-section-title font-serif font-semibold text-blue-950">
         My account
       </h2>
       <ul className="mt-3 space-y-2.5">
@@ -579,7 +579,7 @@ function FacultyProfileDashboard({
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
               Faculty profile
             </p>
-            <h2 className="mt-2 font-serif text-[1.75rem] font-semibold leading-none text-blue-950">
+            <h2 className="mm-profile-name mt-2 font-serif font-semibold text-blue-950">
               {profile.fullName}
             </h2>
             <p className="mt-2 text-sm font-semibold text-blue-800">
@@ -593,7 +593,7 @@ function FacultyProfileDashboard({
                 {profile.availability}
               </p>
             ) : null}
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-900/80">
+            <p className="mt-3 max-w-2xl text-sm leading-5 text-blue-900/80">
               {profile.bio || "No bio yet."}
             </p>
           </div>
@@ -616,7 +616,7 @@ function FacultyProfileDashboard({
 
       <div className="grid gap-3 lg:grid-cols-2">
         <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
-          <h2 className="inline-flex items-center gap-2.5 font-serif text-xl font-semibold text-blue-950">
+          <h2 className="mm-section-title inline-flex items-center gap-2.5 font-serif font-semibold text-blue-950">
             <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
               <GraduationIcon />
             </span>
@@ -631,7 +631,7 @@ function FacultyProfileDashboard({
         </section>
 
         <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
-          <h2 className="inline-flex items-center gap-2.5 font-serif text-xl font-semibold text-blue-950">
+          <h2 className="mm-section-title inline-flex items-center gap-2.5 font-serif font-semibold text-blue-950">
             <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
               <BarsIcon />
             </span>
@@ -646,7 +646,7 @@ function FacultyProfileDashboard({
         </section>
 
         <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
-          <h2 className="inline-flex items-center gap-2.5 font-serif text-xl font-semibold text-blue-950">
+          <h2 className="mm-section-title inline-flex items-center gap-2.5 font-serif font-semibold text-blue-950">
             <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
               <SparkIcon />
             </span>
@@ -661,7 +661,7 @@ function FacultyProfileDashboard({
         </section>
 
         <section className="mm-panel rounded-[1.125rem] border border-blue-100 bg-white">
-          <h2 className="inline-flex items-center gap-2.5 font-serif text-xl font-semibold text-blue-950">
+          <h2 className="mm-section-title inline-flex items-center gap-2.5 font-serif font-semibold text-blue-950">
             <span className="inline-flex h-7 w-7 items-center justify-center text-blue-800">
               <CalendarIcon />
             </span>
@@ -838,7 +838,7 @@ function StudentProfileDashboard({
           />
 
           <div className="min-w-0">
-            <h2 className="font-serif text-[1.75rem] font-semibold leading-none text-blue-950">
+            <h2 className="mm-profile-name font-serif font-semibold text-blue-950">
               {profile.fullName}
             </h2>
             <p className="mt-2 text-sm font-semibold text-blue-800">
@@ -858,7 +858,7 @@ function StudentProfileDashboard({
                 <SocialLinksList compact links={profile.socialLinks} />
               </div>
             ) : null}
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-900/80">
+            <p className="mt-3 max-w-2xl text-sm leading-5 text-blue-900/80">
               {state.bio || "No bio yet."}
             </p>
             {heroChips.length > 0 ? (
@@ -906,7 +906,7 @@ function StudentProfileDashboard({
                 About me
               </label>
               <textarea
-                className="min-h-28 w-full resize-y rounded-md border border-blue-200 bg-white px-4 py-3 text-sm font-medium leading-6 text-blue-950 outline-none transition focus:border-blue-400 disabled:cursor-not-allowed disabled:bg-blue-50"
+                className="mm-input-text min-h-28 w-full resize-y rounded-md border border-blue-200 bg-white px-4 py-3 font-medium text-blue-950 outline-none transition focus:border-blue-400 disabled:cursor-not-allowed disabled:bg-blue-50"
                 disabled={isSaving}
                 id="inline-bio"
                 maxLength={500}
@@ -923,7 +923,7 @@ function StudentProfileDashboard({
               />
             </div>
           ) : (
-            <p className="leading-7 text-blue-900/80">
+            <p className="mm-body-text text-blue-900/80">
               {state.bio ||
                 "Add a bio so other students understand what you want to build."}
             </p>

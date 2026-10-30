@@ -225,7 +225,7 @@ export function AppSidebar({ active }: Readonly<{ active: NavKey }>) {
         </div>
         <form action="/auth/logout" className="px-2.5" method="post">
           <button
-            className="text-[0.8125rem] font-semibold text-slate-500 transition hover:text-blue-900"
+            className="mm-filter-label font-semibold text-slate-500 transition hover:text-blue-900"
             type="submit"
           >
             Log out
@@ -250,7 +250,7 @@ function AppTopBar({
             <SearchIcon />
           </span>
           <input
-            className="h-10 w-full rounded-lg border border-blue-100 bg-blue-50/80 pl-10 pr-4 text-[0.8125rem] font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
+            className="mm-input-text h-10 w-full rounded-lg border border-blue-100 bg-blue-50/80 pl-10 pr-4 font-medium text-blue-950 outline-none transition placeholder:text-blue-400 focus:border-blue-300 focus:bg-white"
             id="global-search"
             name="q"
             placeholder="Search students, skills or interests..."
@@ -280,7 +280,7 @@ function AppTopBar({
               />
             ) : null}
             <span className="text-left">
-              <span className="block text-[0.8125rem] font-semibold">
+              <span className="mm-body-text block font-semibold">
                 {currentProfile?.fullName ?? "My profile"}
               </span>
               <span className="block text-xs text-slate-500">My profile</span>
@@ -335,7 +335,7 @@ export function BrandQuoteCard({
       <p className="font-serif text-4xl font-bold leading-none text-blue-800">
         &quot;
       </p>
-      <p className="mt-1 font-serif text-[1.375rem] font-semibold italic leading-[1.08] text-blue-950">
+      <p className="mm-filter-title mt-1 font-serif font-semibold italic text-blue-950">
         {text}
       </p>
       <div className="mt-4 h-px w-12 bg-blue-300" />

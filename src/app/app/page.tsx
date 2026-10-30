@@ -299,7 +299,7 @@ export default async function AppPage({ searchParams }: PageProps) {
                 <p className="font-serif text-4xl font-bold leading-none text-blue-800">
                   &quot;
                 </p>
-                <p className="mt-1 font-serif text-[1.375rem] font-semibold italic leading-[1.08] text-blue-950">
+                <p className="mm-filter-title mt-1 font-serif font-semibold italic text-blue-950">
                   Great things happen when Mohylians find each other.
                 </p>
                 <div className="mt-auto pt-4">

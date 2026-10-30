@@ -13,11 +13,11 @@ export function PublicHeader({ active = "landing" }: PublicHeaderProps) {
       <div className={headerLayoutClassName}>
         <Link
           href="/"
-          className="text-[0.82rem] font-bold uppercase tracking-[0.14em] text-[#173f95] transition hover:text-[#101b55] sm:text-sm"
+          className="mm-filter-label font-bold uppercase tracking-[0.14em] text-[#173f95] transition hover:text-[#101b55]"
         >
           Mohyla Match
         </Link>
-        <nav className="flex items-center gap-3.5 text-[0.8125rem] font-bold text-[#070d35] sm:gap-4">
+        <nav className="mm-filter-label flex items-center gap-3.5 font-bold text-[#070d35] sm:gap-4">
           <Link
             href="/login"
             className={`relative rounded-sm transition after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-0.5 after:rounded-full hover:text-[#3154b8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3154b8] ${

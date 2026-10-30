@@ -32,13 +32,13 @@ export function ProfileSafetyMenu({
   return (
     <div className="relative">
       <details className="group">
-        <summary className="inline-flex h-10 cursor-pointer list-none items-center gap-2 rounded-md border border-blue-100 bg-white px-3 text-sm font-bold text-blue-800 transition hover:border-blue-300 hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
+        <summary className="mm-filter-label inline-flex h-10 cursor-pointer list-none items-center gap-2 rounded-md border border-blue-100 bg-white px-3 font-bold text-blue-800 transition hover:border-blue-300 hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
           <MoreIcon />
           More
         </summary>
         <div className="absolute right-0 z-20 mt-2 w-[min(22rem,86vw)] rounded-lg border border-blue-100 bg-white p-4 shadow-xl">
           <details>
-            <summary className="inline-flex h-10 w-full cursor-pointer list-none items-center justify-center rounded-md border border-blue-100 px-4 text-sm font-bold text-blue-800 transition hover:bg-blue-50">
+            <summary className="mm-filter-label inline-flex h-10 w-full cursor-pointer list-none items-center justify-center rounded-md border border-blue-100 px-4 font-bold text-blue-800 transition hover:bg-blue-50">
               Report user
             </summary>
             <form
@@ -49,9 +49,9 @@ export function ProfileSafetyMenu({
               <input name="targetUserId" type="hidden" value={targetUserId} />
               <input name="returnTo" type="hidden" value={returnTo} />
               <label className="block">
-                <span className="text-sm font-bold text-blue-900">Reason</span>
+                <span className="mm-filter-label font-bold text-blue-900">Reason</span>
                 <select
-                  className="mt-2 h-10 w-full rounded-md border border-blue-200 bg-white px-3 text-sm outline-none transition focus:border-blue-400"
+                  className="mm-input-text mt-2 h-10 w-full rounded-md border border-blue-200 bg-white px-3 outline-none transition focus:border-blue-400"
                   name="reasonCode"
                   required
                 >
@@ -63,15 +63,15 @@ export function ProfileSafetyMenu({
                 </select>
               </label>
               <label className="block">
-                <span className="text-sm font-bold text-blue-900">Details</span>
+                <span className="mm-filter-label font-bold text-blue-900">Details</span>
                 <textarea
-                  className="mt-2 min-h-20 w-full resize-y rounded-md border border-blue-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-blue-400"
+                  className="mm-input-text mt-2 min-h-20 w-full resize-y rounded-md border border-blue-200 bg-white px-3 py-2 outline-none transition focus:border-blue-400"
                   maxLength={2000}
                   name="details"
                 />
               </label>
               <AuthSubmitButton
-                className="inline-flex h-10 w-full items-center justify-center rounded-md bg-blue-800 px-4 text-sm font-bold text-white transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
+                className="mm-filter-label inline-flex h-10 w-full items-center justify-center rounded-md bg-blue-800 px-4 font-bold text-white transition hover:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-70"
                 pendingLabel="Submitting..."
               >
                 Submit report

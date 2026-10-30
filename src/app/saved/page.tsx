@@ -64,10 +64,10 @@ function SavedSummaryCard({ count }: Readonly<{ count: number }>) {
       <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-800">
         <BookmarkIcon />
       </div>
-      <h2 className="mt-4 font-serif text-xl font-semibold text-blue-950">
+      <h2 className="mm-section-title mt-4 font-serif font-semibold text-blue-950">
         Your saved profiles
       </h2>
-      <p className="mt-3 font-serif text-4xl font-semibold leading-none text-blue-950">
+      <p className="mt-3 font-serif text-[2rem] font-semibold leading-none text-blue-950">
         {count}
       </p>
       <p className="mt-2 max-w-64 text-sm leading-5 text-blue-800/75">
@@ -81,10 +81,10 @@ function SavedSummaryCard({ count }: Readonly<{ count: number }>) {
 function EmptySavedState() {
   return (
     <section className="mm-panel rounded-lg border border-blue-100 bg-white">
-      <h2 className="font-serif text-3xl font-semibold text-blue-950">
+      <h2 className="mm-empty-title font-serif font-semibold text-blue-950">
         No saved profiles yet
       </h2>
-      <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-900/75">
+      <p className="mt-3 max-w-2xl text-sm leading-5 text-blue-900/75">
         Save people you would like to come back to or collaborate with later.
       </p>
       <Link
@@ -124,10 +124,10 @@ export default async function SavedPage({ searchParams }: PageProps) {
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-blue-700">
               Saved
             </p>
-            <h1 className="mt-4 font-serif text-4xl font-semibold text-blue-950">
+            <h1 className="mm-empty-title mt-4 font-serif font-semibold text-blue-950">
               Saved profiles unavailable
             </h1>
-            <p className="mt-3 leading-7 text-slate-600">
+            <p className="mm-body-text mt-3 text-slate-600">
               We could not load your saved profiles. Try again in a moment.
             </p>
           </div>

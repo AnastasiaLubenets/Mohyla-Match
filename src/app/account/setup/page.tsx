@@ -147,10 +147,10 @@ function RoleSelection({ error }: Readonly<{ error?: string }>) {
                 type="radio"
                 value={role.value}
               />
-              <span className="font-serif text-[1.375rem] font-bold text-[#07133f]">
+              <span className="mm-card-title font-serif font-bold text-[#07133f]">
                 {role.label}
               </span>
-              <span className="mt-1.5 text-[0.8125rem] leading-5 text-[#66769e]">
+              <span className="mm-body-text mt-1.5 text-[#66769e]">
                 {role.description}
               </span>
             </label>
@@ -290,7 +290,7 @@ function FacultyResearchStep({
       />
       <div className="flex justify-end">
         <button
-          className="text-[0.8125rem] font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
+          className="mm-filter-label font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
           name="skip"
           type="submit"
           value="true"
@@ -319,7 +319,7 @@ function FacultyPreviewStep({
         <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#245ba2]">
           Preview
         </p>
-        <h2 className="mt-2 font-serif text-[1.375rem] font-bold text-[#07133f]">
+        <h2 className="mm-card-title mt-2 font-serif font-bold text-[#07133f]">
           {profile?.full_name ?? "Faculty profile"}
         </h2>
         <dl className="mt-4 grid gap-3 text-sm text-[#66769e] sm:grid-cols-3">
@@ -403,7 +403,7 @@ function BuildStep({
       </FormNavigation>
       <div className="flex justify-end">
         <button
-          className="text-[0.8125rem] font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
+          className="mm-filter-label font-bold text-[#55688f] transition hover:text-[#102653] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245ba2]"
           name="skip"
           type="submit"
           value="true"
@@ -542,8 +542,8 @@ export default async function AccountSetupPage({ searchParams }: PageProps) {
           <Link href="/" className="text-sm font-semibold text-primary">
             Mohyla Match
           </Link>
-          <h1 className="mt-8 text-3xl font-semibold">Setup unavailable</h1>
-          <p className="mt-3 leading-7 text-muted">
+          <h1 className="mm-empty-title mt-8 font-semibold">Setup unavailable</h1>
+          <p className="mm-body-text mt-3 text-muted">
             We could not load the setup data. Try again in a moment.
           </p>
         </section>

@@ -17,8 +17,8 @@ export default async function AccountSuspendedPage() {
         <Link href="/" className="text-sm font-semibold text-primary">
           Mohyla Match
         </Link>
-        <h1 className="mt-8 text-3xl font-semibold">Account suspended</h1>
-        <p className="mt-3 leading-7 text-muted">
+        <h1 className="mm-empty-title mt-8 font-semibold">Account suspended</h1>
+        <p className="mm-body-text mt-3 text-muted">
           Access to Mohyla Match is paused for this account.
         </p>
         <form action="/auth/logout" className="mt-8" method="post">
